@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 
-type Role = "paciente" | "terapeuta";
+type Role = "paciente" | "terapeuta" | "ambos";
 
 export default function VincularTerapeutaPage() {
   const router = useRouter();
@@ -43,10 +43,10 @@ export default function VincularTerapeutaPage() {
 
       const role = String(perfil.role || "").trim() as Role;
 
-      if (role !== "paciente") {
+      if (role !== "paciente" && role !== "ambos") {
         router.replace("/clinico/painel");
         return;
-      }
+      } 
 
       setNomeUsuario(perfil.name || "");
       setCarregandoAcesso(false);
@@ -80,17 +80,28 @@ export default function VincularTerapeutaPage() {
       });
 
       if (error) {
+        console.error("ERRO AO VINCULAR TERAPEUTA:", error);
+      
         if (error.message.includes("therapist_not_found")) {
           setErro("Não encontramos um terapeuta cadastrado com esse e-mail.");
           return;
         }
-
+      
         if (error.message.includes("cannot_link_to_self")) {
           setErro("Você não pode vincular sua própria conta como terapeuta.");
           return;
         }
-
-        setErro("Não foi possível vincular este terapeuta.");
+      
+        if (error.message.includes("only_patient_can_link")) {
+          setErro("Esta conta não tem permissão para vincular terapeuta.");
+          return;
+        }
+      
+        setErro(
+          `Não foi possível vincular este terapeuta. Erro: ${
+            error.message || "erro desconhecido"
+          }`
+        );
         return;
       }
 

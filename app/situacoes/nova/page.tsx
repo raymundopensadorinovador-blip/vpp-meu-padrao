@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 
-type Role = "paciente" | "terapeuta";
+type Role = "paciente" | "terapeuta" | "ambos";
 
 const areas = [
   "Família",
@@ -78,7 +78,7 @@ export default function NovaSituacaoPage() {
 
       const role = String(perfil.role || "").trim() as Role;
 
-      if (role !== "paciente") {
+      if (role !== "paciente" && role !== "ambos") {
         router.replace("/clinico/painel");
         return;
       }

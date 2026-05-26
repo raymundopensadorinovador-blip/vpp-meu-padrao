@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "@/lib/supabase";
 
-type Role = "paciente" | "terapeuta";
+type Role = "paciente" | "terapeuta" | "ambos";
 
 type PacienteDetalhe = {
   patient_id: string;
@@ -191,10 +191,10 @@ const [sucessoNota, setSucessoNota] = useState("");
 
       const role = String(perfil.role || "").trim() as Role;
 
-      if (role !== "terapeuta") {
-        router.replace("/painel");
-        return;
-      }
+      if (role !== "terapeuta" && role !== "ambos") {
+  router.replace("/painel");
+  return;
+}
 
       const { data: detalhe, error: erroDetalhe } = await supabase.rpc(
         "get_linked_patient_details",

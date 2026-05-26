@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 
-type Role = "paciente" | "terapeuta";
+type Role = "paciente" | "terapeuta" | "ambos";
 
 export default function ClinicoSobrePage() {
   const router = useRouter();
@@ -36,10 +36,10 @@ export default function ClinicoSobrePage() {
 
       const role = String(perfil.role || "").trim() as Role;
 
-      if (role !== "terapeuta") {
-        router.replace("/painel");
-        return;
-      }
+      if (role !== "terapeuta" && role !== "ambos") {
+  router.replace("/painel");
+  return;
+}
 
       setCarregando(false);
     }

@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 
-type Role = "paciente" | "terapeuta";
+type Role = "paciente" | "terapeuta" | "ambos";
 
 type Encaminhamento = {
   id: string;
@@ -73,10 +73,10 @@ export default function DetalheEncaminhamentoPage() {
 
       const role = String(perfil.role || "").trim() as Role;
 
-      if (role !== "terapeuta") {
-        router.replace("/painel");
-        return;
-      }
+      if (role !== "terapeuta" && role !== "ambos") {
+  router.replace("/painel");
+  return;
+}
 
       const { data: vinculo } = await supabase
         .from("therapist_patient_links")

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabase";
 
-type Role = "paciente" | "terapeuta";
+type Role = "paciente" | "terapeuta" | "ambos";
 
 type PacienteVinculado = {
   patient_id: string;
@@ -21,9 +21,11 @@ export default function ClinicoPainelPage() {
   const router = useRouter();
 
   const [carregando, setCarregando] = useState(true);
-  const [nomeUsuario, setNomeUsuario] = useState("");
-  const [pacientes, setPacientes] = useState<PacienteVinculado[]>([]);
-  const [erro, setErro] = useState("");
+const [nomeUsuario, setNomeUsuario] = useState("");
+const [roleUsuario, setRoleUsuario] = useState<Role | null>(null);
+const [ativandoModoPaciente, setAtivandoModoPaciente] = useState(false);
+const [pacientes, setPacientes] = useState<PacienteVinculado[]>([]);
+const [erro, setErro] = useState("");
 
   useEffect(() => {
     async function verificarAcesso() {
@@ -49,22 +51,30 @@ export default function ClinicoPainelPage() {
 
       const role = String(perfil.role || "").trim() as Role;
 
-      if (role !== "terapeuta") {
+      if (role !== "terapeuta" && role !== "ambos") {
         router.replace("/painel");
         return;
       }
-
-      setNomeUsuario(perfil.name || "");
+      
+      setRoleUsuario(role);
+      setNomeUsuario(perfil.name || "");  
 
       const { data: pacientesVinculados, error: erroPacientes } =
         await supabase.rpc("get_linked_patients_for_therapist");
 
-      if (erroPacientes) {
-        setErro("Não foi possível carregar os pacientes vinculados.");
-        setPacientes([]);
-        setCarregando(false);
-        return;
-      }
+        if (erroPacientes) {
+          console.error("ERRO AO BUSCAR PACIENTES VINCULADOS:", erroPacientes);
+        
+          setErro(
+            `Não foi possível carregar os pacientes vinculados. Erro: ${
+              erroPacientes.message || "erro desconhecido"
+            }`
+          );
+        
+          setPacientes([]);
+          setCarregando(false);
+          return;
+        }
 
       setPacientes((pacientesVinculados || []) as PacienteVinculado[]);
       setCarregando(false);
@@ -72,6 +82,33 @@ export default function ClinicoPainelPage() {
 
     verificarAcesso();
   }, [router]);
+
+  async function handleUsarComoPaciente() {
+    setErro("");
+  
+    if (roleUsuario === "ambos") {
+      router.push("/painel");
+      return;
+    }
+  
+    setAtivandoModoPaciente(true);
+  
+    try {
+      const { error } = await supabase.rpc(
+        "enable_patient_mode_for_current_user"
+      );
+  
+      if (error) {
+        setErro("Não foi possível ativar o modo paciente para esta conta.");
+        return;
+      }
+  
+      setRoleUsuario("ambos");
+      router.push("/painel");
+    } finally {
+      setAtivandoModoPaciente(false);
+    }
+  }
 
   async function handleSair() {
     await supabase.auth.signOut();
@@ -155,7 +192,14 @@ export default function ClinicoPainelPage() {
               >
                 Meu perfil
               </Link>
-
+              <button
+  type="button"
+  onClick={handleUsarComoPaciente}
+  disabled={ativandoModoPaciente}
+  className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-[#D8C7B1] bg-white px-5 text-sm font-medium text-[#5F564C] shadow-sm transition hover:bg-[#FFF8EE] disabled:cursor-not-allowed disabled:opacity-60 lg:w-auto"
+>
+  {ativandoModoPaciente ? "Ativando..." : "Usar como paciente"}
+</button>
               <Link
                 href="/clinico/perfil-profissional"
                 className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl bg-[#2F2A24] px-5 text-sm font-semibold text-white shadow-sm transition hover:opacity-95 lg:w-auto"

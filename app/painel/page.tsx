@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 
-type Role = "paciente" | "terapeuta";
+type Role = "paciente" | "terapeuta" | "ambos";
 
 type ResumoSituacoes = {
   total: number;
@@ -24,8 +24,9 @@ export default function PainelPage() {
   const router = useRouter();
 
   const [carregando, setCarregando] = useState(true);
-  const [nomeUsuario, setNomeUsuario] = useState("");
-  const [resumoSituacoes, setResumoSituacoes] = useState<ResumoSituacoes>({
+const [nomeUsuario, setNomeUsuario] = useState("");
+const [roleUsuario, setRoleUsuario] = useState<Role | null>(null);
+const [resumoSituacoes, setResumoSituacoes] = useState<ResumoSituacoes>({
     total: 0,
     areaMaisRecorrente: "Ainda sem registros",
     respostaMaisComum: "Ainda sem registros",
@@ -80,12 +81,13 @@ export default function PainelPage() {
 
       const role = String(perfil.role || "").trim() as Role;
 
-      if (role !== "paciente") {
-        router.replace("/clinico/painel");
-        return;
-      }
+if (role !== "paciente" && role !== "ambos") {
+  router.replace("/clinico/painel");
+  return;
+}
 
-      setNomeUsuario(perfil.name || "");
+setRoleUsuario(role);
+setNomeUsuario(perfil.name || "");
 
       const { data: registros } = await supabase
         .from("vpp_situation_records")
@@ -186,7 +188,14 @@ export default function PainelPage() {
               >
                 Meu perfil
               </Link>
-
+              {roleUsuario === "ambos" && (
+  <Link
+    href="/clinico/painel"
+    className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-[#D8C7B1] bg-white px-5 text-sm font-medium text-[#5F564C] shadow-sm transition hover:bg-[#FFF8EE] sm:w-auto"
+  >
+    Ir para área clínica
+  </Link>
+)}
               <Link
                 href="/vincular-terapeuta"
                 className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl bg-[#2F2A24] px-5 text-sm font-semibold text-white shadow-sm transition hover:opacity-95 sm:w-auto"

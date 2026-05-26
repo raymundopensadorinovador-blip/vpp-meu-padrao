@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 
-type Role = "paciente" | "terapeuta";
+type Role = "paciente" | "terapeuta" | "ambos";
 
 type Situacao = {
   id: string;
@@ -56,10 +56,10 @@ export default function DetalheSituacaoPage() {
 
       const role = String(perfil.role || "").trim() as Role;
 
-      if (role !== "paciente") {
+      if (role !== "paciente" && role !== "ambos") {
         router.replace("/clinico/painel");
         return;
-      }
+      } 
 
       const { data: registro, error: erroRegistro } = await supabase
         .from("vpp_situation_records")

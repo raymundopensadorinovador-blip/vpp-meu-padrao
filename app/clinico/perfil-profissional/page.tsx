@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 
-type Role = "paciente" | "terapeuta";
+type Role = "paciente" | "terapeuta" | "ambos";
 
 type PerfilProfissional = {
   id: string;
@@ -59,10 +59,10 @@ export default function PerfilProfissionalPage() {
 
       const role = String(perfilUsuario.role || "").trim() as Role;
 
-      if (role !== "terapeuta") {
-        router.replace("/painel");
-        return;
-      }
+      if (role !== "terapeuta" && role !== "ambos") {
+  router.replace("/painel");
+  return;
+}
 
       setTherapistId(usuarioAtual.user.id);
 
