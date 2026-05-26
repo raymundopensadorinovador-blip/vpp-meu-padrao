@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { supabase } from "@/lib/supabase";
 
 declare global {
   interface Window {
@@ -16,6 +17,36 @@ export default function OneSignalInitializer() {
   const [permitido, setPermitido] = useState(false);
   const [carregando, setCarregando] = useState(false);
   const [mensagem, setMensagem] = useState("");
+  const [dispensado, setDispensado] = useState(false);
+
+  async function salvarInscricaoPush(OneSignal: any) {
+    const { data: usuarioAtual } = await supabase.auth.getUser();
+
+    if (!usuarioAtual.user) {
+      return;
+    }
+
+    if (typeof OneSignal.login === "function") {
+      await OneSignal.login(usuarioAtual.user.id);
+    }
+
+    const subscriptionId = OneSignal.User?.PushSubscription?.id;
+
+    if (!subscriptionId) {
+      return;
+    }
+
+    const { error } = await supabase.rpc("save_push_subscription", {
+      p_subscription_id: subscriptionId,
+      p_permission: Notification.permission,
+      p_user_agent: navigator.userAgent,
+      p_platform: "web",
+    });
+
+    if (error) {
+      console.error("ERRO AO SALVAR INSCRIÇÃO PUSH:", error);
+    }
+  }
 
   useEffect(() => {
     if (iniciou.current) return;
@@ -59,7 +90,12 @@ export default function OneSignalInitializer() {
         allowLocalhostAsSecureOrigin: true,
       });
 
-      setPermitido(Notification.permission === "granted");
+      const permissaoAtual = Notification.permission === "granted";
+      setPermitido(permissaoAtual);
+
+      if (permissaoAtual) {
+        await salvarInscricaoPush(OneSignal);
+      }
     });
   }, []);
 
@@ -80,24 +116,27 @@ export default function OneSignalInitializer() {
         await OneSignal.Notifications.requestPermission();
 
         const permissaoAtual = Notification.permission === "granted";
-
         setPermitido(permissaoAtual);
 
-        if (permissaoAtual) {
-          setMensagem("Notificações ativadas com sucesso.");
+        if (!permissaoAtual) {
+          setMensagem("As notificações não foram permitidas neste navegador.");
           return;
         }
 
-        setMensagem("As notificações não foram permitidas neste navegador.");
+        await new Promise((resolve) => setTimeout(resolve, 1200));
+        await salvarInscricaoPush(OneSignal);
+
+        setMensagem("Notificações ativadas com sucesso.");
       });
-    } catch {
+    } catch (error) {
+      console.error("ERRO AO ATIVAR NOTIFICAÇÕES:", error);
       setMensagem("Não foi possível ativar as notificações agora.");
     } finally {
       setCarregando(false);
     }
   }
 
-  if (!suportado || permitido) {
+  if (!suportado || permitido || dispensado) {
     return null;
   }
 
@@ -128,7 +167,7 @@ export default function OneSignalInitializer() {
 
         <button
           type="button"
-          onClick={() => setSuportado(false)}
+          onClick={() => setDispensado(true)}
           className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-[#D8C7B1] bg-white px-5 text-sm font-medium text-[#5F564C] shadow-sm transition hover:bg-[#FFF8EE]"
         >
           Agora não
