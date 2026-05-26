@@ -157,6 +157,13 @@ const [tipoNota, setTipoNota] =
 const [notaEditandoId, setNotaEditandoId] = useState<string | null>(null);
 const [salvandoNota, setSalvandoNota] = useState(false);
 const [excluindoNotaId, setExcluindoNotaId] = useState<string | null>(null);
+
+const [mostrandoEncerrarVinculo, setMostrandoEncerrarVinculo] =
+  useState(false);
+const [motivoEncerramento, setMotivoEncerramento] = useState("alta");
+const [observacaoEncerramento, setObservacaoEncerramento] = useState("");
+const [encerrandoVinculo, setEncerrandoVinculo] = useState(false);
+
 const [erro, setErro] = useState("");
 const [sucessoNota, setSucessoNota] = useState("");
 
@@ -406,6 +413,38 @@ carregarPaciente();
       setExcluindoNotaId(null);
     }
   }
+
+  async function handleEncerrarVinculo() {
+    if (!paciente) return;
+  
+    setErro("");
+  
+    const confirmar = window.confirm(
+      "Tem certeza que deseja encerrar o vínculo com este paciente? Ele deixará de aparecer na sua lista de pacientes ativos."
+    );
+  
+    if (!confirmar) return;
+  
+    setEncerrandoVinculo(true);
+  
+    try {
+      const { error } = await supabase.rpc("end_patient_therapist_link", {
+        p_patient_id: paciente.patient_id,
+        p_ended_reason: motivoEncerramento,
+        p_ended_note: observacaoEncerramento.trim() || null,
+      });
+  
+      if (error) {
+        setErro("Não foi possível encerrar o vínculo com este paciente.");
+        return;
+      }
+  
+      router.replace("/clinico/painel");
+    } finally {
+      setEncerrandoVinculo(false);
+    }
+  }
+
   function formatarData(data: string | null) {
     if (!data) return "Não realizado";
 
@@ -459,7 +498,7 @@ carregarPaciente();
   className="mt-6 inline-flex min-h-11 w-full items-center justify-center rounded-2xl bg-[#2F2A24] px-5 text-sm font-semibold text-white shadow-sm transition hover:opacity-95"
 >
   Voltar ao painel clínico
-</Link>   
+</Link>     
           </div>
         </section>
       </main>
@@ -469,46 +508,145 @@ carregarPaciente();
   return (
     <main className="min-h-screen bg-[#F7F3EC] px-4 py-6 text-[#2F2A24] sm:px-6 lg:px-8">
       <section className="mx-auto w-full max-w-6xl">
-        <header className="mb-6 rounded-3xl border border-[#E5DDD2] bg-white p-5 shadow-sm sm:p-7">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-            <div className="min-w-0">
-              <p className="mb-2 text-sm font-medium text-[#8A2E2B]">
-                Paciente vinculado
-              </p>
+      <header className="mb-6 rounded-3xl border border-[#E5DDD2] bg-white p-5 shadow-sm sm:p-7">
+  <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+    <div className="min-w-0">
+      <p className="mb-2 text-sm font-medium text-[#8A2E2B]">
+        Paciente vinculado
+      </p>
 
-              <h1 className="text-2xl font-semibold tracking-tight text-[#2F2A24] sm:text-3xl">
-                {paciente.patient_name}
-              </h1>
+      <h1 className="text-2xl font-semibold tracking-tight text-[#2F2A24] sm:text-3xl">
+        {paciente.patient_name}
+      </h1>
 
-              <p className="mt-2 break-words text-sm leading-6 text-[#5F564C]">
-                {paciente.patient_email}
-              </p>
+      <p className="mt-2 break-words text-sm leading-6 text-[#5F564C]">
+        {paciente.patient_email}
+      </p>
 
-              <p className="mt-2 text-xs text-[#8A7A68]">
-                Vinculado em {formatarData(paciente.linked_at)}
-              </p>
-            </div>
+      <p className="mt-2 text-xs text-[#8A7A68]">
+        Vinculado em {formatarData(paciente.linked_at)}
+      </p>
+    </div>
 
-            <div className="flex w-full flex-col gap-3 sm:flex-row lg:w-auto">
-  <Link
-    href={`/clinico/pacientes/${paciente.patient_id}/encaminhamentos/novo`}
-    className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl bg-[#2F2A24] px-5 text-sm font-semibold text-white shadow-sm transition hover:opacity-95 lg:w-auto"
-  >
-    Novo encaminhamento
-  </Link>
+    <div className="flex w-full flex-col gap-3 sm:flex-row lg:w-auto">
+      <button
+        type="button"
+        onClick={() => setMostrandoEncerrarVinculo((valor) => !valor)}
+        className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-[#E8C7C0] bg-white px-5 text-sm font-semibold text-[#9A4A3F] shadow-sm transition hover:bg-red-50 lg:w-auto"
+      >
+        Encerrar vínculo
+      </button>
 
-  <Link
-    href="/clinico/painel"
-    className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-[#D8C7B1] bg-white px-5 text-sm font-medium text-[#5F564C] shadow-sm transition hover:bg-[#FFF8EE] lg:w-auto"
-  >
-    Voltar ao painel clínico
-  </Link>
-</div>    
-          </div>
-        </header>
+      <Link
+        href={`/clinico/pacientes/${paciente.patient_id}/encaminhamentos/novo`}
+        className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl bg-[#2F2A24] px-5 text-sm font-semibold text-white shadow-sm transition hover:opacity-95 lg:w-auto"
+      >
+        Novo encaminhamento
+      </Link>
 
-        <section className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <article className="rounded-3xl border border-[#E5DDD2] bg-white p-5 shadow-sm">
+      <Link
+        href="/clinico/painel"
+        className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-[#D8C7B1] bg-white px-5 text-sm font-medium text-[#5F564C] shadow-sm transition hover:bg-[#FFF8EE] lg:w-auto"
+      >
+        Voltar ao painel clínico
+      </Link>
+    </div>
+  </div>
+</header>
+        {mostrandoEncerrarVinculo && (
+  <section className="mb-6 rounded-3xl border border-[#E8C7C0] bg-white p-5 shadow-sm sm:p-7">
+    <div className="mb-5">
+      <p className="mb-2 text-sm font-medium text-[#9A4A3F]">
+        Encerrar vínculo clínico
+      </p>
+
+      <h2 className="text-xl font-semibold text-[#2F2A24]">
+        Remover paciente da lista ativa
+      </h2>
+
+      <p className="mt-3 text-sm leading-6 text-[#5F564C]">
+        O vínculo será encerrado, mas o histórico não será apagado. Use esta
+        opção em casos de alta, pausa no acompanhamento, encaminhamento para
+        outro profissional ou encerramento por motivo administrativo.
+      </p>
+    </div>
+
+    <div className="grid gap-5 md:grid-cols-2">
+      <label className="block">
+        <span className="text-sm font-medium text-[#2F2A24]">
+          Motivo do encerramento
+        </span>
+
+        <select
+          value={motivoEncerramento}
+          onChange={(event) => setMotivoEncerramento(event.target.value)}
+          className="mt-2 min-h-11 w-full rounded-2xl border border-[#D8C7B1] bg-[#F7F3EC] px-4 text-sm text-[#2F2A24] outline-none focus:border-[#8A2E2B] focus:bg-white"
+          disabled={encerrandoVinculo}
+        >
+          <option value="alta">Alta / encerramento terapêutico</option>
+          <option value="pausa">Pausa no acompanhamento</option>
+          <option value="encaminhamento">
+            Encaminhamento para outro profissional
+          </option>
+          <option value="administrativo">
+            Pendência administrativa
+          </option>
+          <option value="outro">Outro motivo</option>
+        </select>
+      </label>
+
+      <label className="block">
+        <span className="text-sm font-medium text-[#2F2A24]">
+          Observação opcional
+        </span>
+
+        <input
+          type="text"
+          value={observacaoEncerramento}
+          onChange={(event) => setObservacaoEncerramento(event.target.value)}
+          placeholder="Ex: encerrado após devolutiva final"
+          className="mt-2 min-h-11 w-full rounded-2xl border border-[#D8C7B1] bg-[#F7F3EC] px-4 text-sm text-[#2F2A24] outline-none transition placeholder:text-[#8A7A68] focus:border-[#8A2E2B] focus:bg-white"
+          disabled={encerrandoVinculo}
+        />
+      </label>
+    </div>
+
+    <div className="mt-5 rounded-2xl border border-[#E5DDD2] bg-[#F7F3EC] p-4">
+      <p className="text-sm leading-6 text-[#5F564C]">
+        Esta ação remove o paciente da sua lista ativa, mas mantém o histórico
+        clínico preservado. Para reativar o vínculo no futuro, o paciente poderá
+        vincular novamente sua conta pelo e-mail do terapeuta.
+      </p>
+    </div>
+
+    <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+      <button
+        type="button"
+        onClick={handleEncerrarVinculo}
+        disabled={encerrandoVinculo}
+        className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-[#E8C7C0] bg-white px-5 text-sm font-semibold text-[#9A4A3F] shadow-sm transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+      >
+        {encerrandoVinculo ? "Encerrando..." : "Confirmar encerramento"}
+      </button>
+
+      <button
+        type="button"
+        onClick={() => {
+          setMostrandoEncerrarVinculo(false);
+          setMotivoEncerramento("alta");
+          setObservacaoEncerramento("");
+        }}
+        disabled={encerrandoVinculo}
+        className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-[#D8C7B1] bg-white px-5 text-sm font-medium text-[#5F564C] shadow-sm transition hover:bg-[#FFF8EE] disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+      >
+        Cancelar
+      </button>
+    </div>
+  </section>
+)}
+
+<section className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+  <article className="rounded-3xl border border-[#E5DDD2] bg-white p-5 shadow-sm">
             <p className="text-sm font-medium text-[#8A7A68]">
               Perfil predominante
             </p>
