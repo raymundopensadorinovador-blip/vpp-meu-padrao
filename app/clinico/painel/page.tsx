@@ -1,0 +1,420 @@
+"use client";
+
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
+import { supabase } from "@/lib/supabase";
+
+type Role = "paciente" | "terapeuta";
+
+type PacienteVinculado = {
+  patient_id: string;
+  patient_name: string;
+  patient_email: string;
+  linked_at: string;
+  latest_profile: string | null;
+  latest_test_at: string | null;
+  situation_count: number;
+};
+
+export default function ClinicoPainelPage() {
+  const router = useRouter();
+
+  const [carregando, setCarregando] = useState(true);
+  const [nomeUsuario, setNomeUsuario] = useState("");
+  const [pacientes, setPacientes] = useState<PacienteVinculado[]>([]);
+  const [erro, setErro] = useState("");
+
+  useEffect(() => {
+    async function verificarAcesso() {
+      const { data: usuarioAtual, error: erroUsuario } =
+        await supabase.auth.getUser();
+
+      if (erroUsuario || !usuarioAtual.user) {
+        router.replace("/login");
+        return;
+      }
+
+      const { data: perfil, error: erroPerfil } = await supabase
+        .from("profiles")
+        .select("name, role")
+        .eq("id", usuarioAtual.user.id)
+        .maybeSingle();
+
+      if (erroPerfil || !perfil) {
+        await supabase.auth.signOut();
+        router.replace("/login");
+        return;
+      }
+
+      const role = String(perfil.role || "").trim() as Role;
+
+      if (role !== "terapeuta") {
+        router.replace("/painel");
+        return;
+      }
+
+      setNomeUsuario(perfil.name || "");
+
+      const { data: pacientesVinculados, error: erroPacientes } =
+        await supabase.rpc("get_linked_patients_for_therapist");
+
+      if (erroPacientes) {
+        setErro("Não foi possível carregar os pacientes vinculados.");
+        setPacientes([]);
+        setCarregando(false);
+        return;
+      }
+
+      setPacientes((pacientesVinculados || []) as PacienteVinculado[]);
+      setCarregando(false);
+    }
+
+    verificarAcesso();
+  }, [router]);
+
+  async function handleSair() {
+    await supabase.auth.signOut();
+    router.replace("/login");
+  }
+
+  function formatarData(data: string | null) {
+    if (!data) return "Não realizado";
+
+    return new Intl.DateTimeFormat("pt-BR", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    }).format(new Date(data));
+  }
+
+  const totalPacientes = pacientes.length;
+
+  const totalComTeste = useMemo(() => {
+    return pacientes.filter((paciente) => paciente.latest_profile).length;
+  }, [pacientes]);
+
+  const totalRegistros = useMemo(() => {
+    return pacientes.reduce(
+      (soma, paciente) => soma + Number(paciente.situation_count || 0),
+      0
+    );
+  }, [pacientes]);
+
+  const pacientesComRegistros = useMemo(() => {
+    return pacientes.filter(
+      (paciente) => Number(paciente.situation_count || 0) > 0
+    ).length;
+  }, [pacientes]);
+
+  if (carregando) {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-[#F7F3EC] px-4 text-[#2F2A24]">
+        <div className="w-full max-w-md rounded-3xl border border-[#E5DDD2] bg-white p-6 text-center shadow-sm">
+          <p className="text-sm font-medium text-[#8A2E2B]">
+            Verificando acesso clínico
+          </p>
+
+          <h1 className="mt-3 text-2xl font-semibold">
+            Carregando painel...
+          </h1>
+
+          <p className="mt-3 text-sm leading-6 text-[#5F564C]">
+            Estamos confirmando seu perfil antes de abrir a área clínica.
+          </p>
+        </div>
+      </main>
+    );
+  }
+
+  return (
+    <main className="min-h-screen bg-[#F7F3EC] px-4 py-6 text-[#2F2A24] sm:px-6 lg:px-8">
+      <section className="mx-auto w-full max-w-6xl">
+        <header className="mb-6 rounded-3xl border border-[#E5DDD2] bg-white p-5 shadow-sm sm:p-7">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+            <div className="min-w-0">
+              <p className="mb-2 text-sm font-medium text-[#8A2E2B]">
+                Área clínica
+              </p>
+
+              <h1 className="text-2xl font-semibold tracking-tight text-[#2F2A24] sm:text-3xl">
+                Painel do terapeuta
+              </h1>
+
+              <p className="mt-3 max-w-3xl text-sm leading-6 text-[#5F564C]">
+                {nomeUsuario
+                  ? `${nomeUsuario}, acompanhe pacientes vinculados, resultados do teste VPP e registros de situações reais.`
+                  : "Acompanhe pacientes vinculados, resultados do teste VPP e registros de situações reais."}
+              </p>
+            </div>
+            <div className="flex w-full flex-col gap-3 sm:flex-row lg:w-auto">
+            <Link
+  href="/perfil"
+  className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-[#D8C7B1] bg-white px-5 text-sm font-medium text-[#5F564C] shadow-sm transition hover:bg-[#FFF8EE] lg:w-auto"
+>
+  Meu perfil
+</Link>
+  <Link
+    href="/clinico/perfil-profissional"
+    className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl bg-[#2F2A24] px-5 text-sm font-semibold text-white shadow-sm transition hover:opacity-95 lg:w-auto"
+  >
+    Perfil profissional
+  </Link>
+
+  <Link
+    href="/clinico/sobre"
+    className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-[#D8C7B1] bg-white px-5 text-sm font-medium text-[#5F564C] shadow-sm transition hover:bg-[#FFF8EE] lg:w-auto"
+  >
+    Sobre a área clínica
+  </Link>
+
+  <button
+    type="button"
+    onClick={handleSair}
+    className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-[#D8C7B1] bg-white px-5 text-sm font-medium text-[#5F564C] shadow-sm transition hover:bg-[#FFF8EE] lg:w-auto"
+  >
+    Sair
+  </button>
+  
+            </div>
+          </div>
+        </header>
+
+        {erro && (
+          <div className="mb-6 rounded-2xl border border-[#E8C7C0] bg-red-50 px-4 py-3 text-sm leading-6 text-[#8A2E2B]">
+            {erro}
+          </div>
+        )}
+
+        <section className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <article className="rounded-3xl border border-[#E5DDD2] bg-white p-5 shadow-sm">
+            <p className="text-sm font-medium text-[#8A7A68]">
+              Pacientes vinculados
+            </p>
+
+            <p className="mt-3 text-3xl font-semibold text-[#2F2A24]">
+              {totalPacientes}
+            </p>
+
+            <p className="mt-2 text-sm leading-6 text-[#5F564C]">
+              {totalPacientes === 1
+                ? "1 paciente ativo."
+                : `${totalPacientes} pacientes ativos.`}
+            </p>
+          </article>
+
+          <article className="rounded-3xl border border-[#E5DDD2] bg-white p-5 shadow-sm">
+            <p className="text-sm font-medium text-[#8A7A68]">
+              Testes recebidos
+            </p>
+
+            <p className="mt-3 text-3xl font-semibold text-[#2F2A24]">
+              {totalComTeste}
+            </p>
+
+            <p className="mt-2 text-sm leading-6 text-[#5F564C]">
+              Resultados VPP disponíveis.
+            </p>
+          </article>
+
+          <article className="rounded-3xl border border-[#E5DDD2] bg-white p-5 shadow-sm">
+            <p className="text-sm font-medium text-[#8A7A68]">
+              Registros reais
+            </p>
+
+            <p className="mt-3 text-3xl font-semibold text-[#2F2A24]">
+              {totalRegistros}
+            </p>
+
+            <p className="mt-2 text-sm leading-6 text-[#5F564C]">
+              Situações registradas pelos pacientes.
+            </p>
+          </article>
+
+          <article className="rounded-3xl border border-[#E5DDD2] bg-white p-5 shadow-sm">
+            <p className="text-sm font-medium text-[#8A7A68]">
+              Pacientes ativos
+            </p>
+
+            <p className="mt-3 text-3xl font-semibold text-[#2F2A24]">
+              {pacientesComRegistros}
+            </p>
+
+            <p className="mt-2 text-sm leading-6 text-[#5F564C]">
+              Com pelo menos 1 registro real.
+            </p>
+          </article>
+        </section>
+
+        <section className="grid gap-4 lg:grid-cols-[1.15fr_0.85fr]">
+          <article className="rounded-3xl border border-[#E5DDD2] bg-white p-5 shadow-sm sm:p-7">
+            <div className="mb-5">
+              <p className="mb-2 text-sm font-medium text-[#8A2E2B]">
+                Pacientes
+              </p>
+
+              <h2 className="text-xl font-semibold text-[#2F2A24]">
+                {totalPacientes > 0
+                  ? "Pacientes vinculados"
+                  : "Nenhum paciente vinculado"}
+              </h2>
+
+              <p className="mt-3 text-sm leading-6 text-[#5F564C]">
+                O terapeuta vê apenas pacientes vinculados a ele. Nada de
+                passear por dados alheios como se privacidade fosse enfeite.
+              </p>
+            </div>
+
+            {pacientes.length === 0 ? (
+              <div className="rounded-2xl border border-dashed border-[#D8C7B1] bg-[#F7F3EC] p-5">
+                <p className="text-sm font-medium text-[#2F2A24]">
+                  Aguardando vínculo de paciente
+                </p>
+
+                <p className="mt-3 text-sm leading-6 text-[#5F564C]">
+                  Para aparecer aqui, o paciente precisa entrar no próprio
+                  painel, clicar em “Vincular terapeuta” e informar o e-mail da
+                  sua conta de terapeuta.
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {pacientes.map((paciente) => (
+                  <Link
+                  key={paciente.patient_id}
+                  href={`/clinico/pacientes/${paciente.patient_id}`}
+                  className="block rounded-2xl border border-[#E5DDD2] bg-[#F7F3EC] p-4 transition hover:bg-[#FFF8EE] hover:shadow-sm"
+                >
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                      <div className="min-w-0">
+                        <h3 className="text-base font-semibold text-[#2F2A24]">
+                          {paciente.patient_name}
+                        </h3>
+
+                        <p className="mt-1 break-words text-sm text-[#5F564C]">
+                          {paciente.patient_email}
+                        </p>
+
+                        <p className="mt-2 text-xs text-[#8A7A68]">
+                          Vinculado em {formatarData(paciente.linked_at)}
+                        </p>
+                      </div>
+
+                      <div className="flex flex-wrap gap-2 sm:justify-end">
+                        <span className="rounded-2xl border border-blue-200 bg-blue-50/70 px-3 py-2 text-xs font-semibold text-blue-700">
+                          {paciente.latest_profile || "Sem teste"}
+                        </span>
+
+                        <span className="rounded-2xl border border-amber-200 bg-amber-50/80 px-3 py-2 text-xs font-semibold text-amber-700">
+                          {Number(paciente.situation_count || 0)} registro(s)
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                      <div className="rounded-2xl bg-white p-3">
+                        <p className="text-xs font-medium text-[#8A7A68]">
+                          Último teste
+                        </p>
+
+                        <p className="mt-1 text-sm font-semibold text-[#2F2A24]">
+                          {formatarData(paciente.latest_test_at)}
+                        </p>
+                      </div>
+
+                      <div className="rounded-2xl bg-white p-3">
+                        <p className="text-xs font-medium text-[#8A7A68]">
+                          Perfil predominante
+                        </p>
+
+                        <p className="mt-1 text-sm font-semibold text-[#2F2A24]">
+                          {paciente.latest_profile || "Ainda sem resultado"}
+                        </p>
+                      </div>
+                    </div>
+                    </Link>
+                ))}
+              </div>
+            )}
+          </article>
+
+          <aside className="space-y-4">
+            <article className="rounded-3xl border border-[#E5DDD2] bg-white p-5 shadow-sm sm:p-7">
+              <p className="mb-2 text-sm font-medium text-[#8A2E2B]">
+                Leitura clínica
+              </p>
+
+              <h2 className="text-xl font-semibold text-[#2F2A24]">
+                O app organiza sinais. O terapeuta interpreta padrões.
+              </h2>
+
+              <p className="mt-3 text-sm leading-6 text-[#5F564C]">
+                A área clínica não deve transformar o VPP em diagnóstico
+                automático. Ela deve ajudar o terapeuta a enxergar repetições,
+                levantar hipóteses e construir a devolutiva junto com o paciente.
+              </p>
+            </article>
+
+            <article className="rounded-3xl border border-[#E5DDD2] bg-white p-5 shadow-sm sm:p-7">
+              <p className="mb-2 text-sm font-medium text-[#8A7A68]">
+                Atenção ética
+              </p>
+
+              <p className="text-sm leading-6 text-[#5F564C]">
+                O terapeuta só acessa pacientes vinculados. O paciente inicia o
+                vínculo pelo próprio painel. Isso preserva a ideia central:
+                dados emocionais precisam de consentimento claro, não de
+                curiosidade técnica fantasiada de recurso.
+              </p>
+            </article>
+          </aside>
+        </section>
+
+        <section className="mt-6 rounded-3xl border border-[#E5DDD2] bg-white p-5 shadow-sm sm:p-7">
+          <p className="mb-2 text-sm font-medium text-[#8A2E2B]">
+            Próxima evolução da área clínica
+          </p>
+
+          <h2 className="text-xl font-semibold text-[#2F2A24]">
+            Da observação do padrão para a devolutiva
+          </h2>
+
+          <div className="mt-5 grid gap-4 md:grid-cols-3">
+            <div className="rounded-2xl border border-[#E5DDD2] bg-[#F7F3EC] p-4">
+              <p className="text-sm font-semibold text-[#2F2A24]">
+                1. Resultado do teste
+              </p>
+
+              <p className="mt-2 text-sm leading-6 text-[#5F564C]">
+                O terapeuta visualiza perfil predominante, perfis secundários e
+                pontos de atenção.
+              </p>
+            </div>
+
+            <div className="rounded-2xl border border-[#E5DDD2] bg-[#F7F3EC] p-4">
+              <p className="text-sm font-semibold text-[#2F2A24]">
+                2. Situações reais
+              </p>
+
+              <p className="mt-2 text-sm leading-6 text-[#5F564C]">
+                O paciente registra acontecimentos concretos e o terapeuta
+                observa repetições.
+              </p>
+            </div>
+
+            <div className="rounded-2xl border border-[#E5DDD2] bg-[#F7F3EC] p-4">
+              <p className="text-sm font-semibold text-[#2F2A24]">
+                3. Devolutiva
+              </p>
+
+              <p className="mt-2 text-sm leading-6 text-[#5F564C]">
+                A leitura clínica organiza hipótese, padrão percebido e pergunta
+                de investigação.
+              </p>
+            </div>
+          </div>
+        </section>
+      </section>
+    </main>
+  );
+}
