@@ -104,7 +104,29 @@ export default function VincularTerapeutaPage() {
         );
         return;
       }
-
+      const { data: terapeutaEncontrado, error: erroTerapeuta } = await supabase
+      .from("profiles")
+      .select("id, name")
+      .eq("email", emailLimpo)
+      .in("role", ["terapeuta", "ambos"])
+      .maybeSingle();
+    
+    if (!erroTerapeuta && terapeutaEncontrado?.id) {
+      await fetch("/api/push/send", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: terapeutaEncontrado.id,
+          title: "Novo paciente vinculado",
+          message: nomeUsuario
+            ? `${nomeUsuario} vinculou você como terapeuta no VPP — Meu Padrão.`
+            : "Um paciente vinculou você como terapeuta no VPP — Meu Padrão.",
+          url: "/clinico/painel",
+        }),
+      });
+    }
       setSucesso("Terapeuta vinculado com sucesso.");
       setEmailTerapeuta("");
 
