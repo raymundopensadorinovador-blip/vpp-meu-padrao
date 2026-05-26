@@ -158,10 +158,10 @@ export default function ResultadoPage() {
               </h1>
 
               <p className="mt-3 max-w-3xl text-sm leading-6 text-[#5F564C]">
-                Este resultado não é diagnóstico. Ele é uma leitura inicial de
-                padrão, criada para orientar sua auto-observação e aprofundar o
-                processo terapêutico.
-              </p>
+  Este resultado não é diagnóstico. Ele organiza uma leitura inicial de
+  padrão para apoiar sua auto-observação e, quando houver acompanhamento,
+  aprofundar o processo terapêutico.
+</p>
             </div>
 
             <Link
@@ -230,7 +230,7 @@ export default function ResultadoPage() {
   </p>
 
   <h2 className="text-xl font-semibold text-[#2F2A24]">
-    Onde esse padrão pode te prender
+  Onde esse padrão pode limitar sua resposta
   </h2>
 
   <p className="mt-4 text-sm leading-6 text-[#5F564C]">
@@ -247,7 +247,7 @@ export default function ResultadoPage() {
   </p>
 
   <h2 className="text-xl font-semibold text-[#2F2A24]">
-    O que pode ser reorganizado em força
+  O que pode se tornar força
   </h2>
 
   <p className="mt-4 text-sm leading-6 text-[#5F564C]">
@@ -278,7 +278,7 @@ export default function ResultadoPage() {
           </p>
 
           <h2 className="text-xl font-semibold text-[#2F2A24]">
-            Uma pergunta para levar para a vida real
+          Uma pergunta para observar na prática
           </h2>
 
           <div className="mt-5 rounded-2xl border border-[#E5DDD2] bg-[#F7F3EC] p-4">
@@ -299,9 +299,9 @@ export default function ResultadoPage() {
           </h2>
 
           <p className="mt-3 text-sm leading-6 text-[#5F564C]">
-            O teste mostra uma leitura inicial. O próximo passo será registrar
-            situações reais para observar se esse padrão se repete na prática.
-          </p>
+  O teste mostra uma leitura inicial. O próximo passo é registrar situações
+  reais para observar como esse padrão aparece no cotidiano.
+</p>
 
           <div className="mt-6 flex flex-col gap-3 sm:flex-row">
             <Link

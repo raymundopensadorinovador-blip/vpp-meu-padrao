@@ -298,10 +298,9 @@ export default function NovoEncaminhamentoPage() {
               </h1>
 
               <p className="mt-3 max-w-3xl text-sm leading-6 text-[#5F564C]">
-                Crie um encaminhamento para {paciente.patient_name}. Nesta etapa,
-                o documento será salvo como rascunho. Depois vamos gerar a tela
-                própria para impressão/PDF, WhatsApp e e-mail.
-              </p>
+  Crie um encaminhamento para {paciente.patient_name}. O documento será
+  salvo para consulta, edição, impressão ou salvamento em PDF.
+</p>
             </div>
 
             <Link
@@ -440,7 +439,7 @@ export default function NovoEncaminhamentoPage() {
                 <textarea
                   value={clinicalSummary}
                   onChange={(event) => setClinicalSummary(event.target.value)}
-                  placeholder="Descreva de forma objetiva os sinais observados, demanda apresentada e pontos relevantes para o profissional de destino."
+                  placeholder="Descreva de forma objetiva a demanda apresentada, sinais observados e pontos relevantes para o profissional de destino."
                   className="mt-2 min-h-36 w-full resize-none rounded-2xl border border-[#D8C7B1] bg-[#F7F3EC] px-4 py-3 text-sm leading-6 text-[#2F2A24] outline-none placeholder:text-[#8A7A68] focus:border-[#8A2E2B] focus:bg-white"
                   disabled={salvando}
                   required
@@ -516,14 +515,14 @@ export default function NovoEncaminhamentoPage() {
 
               <label className="block">
                 <span className="text-sm font-medium text-[#2F2A24]">
-                  Texto do carimbo
+                Informação para carimbo
                 </span>
 
                 <input
                   type="text"
                   value={stampText}
                   onChange={(event) => setStampText(event.target.value)}
-                  placeholder="Opcional: texto que aparecerá no espaço do carimbo"
+                 placeholder="Opcional: informação que aparecerá no espaço do carimbo"
                   className="mt-2 min-h-11 w-full rounded-2xl border border-[#D8C7B1] bg-[#F7F3EC] px-4 text-sm text-[#2F2A24] outline-none transition placeholder:text-[#8A7A68] focus:border-[#8A2E2B] focus:bg-white"
                   disabled={salvando}
                 />
@@ -562,12 +561,10 @@ export default function NovoEncaminhamentoPage() {
           </section>
 
           <div className="rounded-2xl border border-[#E5DDD2] bg-[#F7F3EC] p-4">
-            <p className="text-sm leading-6 text-[#5F564C]">
-              Este encaminhamento será salvo como rascunho. Na próxima etapa,
-              ele terá uma página própria em formato de documento para
-              impressão/PDF. WhatsApp e e-mail entram depois, com calma, porque
-              documento clínico não é bilhete de geladeira.
-            </p>
+          <p className="text-sm leading-6 text-[#5F564C]">
+  Revise as informações antes de salvar. O encaminhamento ficará disponível
+  na página do paciente para consulta, edição, impressão ou salvamento em PDF.
+</p> 
           </div>
 
           <div className="flex flex-col gap-3 sm:flex-row">

@@ -189,10 +189,9 @@ export default function PerfilProfissionalPage() {
               </h1>
 
               <p className="mt-3 max-w-3xl text-sm leading-6 text-[#5F564C]">
-                Esses dados serão usados para preencher automaticamente
-                encaminhamentos clínicos, assinatura, local de atendimento e
-                informações profissionais.
-              </p>
+  Preencha os dados que serão usados automaticamente em encaminhamentos
+  clínicos, assinatura, local de atendimento e identificação profissional.
+</p>
             </div>
 
             <Link
@@ -272,14 +271,14 @@ export default function PerfilProfissionalPage() {
             <div className="grid gap-5 md:grid-cols-2">
               <label className="block">
                 <span className="text-sm font-medium text-[#2F2A24]">
-                  Texto do carimbo
+                Informação para carimbo
                 </span>
 
                 <input
                   type="text"
                   value={stampText}
                   onChange={(event) => setStampText(event.target.value)}
-                  placeholder="Opcional: texto que aparecerá no espaço do carimbo"
+                  placeholder="Opcional: informação que aparecerá no espaço do carimbo"
                   className="mt-2 min-h-11 w-full rounded-2xl border border-[#D8C7B1] bg-[#F7F3EC] px-4 text-sm text-[#2F2A24] outline-none transition placeholder:text-[#8A7A68] focus:border-[#8A2E2B] focus:bg-white"
                   disabled={salvando}
                 />
@@ -303,13 +302,11 @@ export default function PerfilProfissionalPage() {
           </div>
 
           <div className="mt-6 rounded-2xl border border-[#E5DDD2] bg-[#F7F3EC] p-4">
-            <p className="text-sm leading-6 text-[#5F564C]">
-              Esses dados serão usados como preenchimento automático em novos
-              encaminhamentos. Você ainda poderá editar cada documento
-              individualmente antes de imprimir, salvar PDF ou enviar. Sim, um
-              dado preenchido uma vez economiza dezenas de cliques. Tecnologia,
-              quando resolve problemas reais, até parece útil.
-            </p>
+          <p className="text-sm leading-6 text-[#5F564C]">
+  Esses dados serão usados como preenchimento automático em novos
+  encaminhamentos clínicos. Cada documento ainda poderá ser revisado e
+  editado individualmente antes de imprimir, salvar em PDF ou compartilhar.
+</p>
           </div>
 
           <div className="mt-6 flex flex-col gap-3 sm:flex-row">

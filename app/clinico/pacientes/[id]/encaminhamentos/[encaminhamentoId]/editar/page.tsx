@@ -305,9 +305,9 @@ export default function EditarEncaminhamentoPage() {
               </h1>
 
               <p className="mt-3 max-w-3xl text-sm leading-6 text-[#5F564C]">
-                Edite os dados do encaminhamento antes de imprimir, salvar em
-                PDF ou enviar o conteúdo por outros canais.
-              </p>
+  Revise e ajuste os dados do encaminhamento antes de imprimir, salvar em
+  PDF ou compartilhar o conteúdo com o paciente ou outro profissional.
+</p>
             </div>
 
             <Link
@@ -446,7 +446,7 @@ export default function EditarEncaminhamentoPage() {
                 <textarea
                   value={clinicalSummary}
                   onChange={(event) => setClinicalSummary(event.target.value)}
-                  placeholder="Descreva de forma objetiva os sinais observados, demanda apresentada e pontos relevantes para o profissional de destino."
+                  placeholder="Descreva de forma objetiva a demanda apresentada, sinais observados e pontos relevantes para o profissional de destino."
                   className="mt-2 min-h-36 w-full resize-none rounded-2xl border border-[#D8C7B1] bg-[#F7F3EC] px-4 py-3 text-sm leading-6 text-[#2F2A24] outline-none placeholder:text-[#8A7A68] focus:border-[#8A2E2B] focus:bg-white"
                   disabled={salvando}
                   required
@@ -522,14 +522,14 @@ export default function EditarEncaminhamentoPage() {
 
               <label className="block">
                 <span className="text-sm font-medium text-[#2F2A24]">
-                  Texto do carimbo
+                Informação para carimbo
                 </span>
 
                 <input
                   type="text"
                   value={stampText}
                   onChange={(event) => setStampText(event.target.value)}
-                  placeholder="Opcional: texto que aparecerá no espaço do carimbo"
+                  placeholder="Opcional: informação que aparecerá no espaço do carimbo"
                   className="mt-2 min-h-11 w-full rounded-2xl border border-[#D8C7B1] bg-[#F7F3EC] px-4 text-sm text-[#2F2A24] outline-none transition placeholder:text-[#8A7A68] focus:border-[#8A2E2B] focus:bg-white"
                   disabled={salvando}
                 />
@@ -585,10 +585,10 @@ export default function EditarEncaminhamentoPage() {
           </section>
 
           <div className="rounded-2xl border border-[#E5DDD2] bg-[#F7F3EC] p-4">
-            <p className="text-sm leading-6 text-[#5F564C]">
-              As alterações atualizam o documento salvo. Depois de salvar, você
-              voltará para a página do encaminhamento.
-            </p>
+          <p className="text-sm leading-6 text-[#5F564C]">
+  As alterações serão aplicadas ao documento salvo. Depois de salvar, você
+  retornará para a página do encaminhamento.
+</p>
           </div>
 
           <div className="flex flex-col gap-3 sm:flex-row">

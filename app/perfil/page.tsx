@@ -177,10 +177,10 @@ export default function PerfilPage() {
               </h1>
 
               <p className="mt-3 max-w-2xl text-sm leading-6 text-[#5F564C]">
-                Edite seu nome de exibição no VPP — Meu Padrão. O e-mail e o
-                tipo de conta ficam protegidos nesta etapa para evitar bagunça
-                com login e permissões.
-              </p>
+  Edite seu nome de exibição no VPP — Meu Padrão. O e-mail e o
+  tipo de conta permanecem protegidos nesta etapa por estarem ligados
+  ao acesso e às permissões da conta.
+</p> 
             </div>
 
             <Link
@@ -235,7 +235,7 @@ export default function PerfilPage() {
                 </p>
 
                 <p className="mt-2 text-xs leading-5 text-[#8A7A68]">
-                  Alteração de e-mail será tratada em uma etapa própria.
+                A alteração de e-mail será tratada em uma etapa própria.
                 </p>
               </div>
 
@@ -249,19 +249,18 @@ export default function PerfilPage() {
                 </p>
 
                 <p className="mt-2 text-xs leading-5 text-[#8A7A68]">
-                  Este campo não pode ser alterado pelo usuário.
+                Este campo define as permissões da conta e não pode ser alterado aqui.
                 </p>
               </div>
             </div>
           </div>
 
           <div className="mt-6 rounded-2xl border border-[#E5DDD2] bg-[#F7F3EC] p-4">
-            <p className="text-sm leading-6 text-[#5F564C]">
-              Se você errou o nome no cadastro, corrija aqui. E-mail e tipo de
-              conta ficam bloqueados por enquanto porque mexem diretamente com
-              autenticação e permissões. Pequenas travas evitam grandes
-              incêndios, uma lição que a internet insiste em reaprender.
-            </p>
+          <p className="text-sm leading-6 text-[#5F564C]">
+  Se você errou o nome no cadastro, corrija aqui. O e-mail e o tipo
+  de conta permanecem bloqueados nesta etapa porque estão ligados ao
+  login, à segurança e às permissões de acesso.
+</p>
           </div>
 
           <div className="mt-6 flex flex-col gap-3 sm:flex-row">

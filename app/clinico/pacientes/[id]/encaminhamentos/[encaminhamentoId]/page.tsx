@@ -143,10 +143,10 @@ export default function DetalheEncaminhamentoPage() {
       "",
       `Encaminhado para: ${destino}`,
       encaminhamento.destination_name
-        ? `Profissional/serviço: ${encaminhamento.destination_name}`
+        ? `Profissional ou serviço: ${encaminhamento.destination_name}`
         : "",
       encaminhamento.destination_contact
-        ? `Contato/endereço: ${encaminhamento.destination_contact}`
+        ? `Contato ou endereço: ${encaminhamento.destination_contact}`
         : "",
       "",
       "Motivo do encaminhamento:",
@@ -186,9 +186,9 @@ export default function DetalheEncaminhamentoPage() {
   
       setMensagemCopiada(
         tipo === "whatsapp"
-          ? "Texto para WhatsApp copiado."
-          : "Texto para e-mail copiado."
-      );
+          ? "Texto copiado para envio pelo WhatsApp."
+          : "Texto copiado para envio por e-mail."
+      );  
   
       setTimeout(() => {
         setMensagemCopiada("");
@@ -371,9 +371,9 @@ export default function DetalheEncaminhamentoPage() {
               </h1>
 
               <p className="mt-3 max-w-3xl text-sm leading-6 text-[#5F564C]">
-                Revise o documento antes de imprimir ou salvar em PDF pelo
-                navegador.
-              </p>
+  Revise as informações antes de imprimir, salvar em PDF ou compartilhar o
+  conteúdo com o paciente ou outro profissional.
+</p>
             </div>
 
             <div className="flex w-full flex-col gap-3 sm:flex-row lg:w-auto">
@@ -396,7 +396,7 @@ export default function DetalheEncaminhamentoPage() {
   onClick={() => copiarTextoEncaminhamento("whatsapp")}
   className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-[#D8C7B1] bg-white px-5 text-sm font-medium text-[#5F564C] shadow-sm transition hover:bg-[#FFF8EE] lg:w-auto"
 >
-  Copiar texto
+Copiar para WhatsApp
 </button>
 <button
   type="button"
@@ -438,8 +438,8 @@ export default function DetalheEncaminhamentoPage() {
             </p>
 
             <h2 className="mt-3 text-3xl font-bold text-[#2F2A24]">
-              Documento de encaminhamento
-            </h2>
+  Encaminhamento clínico
+</h2>
 
             <p className="mt-3 text-sm leading-6 text-[#5F564C]">
               Data: {formatarData(encaminhamento.referral_date)}
@@ -570,11 +570,11 @@ export default function DetalheEncaminhamentoPage() {
           </section>
 
           <footer className="mt-10 border-t border-[#E5DDD2] pt-5">
-            <p className="text-xs leading-5 text-[#8A7A68]">
-              Documento emitido a partir do VPP — Meu Padrão. Este
-              encaminhamento não substitui avaliação médica, psicológica ou
-              psiquiátrica quando necessária.
-            </p>
+          <p className="text-xs leading-5 text-[#8A7A68]">
+  Documento emitido a partir do VPP — Meu Padrão. Este encaminhamento
+  tem finalidade informativa e de continuidade do cuidado, não substituindo
+  avaliação médica, psicológica ou psiquiátrica quando indicada.
+</p>
           </footer>
         </article>
       </section>

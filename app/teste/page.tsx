@@ -566,7 +566,7 @@ export default function TestePage() {
       }
 
       setSucesso(
-        `Teste salvo com sucesso. Perfil predominante: ${perfilPredominante}.`
+        `Teste salvo com sucesso. Sua leitura inicial foi organizada a partir do perfil predominante: ${perfilPredominante}.`
       );
 
       setTimeout(() => {
@@ -610,9 +610,9 @@ export default function TestePage() {
               </h1>
 
               <p className="mt-3 max-w-3xl text-sm leading-6 text-[#5F564C]">
-                {nomeUsuario
-                  ? `${nomeUsuario}, responda com sinceridade. Não procure a resposta ideal. Procure a resposta mais parecida com seu funcionamento real.`
-                  : "Responda com sinceridade. Não procure a resposta ideal. Procure a resposta mais parecida com seu funcionamento real."}
+              {nomeUsuario
+  ? `${nomeUsuario}, responda considerando seu funcionamento mais frequente, não a resposta que pareceria ideal.`
+  : "Responda considerando seu funcionamento mais frequente, não a resposta que pareceria ideal."}  
               </p>
             </div>
 
@@ -650,8 +650,9 @@ export default function TestePage() {
           </div>
 
           <p className="mt-4 text-sm leading-6 text-[#5F564C]">
-            Marque de 1 a 5 o quanto cada frase se parece com você.
-          </p>
+  Marque de 1 a 5 o quanto cada frase se aproxima da forma como você costuma
+  funcionar na prática.
+</p>
         </section>
 
         {erro && (

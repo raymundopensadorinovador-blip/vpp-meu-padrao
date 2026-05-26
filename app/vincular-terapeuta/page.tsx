@@ -148,9 +148,9 @@ export default function VincularTerapeutaPage() {
             </h1>
 
             <p className="mt-4 text-sm leading-6 text-[#5F564C]">
-              {nomeUsuario
-                ? `${nomeUsuario}, informe o e-mail do terapeuta que acompanhará seus registros no VPP — Meu Padrão.`
-                : "Informe o e-mail do terapeuta que acompanhará seus registros no VPP — Meu Padrão."}
+            {nomeUsuario
+  ? `${nomeUsuario}, informe o e-mail do terapeuta que terá acesso aos seus registros no VPP — Meu Padrão.`
+  : "Informe o e-mail do terapeuta que terá acesso aos seus registros no VPP — Meu Padrão."}
             </p>
           </div>
 
@@ -199,12 +199,12 @@ export default function VincularTerapeutaPage() {
           </form>
 
           <div className="mt-6 rounded-2xl border border-[#E5DDD2] bg-[#F7F3EC] p-4">
-            <p className="text-sm leading-6 text-[#5F564C]">
-              O terapeuta só poderá ver seus dados se estiver cadastrado como
-              terapeuta na plataforma e se este vínculo estiver ativo. Dados
-              emocionais não são panfleto de supermercado, por incrível que
-              pareça.
-            </p>
+          <p className="text-sm leading-6 text-[#5F564C]">
+  O terapeuta só poderá acessar seus dados se estiver cadastrado como
+  terapeuta na plataforma e se este vínculo estiver ativo. Esse vínculo
+  pode ser encerrado quando necessário, preservando o cuidado com suas
+  informações.
+</p>
           </div>
         </div>
       </section>

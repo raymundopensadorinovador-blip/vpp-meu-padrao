@@ -82,10 +82,10 @@ export default function ClinicoSobrePage() {
               </h1>
 
               <p className="mt-3 max-w-3xl text-sm leading-6 text-[#5F564C]">
-                Esta área será criada para apoiar a leitura de padrões, não para
-                substituir escuta clínica, interpretação cuidadosa ou construção
-                conjunta com o paciente.
-              </p>
+  Esta área foi criada para apoiar a leitura de padrões, sem substituir
+  a escuta clínica, a interpretação cuidadosa e a construção conjunta
+  com o paciente.
+</p>
             </div>
 
             <Link
@@ -179,10 +179,10 @@ export default function ClinicoSobrePage() {
               </p>
 
               <p className="mt-2 text-sm leading-6 text-[#5F564C]">
-                A devolutiva deve organizar o padrão em linguagem humana,
-                clara, validável e sem transformar hipótese clínica em decreto
-                divino. Já temos problemas suficientes.
-              </p>
+  A devolutiva deve organizar o padrão em linguagem humana,
+  clara, validável e cuidadosa, sem transformar hipótese clínica em
+  conclusão definitiva.
+</p>
             </article>
           </div>
         </section>
@@ -214,7 +214,7 @@ export default function ClinicoSobrePage() {
               <li>• Não deve substituir o processo terapêutico.</li>
               <li>• Não deve rotular o paciente como um perfil fixo.</li>
               <li>• Não deve liberar dados sem vínculo e consentimento.</li>
-              <li>• Não deve transformar o terapeuta em apertador de botão.</li>
+              <li>• Não deve substituir o raciocínio clínico do terapeuta.</li>
             </ul>
           </article>
         </section>
@@ -236,11 +236,11 @@ export default function ClinicoSobrePage() {
           </p>
 
           <div className="mt-5 rounded-2xl border border-[#E5DDD2] bg-[#F7F3EC] p-4">
-            <p className="text-sm leading-6 text-[#5F564C]">
-              Para o MVP, a regra será simples: paciente vê os próprios dados.
-              Terapeuta vê apenas pacientes vinculados. Supervisão clínica fica
-              para uma etapa futura, com permissões próprias.
-            </p>
+          <p className="text-sm leading-6 text-[#5F564C]">
+  A regra inicial é simples: o paciente acessa os próprios dados, e o
+  terapeuta acessa apenas pacientes vinculados a ele. Recursos de
+  supervisão clínica devem ter permissões próprias em etapa futura.
+</p> 
           </div>
 
           <div className="mt-6 flex flex-col gap-3 sm:flex-row">
@@ -249,13 +249,6 @@ export default function ClinicoSobrePage() {
               className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl bg-[#2F2A24] px-5 text-sm font-semibold text-white shadow-sm transition hover:opacity-95 sm:w-auto"
             >
               Voltar ao painel clínico
-            </Link>
-
-            <Link
-              href="/login"
-              className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-[#D8C7B1] bg-white px-5 text-sm font-medium text-[#5F564C] shadow-sm transition hover:bg-[#FFF8EE] sm:w-auto"
-            >
-              Ir para login
             </Link>
           </div>
         </section>
