@@ -76,10 +76,11 @@ export default function CadastroPage() {
 
       const role = codigoEncontrado.role as Role;
 
-      const { data: cadastro, error: erroCadastro } = await supabase.auth.signUp({
-        email: emailLimpo,
-        password: senha,
-      });
+      const { data: cadastro, error: erroCadastro } =
+        await supabase.auth.signUp({
+          email: emailLimpo,
+          password: senha,
+        });
 
       if (erroCadastro) {
         setErro(erroCadastro.message || "Não foi possível criar sua conta.");
@@ -88,17 +89,17 @@ export default function CadastroPage() {
 
       let userId = cadastro.user?.id;
 
-if (!userId) {
-  const { data: usuarioAtual } = await supabase.auth.getUser();
-  userId = usuarioAtual.user?.id;
-}
+      if (!userId) {
+        const { data: usuarioAtual } = await supabase.auth.getUser();
+        userId = usuarioAtual.user?.id;
+      }
 
-if (!userId) {
-  setErro(
-    "Conta criada, mas o Supabase não retornou o usuário. Verifique se a confirmação de e-mail está desativada em Authentication → Providers → Email e tente novamente com outro e-mail."
-  );
-  return;
-}
+      if (!userId) {
+        setErro(
+          "A conta foi iniciada, mas não foi possível concluir o cadastro neste momento. Tente novamente com outro e-mail ou entre em contato com o responsável pelo acesso."
+        );
+        return;
+      }
 
       const { error: erroPerfil } = await supabase.from("profiles").insert({
         id: userId,
@@ -119,11 +120,11 @@ if (!userId) {
           p_code: codigoLimpo,
         }
       );
-      
+
       if (erroAtualizarCodigo) {
-        setErro("A conta foi criada, mas houve erro ao marcar o código como usado.");
+        setErro("A conta foi criada, mas houve erro ao finalizar o código de acesso.");
         return;
-      }  
+      }
 
       setSucesso("Conta criada com sucesso. Redirecionando...");
 
@@ -149,23 +150,23 @@ if (!userId) {
         </Link>
 
         <section className="rounded-3xl border border-[#E5DDD2] bg-white p-6 shadow-sm sm:p-8">
-        <div className="mb-5 flex justify-center">
-  <img
-    src="/logo-vpp.jpeg"
-    alt="Logo VPP — Meu Padrão"
-    className="h-20 w-20 rounded-3xl object-cover shadow-sm"
-  />
-</div>
+          <div className="mb-5 flex justify-center">
+            <img
+              src="/logo-vpp.jpeg"
+              alt="Logo VPP — Meu Padrão"
+              className="h-20 w-20 rounded-3xl bg-white object-contain p-2 shadow-sm"
+            />
+          </div>
 
-<p className="text-sm font-semibold uppercase tracking-wide text-[#8A2E2B]">
-  Acesso antecipado
-</p>
+          <p className="text-sm font-semibold uppercase tracking-wide text-[#8A2E2B]">
+            Acesso antecipado
+          </p>
 
-<h1 className="mt-3 text-3xl font-bold">Criar conta</h1> 
+          <h1 className="mt-3 text-3xl font-bold">Criar conta</h1>
 
           <p className="mt-3 text-sm leading-6 text-[#5F564C]">
-            Crie sua conta para iniciar o teste e acompanhar seus registros com
-            segurança.
+            Crie sua conta para acessar o VPP — Meu Padrão e começar seus
+            registros com segurança.
           </p>
 
           {erro && (
@@ -182,7 +183,10 @@ if (!userId) {
 
           <form onSubmit={handleCadastro} className="mt-6 space-y-4">
             <label className="block">
-              <span className="text-sm font-medium text-[#5F564C]">Nome</span>
+              <span className="text-sm font-medium text-[#5F564C]">
+                Nome
+              </span>
+
               <input
                 type="text"
                 value={nome}
@@ -196,7 +200,10 @@ if (!userId) {
             </label>
 
             <label className="block">
-              <span className="text-sm font-medium text-[#5F564C]">E-mail</span>
+              <span className="text-sm font-medium text-[#5F564C]">
+                E-mail
+              </span>
+
               <input
                 type="email"
                 value={email}
@@ -210,7 +217,9 @@ if (!userId) {
             </label>
 
             <label className="block">
-              <span className="text-sm font-medium text-[#5F564C]">Senha</span>
+              <span className="text-sm font-medium text-[#5F564C]">
+                Senha
+              </span>
 
               <div className="mt-2 flex items-center rounded-2xl border border-[#D8C7B1] bg-[#F7F3EC] focus-within:border-[#8A2E2B]">
                 <input
@@ -239,6 +248,7 @@ if (!userId) {
               <span className="text-sm font-medium text-[#5F564C]">
                 Código de acesso
               </span>
+
               <input
                 type="text"
                 value={codigoAcesso}

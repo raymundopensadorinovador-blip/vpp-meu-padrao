@@ -49,7 +49,9 @@ export default function NovaSenhaPage() {
       });
 
       if (error) {
-        setErro("Não foi possível salvar a nova senha. Tente pedir um novo link de recuperação.");
+        setErro(
+          "Não foi possível salvar a nova senha. Tente solicitar um novo link de recuperação."
+        );
         return;
       }
 
@@ -79,6 +81,14 @@ export default function NovaSenhaPage() {
 
         <div className="rounded-3xl border border-[#E5DDD2] bg-white p-6 shadow-sm sm:p-8">
           <div className="mb-6 text-center">
+            <div className="mb-5 flex justify-center">
+              <img
+                src="/logo-vpp.jpeg"
+                alt="Logo VPP — Meu Padrão"
+                className="h-20 w-20 rounded-3xl bg-white object-contain p-2 shadow-sm"
+              />
+            </div>
+
             <p className="mb-3 text-sm font-medium text-[#8A2E2B]">
               Nova senha
             </p>
@@ -88,8 +98,7 @@ export default function NovaSenhaPage() {
             </h1>
 
             <p className="mt-4 text-sm leading-6 text-[#5F564C]">
-              Escolha uma senha segura para recuperar o acesso ao VPP — Meu
-              Padrão.
+              Escolha uma senha segura para recuperar o acesso à sua conta.
             </p>
           </div>
 
@@ -191,7 +200,8 @@ export default function NovaSenhaPage() {
         </div>
 
         <p className="mt-6 text-center text-xs leading-5 text-[#8A7A68]">
-          App = consciência. Processo terapêutico = transformação.
+          O VPP — Meu Padrão não realiza diagnóstico e não substitui
+          acompanhamento terapêutico.
         </p>
       </section>
     </main>

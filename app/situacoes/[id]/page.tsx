@@ -85,36 +85,36 @@ export default function DetalheSituacaoPage() {
 
   async function handleExcluirSituacao() {
     if (!situacao) return;
-  
+
     const confirmar = window.confirm(
       "Tem certeza que deseja excluir esta situação? Essa ação não poderá ser desfeita."
     );
-  
+
     if (!confirmar) return;
-  
+
     setErro("");
     setExcluindo(true);
-  
+
     try {
       const { data: usuarioAtual, error: erroUsuario } =
         await supabase.auth.getUser();
-  
+
       if (erroUsuario || !usuarioAtual.user) {
         router.replace("/login");
         return;
       }
-  
+
       const { error } = await supabase
         .from("vpp_situation_records")
         .delete()
         .eq("id", situacao.id)
         .eq("user_id", usuarioAtual.user.id);
-  
+
       if (error) {
         setErro("Não foi possível excluir esta situação.");
         return;
       }
-  
+
       router.replace("/situacoes");
     } finally {
       setExcluindo(false);
@@ -200,32 +200,33 @@ export default function DetalheSituacaoPage() {
               </p>
 
               <h1 className="text-2xl font-semibold tracking-tight text-[#2F2A24] sm:text-3xl">
-                Registro de padrão real
+                Registro de situação real
               </h1>
 
               <p className="mt-3 max-w-3xl text-sm leading-6 text-[#5F564C]">
                 Registrado em {formatarData(situacao.created_at)}. Esta leitura
-                serve para observar a relação entre expectativa, pensamento,
-                reação e consequência.
+                ajuda a observar a relação entre expectativa, pensamento, reação
+                e consequência.
               </p>
             </div>
 
             <div className="flex w-full flex-col gap-3 sm:flex-row lg:w-auto">
-            <Link
-  href={`/situacoes/${situacao.id}/editar`}
-  className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-[#D8C7B1] bg-white px-5 text-sm font-medium text-[#5F564C] shadow-sm transition hover:bg-[#FFF8EE] lg:w-auto"
->
-  Editar
-</Link>
+              <Link
+                href={`/situacoes/${situacao.id}/editar`}
+                className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-[#D8C7B1] bg-white px-5 text-sm font-medium text-[#5F564C] shadow-sm transition hover:bg-[#FFF8EE] lg:w-auto"
+              >
+                Editar
+              </Link>
 
-<button
-  type="button"
-  onClick={handleExcluirSituacao}
-  disabled={excluindo}
-  className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-[#E8C7C0] bg-white px-5 text-sm font-semibold text-[#9A4A3F] shadow-sm transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60 lg:w-auto"
->
-  {excluindo ? "Excluindo..." : "Excluir"}
-</button>
+              <button
+                type="button"
+                onClick={handleExcluirSituacao}
+                disabled={excluindo}
+                className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-[#E8C7C0] bg-white px-5 text-sm font-semibold text-[#9A4A3F] shadow-sm transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60 lg:w-auto"
+              >
+                {excluindo ? "Excluindo..." : "Excluir"}
+              </button>
+
               <Link
                 href="/situacoes"
                 className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-[#D8C7B1] bg-white px-5 text-sm font-medium text-[#5F564C] shadow-sm transition hover:bg-[#FFF8EE] lg:w-auto"
@@ -242,11 +243,13 @@ export default function DetalheSituacaoPage() {
             </div>
           </div>
         </header>
+
         {erro && (
-  <div className="mb-6 rounded-2xl border border-[#E8C7C0] bg-red-50 px-4 py-3 text-sm leading-6 text-[#8A2E2B]">
-    {erro}
-  </div>
-)}
+          <div className="mb-6 rounded-2xl border border-[#E8C7C0] bg-red-50 px-4 py-3 text-sm leading-6 text-[#8A2E2B]">
+            {erro}
+          </div>
+        )}
+
         <section className="mb-6 rounded-3xl border border-[#E5DDD2] bg-white p-5 shadow-sm sm:p-7">
           <div className="mb-5 flex flex-wrap gap-2">
             <span className="rounded-2xl border border-blue-200 bg-blue-50/70 px-4 py-2 text-sm font-semibold text-blue-700">
@@ -356,9 +359,8 @@ export default function DetalheSituacaoPage() {
 
           <p className="mt-3 text-sm leading-6 text-[#5F564C]">
             Um registro isolado mostra um recorte. A repetição aparece quando
-            várias situações começam a revelar expectativa parecida, reação
-            parecida ou consequência parecida. Sim, o padrão gosta de repetir o
-            roteiro. Criativo ele não é.
+            várias situações começam a revelar expectativas parecidas, reações
+            parecidas ou consequências parecidas.
           </p>
 
           <div className="mt-6 flex flex-col gap-3 sm:flex-row">

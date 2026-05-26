@@ -45,7 +45,15 @@ export default function HomePage() {
   return (
     <main className="min-h-screen bg-[#F7F3EC] px-6 py-10 text-[#2F2A24]">
       <section className="mx-auto flex min-h-[calc(100vh-80px)] max-w-3xl flex-col items-center justify-center text-center">
-        <p className="mb-4 rounded-full border border-[#D8C7B1] bg-white px-4 py-2 text-sm text-[#5F564C]">
+        <div className="mb-6 flex justify-center">
+          <img
+            src="/logo-vpp.jpeg"
+            alt="Logo VPP — Meu Padrão"
+            className="h-24 w-24 rounded-3xl bg-white object-contain p-2 shadow-sm"
+          />
+        </div>
+
+        <p className="mb-4 rounded-full border border-[#D8C7B1] bg-white px-4 py-2 text-sm text-[#5F564C] shadow-sm">
           VPP — Vetor Psíquico Primário
         </p>
 
@@ -54,9 +62,13 @@ export default function HomePage() {
         </h1>
 
         <p className="mt-5 max-w-2xl text-lg leading-8 text-[#5F564C]">
-          Descubra qual padrão dos discípulos mais se aproxima do seu
-          funcionamento e observe como você tende a reagir antes mesmo de
-          perceber.
+          Uma ferramenta para reconhecer padrões de funcionamento, organizar
+          registros pessoais e apoiar o acompanhamento terapêutico.
+        </p>
+
+        <p className="mt-4 max-w-2xl text-sm leading-6 text-[#8A7A68]">
+          O app ajuda a observar como expectativas, emoções, pensamentos e
+          comportamentos se repetem em situações reais.
         </p>
 
         <div className="mt-8 flex w-full max-w-sm flex-col gap-3">
@@ -77,7 +89,7 @@ export default function HomePage() {
                 href="/vpp"
                 className="rounded-2xl border border-[#D8C7B1] bg-white px-6 py-4 text-center font-semibold text-[#5F564C] shadow-sm transition hover:bg-[#FFF8EE]"
               >
-                Saiba mais sobre o VPP
+                Conhecer o VPP
               </Link>
             </>
           ) : role === "paciente" ? (
@@ -93,7 +105,7 @@ export default function HomePage() {
                 href="/vpp"
                 className="rounded-2xl border border-[#D8C7B1] bg-white px-6 py-4 text-center font-semibold text-[#5F564C] shadow-sm transition hover:bg-[#FFF8EE]"
               >
-                Saiba mais sobre o VPP
+                Conhecer o VPP
               </Link>
             </>
           ) : (
@@ -109,16 +121,16 @@ export default function HomePage() {
                 href="/sobre"
                 className="rounded-2xl border border-[#D8C7B1] bg-white px-6 py-4 text-center font-semibold text-[#5F564C] shadow-sm transition hover:bg-[#FFF8EE]"
               >
-                Saiba mais sobre o VPP
+                Saiba mais
               </Link>
             </>
           )}
         </div>
 
         <p className="mt-8 max-w-xl text-sm leading-6 text-[#8A7A68]">
-          Esta ferramenta não realiza diagnóstico e não substitui acompanhamento
-          terapêutico. Ela oferece uma leitura reflexiva sobre padrões de
-          funcionamento.
+          O VPP — Meu Padrão não realiza diagnóstico e não substitui
+          acompanhamento terapêutico. Ele oferece uma leitura reflexiva para
+          apoiar a consciência sobre padrões.
         </p>
       </section>
     </main>

@@ -99,23 +99,22 @@ export default function LoginPage() {
         </Link>
 
         <section className="rounded-3xl border border-[#E5DDD2] bg-white p-6 shadow-sm sm:p-8">
-        <div className="mb-5 flex justify-center">
-  <img
-    src="/logo-vpp.jpeg"
-    alt="Logo VPP — Meu Padrão"
-    className="h-20 w-20 rounded-3xl object-cover shadow-sm"
-  />
-</div>
+          <div className="mb-5 flex justify-center">
+            <img
+              src="/logo-vpp.jpeg"
+              alt="Logo VPP — Meu Padrão"
+              className="h-20 w-20 rounded-3xl bg-white object-contain p-2 shadow-sm"
+            />
+          </div>
 
-<p className="text-sm font-semibold uppercase tracking-wide text-[#8A2E2B]">
-  Acesso
-</p>
+          <p className="text-sm font-semibold uppercase tracking-wide text-[#8A2E2B]">
+            Acesso
+          </p>
 
-<h1 className="mt-3 text-3xl font-bold">Entrar</h1>
+          <h1 className="mt-3 text-3xl font-bold">Entrar</h1>
 
           <p className="mt-3 text-sm leading-6 text-[#5F564C]">
-            Acesse sua conta para continuar acompanhando seus padrões e
-            registros.
+            Acesse sua conta para continuar usando o VPP — Meu Padrão.
           </p>
 
           {erro && (
@@ -126,7 +125,10 @@ export default function LoginPage() {
 
           <form onSubmit={handleLogin} className="mt-6 space-y-4">
             <label className="block">
-              <span className="text-sm font-medium text-[#5F564C]">E-mail</span>
+              <span className="text-sm font-medium text-[#5F564C]">
+                E-mail
+              </span>
+
               <input
                 type="email"
                 value={email}
@@ -140,7 +142,9 @@ export default function LoginPage() {
             </label>
 
             <label className="block">
-              <span className="text-sm font-medium text-[#5F564C]">Senha</span>
+              <span className="text-sm font-medium text-[#5F564C]">
+                Senha
+              </span>
 
               <div className="mt-2 flex items-center rounded-2xl border border-[#D8C7B1] bg-[#F7F3EC] focus-within:border-[#8A2E2B]">
                 <input

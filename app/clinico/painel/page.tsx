@@ -147,35 +147,36 @@ export default function ClinicoPainelPage() {
                   : "Acompanhe pacientes vinculados, resultados do teste VPP e registros de situações reais."}
               </p>
             </div>
+
             <div className="flex w-full flex-col gap-3 sm:flex-row lg:w-auto">
-            <Link
-  href="/perfil"
-  className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-[#D8C7B1] bg-white px-5 text-sm font-medium text-[#5F564C] shadow-sm transition hover:bg-[#FFF8EE] lg:w-auto"
->
-  Meu perfil
-</Link>
-  <Link
-    href="/clinico/perfil-profissional"
-    className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl bg-[#2F2A24] px-5 text-sm font-semibold text-white shadow-sm transition hover:opacity-95 lg:w-auto"
-  >
-    Perfil profissional
-  </Link>
+              <Link
+                href="/perfil"
+                className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-[#D8C7B1] bg-white px-5 text-sm font-medium text-[#5F564C] shadow-sm transition hover:bg-[#FFF8EE] lg:w-auto"
+              >
+                Meu perfil
+              </Link>
 
-  <Link
-    href="/clinico/sobre"
-    className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-[#D8C7B1] bg-white px-5 text-sm font-medium text-[#5F564C] shadow-sm transition hover:bg-[#FFF8EE] lg:w-auto"
-  >
-    Sobre a área clínica
-  </Link>
+              <Link
+                href="/clinico/perfil-profissional"
+                className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl bg-[#2F2A24] px-5 text-sm font-semibold text-white shadow-sm transition hover:opacity-95 lg:w-auto"
+              >
+                Perfil profissional
+              </Link>
 
-  <button
-    type="button"
-    onClick={handleSair}
-    className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-[#D8C7B1] bg-white px-5 text-sm font-medium text-[#5F564C] shadow-sm transition hover:bg-[#FFF8EE] lg:w-auto"
-  >
-    Sair
-  </button>
-  
+              <Link
+                href="/clinico/sobre"
+                className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-[#D8C7B1] bg-white px-5 text-sm font-medium text-[#5F564C] shadow-sm transition hover:bg-[#FFF8EE] lg:w-auto"
+              >
+                Sobre a área clínica
+              </Link>
+
+              <button
+                type="button"
+                onClick={handleSair}
+                className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-[#D8C7B1] bg-white px-5 text-sm font-medium text-[#5F564C] shadow-sm transition hover:bg-[#FFF8EE] lg:w-auto"
+              >
+                Sair
+              </button>
             </div>
           </div>
         </header>
@@ -233,7 +234,7 @@ export default function ClinicoPainelPage() {
 
           <article className="rounded-3xl border border-[#E5DDD2] bg-white p-5 shadow-sm">
             <p className="text-sm font-medium text-[#8A7A68]">
-              Pacientes ativos
+              Pacientes com registros
             </p>
 
             <p className="mt-3 text-3xl font-semibold text-[#2F2A24]">
@@ -241,7 +242,7 @@ export default function ClinicoPainelPage() {
             </p>
 
             <p className="mt-2 text-sm leading-6 text-[#5F564C]">
-              Com pelo menos 1 registro real.
+              Com pelo menos 1 situação registrada.
             </p>
           </article>
         </section>
@@ -260,8 +261,8 @@ export default function ClinicoPainelPage() {
               </h2>
 
               <p className="mt-3 text-sm leading-6 text-[#5F564C]">
-                O terapeuta vê apenas pacientes vinculados a ele. Nada de
-                passear por dados alheios como se privacidade fosse enfeite.
+                O terapeuta visualiza apenas pacientes que iniciaram vínculo
+                com sua conta.
               </p>
             </div>
 
@@ -281,10 +282,10 @@ export default function ClinicoPainelPage() {
               <div className="space-y-3">
                 {pacientes.map((paciente) => (
                   <Link
-                  key={paciente.patient_id}
-                  href={`/clinico/pacientes/${paciente.patient_id}`}
-                  className="block rounded-2xl border border-[#E5DDD2] bg-[#F7F3EC] p-4 transition hover:bg-[#FFF8EE] hover:shadow-sm"
-                >
+                    key={paciente.patient_id}
+                    href={`/clinico/pacientes/${paciente.patient_id}`}
+                    className="block rounded-2xl border border-[#E5DDD2] bg-[#F7F3EC] p-4 transition hover:bg-[#FFF8EE] hover:shadow-sm"
+                  >
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                       <div className="min-w-0">
                         <h3 className="text-base font-semibold text-[#2F2A24]">
@@ -332,7 +333,7 @@ export default function ClinicoPainelPage() {
                         </p>
                       </div>
                     </div>
-                    </Link>
+                  </Link>
                 ))}
               </div>
             )}
@@ -349,22 +350,21 @@ export default function ClinicoPainelPage() {
               </h2>
 
               <p className="mt-3 text-sm leading-6 text-[#5F564C]">
-                A área clínica não deve transformar o VPP em diagnóstico
-                automático. Ela deve ajudar o terapeuta a enxergar repetições,
-                levantar hipóteses e construir a devolutiva junto com o paciente.
+                A área clínica não transforma o VPP em diagnóstico automático.
+                Ela ajuda o terapeuta a observar repetições, levantar hipóteses
+                e construir devolutivas com mais clareza.
               </p>
             </article>
 
             <article className="rounded-3xl border border-[#E5DDD2] bg-white p-5 shadow-sm sm:p-7">
               <p className="mb-2 text-sm font-medium text-[#8A7A68]">
-                Atenção ética
+                Consentimento e vínculo
               </p>
 
               <p className="text-sm leading-6 text-[#5F564C]">
-                O terapeuta só acessa pacientes vinculados. O paciente inicia o
-                vínculo pelo próprio painel. Isso preserva a ideia central:
-                dados emocionais precisam de consentimento claro, não de
-                curiosidade técnica fantasiada de recurso.
+                O terapeuta só acessa pacientes vinculados. O vínculo é iniciado
+                pelo paciente no próprio painel, preservando consentimento e
+                controle de acesso aos dados.
               </p>
             </article>
           </aside>
@@ -372,7 +372,7 @@ export default function ClinicoPainelPage() {
 
         <section className="mt-6 rounded-3xl border border-[#E5DDD2] bg-white p-5 shadow-sm sm:p-7">
           <p className="mb-2 text-sm font-medium text-[#8A2E2B]">
-            Próxima evolução da área clínica
+            Caminho clínico
           </p>
 
           <h2 className="text-xl font-semibold text-[#2F2A24]">
@@ -398,7 +398,7 @@ export default function ClinicoPainelPage() {
 
               <p className="mt-2 text-sm leading-6 text-[#5F564C]">
                 O paciente registra acontecimentos concretos e o terapeuta
-                observa repetições.
+                observa repetições ao longo do processo.
               </p>
             </div>
 
@@ -408,8 +408,8 @@ export default function ClinicoPainelPage() {
               </p>
 
               <p className="mt-2 text-sm leading-6 text-[#5F564C]">
-                A leitura clínica organiza hipótese, padrão percebido e pergunta
-                de investigação.
+                A leitura clínica organiza hipóteses, padrões percebidos e
+                perguntas de investigação.
               </p>
             </div>
           </div>

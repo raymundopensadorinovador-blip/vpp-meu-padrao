@@ -266,9 +266,9 @@ export default function EditarSituacaoPage() {
               </h1>
 
               <p className="mt-3 max-w-2xl text-sm leading-6 text-[#5F564C]">
-                Edite apenas para deixar o registro mais claro. Não transforme o
-                relato em versão bonita demais, porque aí o padrão já começa a
-                mentir vestido de revisão.
+                Edite o registro apenas para deixá-lo mais claro e fiel ao que
+                aconteceu. A ideia é preservar a situação real, não criar uma
+                versão idealizada.
               </p>
             </div>
 

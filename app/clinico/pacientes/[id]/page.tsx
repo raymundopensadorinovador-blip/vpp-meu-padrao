@@ -565,10 +565,10 @@ carregarPaciente();
       </h2>
 
       <p className="mt-3 text-sm leading-6 text-[#5F564C]">
-        O vínculo será encerrado, mas o histórico não será apagado. Use esta
-        opção em casos de alta, pausa no acompanhamento, encaminhamento para
-        outro profissional ou encerramento por motivo administrativo.
-      </p>
+  O vínculo será encerrado e o paciente deixará de aparecer na sua lista
+  ativa. O histórico clínico já registrado será preservado para consulta
+  profissional.
+</p>
     </div>
 
     <div className="grid gap-5 md:grid-cols-2">
@@ -612,11 +612,11 @@ carregarPaciente();
     </div>
 
     <div className="mt-5 rounded-2xl border border-[#E5DDD2] bg-[#F7F3EC] p-4">
-      <p className="text-sm leading-6 text-[#5F564C]">
-        Esta ação remove o paciente da sua lista ativa, mas mantém o histórico
-        clínico preservado. Para reativar o vínculo no futuro, o paciente poderá
-        vincular novamente sua conta pelo e-mail do terapeuta.
-      </p>
+    <p className="text-sm leading-6 text-[#5F564C]">
+  Esta ação preserva os registros já criados e encerra apenas o vínculo
+  ativo. Caso o acompanhamento seja retomado no futuro, o paciente poderá
+  iniciar um novo vínculo pelo próprio painel.
+</p>
     </div>
 
     <div className="mt-6 flex flex-col gap-3 sm:flex-row">
@@ -745,8 +745,9 @@ carregarPaciente();
               </p>
 
               <p className="mt-2 text-sm leading-6 text-[#5F564C]">
-                Quando ele responder ao teste, a leitura inicial aparecerá aqui.
-              </p>
+  Quando o paciente responder ao teste, a leitura inicial ficará disponível
+  para apoiar a observação clínica.
+</p>
             </div>
           )}
         </section>
@@ -840,9 +841,10 @@ carregarPaciente();
             </h2>
 
             <p className="mt-3 text-sm leading-6 text-[#5F564C]">
-              Esta leitura usa apenas as situações que o paciente registrou. Não
-              é diagnóstico. É material de observação para conversa clínica.
-            </p>
+  Esta leitura considera apenas as situações registradas pelo paciente. Não
+  se trata de diagnóstico, mas de material de observação para a conversa
+  clínica.
+</p>
           </div>
 
           {situacoes.length === 0 ? (
@@ -938,9 +940,9 @@ carregarPaciente();
       </p>
 
       <p className="mt-2 text-sm leading-6 text-[#5F564C]">
-        Quando um encaminhamento for salvo, ele aparecerá aqui para consulta,
-        impressão e geração de PDF pelo navegador.
-      </p>
+  Quando um encaminhamento for salvo, ele aparecerá aqui para consulta,
+  impressão ou salvamento em PDF.
+</p>
     </div>
   ) : (
     <div className="space-y-3">
@@ -992,9 +994,9 @@ carregarPaciente();
     </h2>
 
     <p className="mt-3 text-sm leading-6 text-[#5F564C]">
-      Registre hipóteses, observações e ideias para devolutiva. Essas anotações
-      não aparecem para o paciente nesta etapa.
-    </p>
+  Registre observações, hipóteses e pontos para devolutiva. Essas anotações
+  ficam disponíveis apenas para o terapeuta.
+</p>
   </div>
 
   {sucessoNota && (
@@ -1058,7 +1060,7 @@ carregarPaciente();
       <textarea
         value={textoNota}
         onChange={(event) => setTextoNota(event.target.value)}
-        placeholder="Escreva sua observação clínica sobre o padrão, hipótese ou ponto para devolutiva."
+        placeholder="Escreva uma observação clínica, hipótese ou ponto para devolutiva."
         className="mt-2 min-h-32 w-full resize-none rounded-2xl border border-[#D8C7B1] bg-white px-4 py-3 text-sm leading-6 text-[#2F2A24] outline-none transition placeholder:text-[#8A7A68] focus:border-[#8A2E2B]"
         disabled={salvandoNota}
       />

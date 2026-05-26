@@ -182,8 +182,8 @@ export default function NovaSituacaoPage() {
 
               <p className="mt-3 max-w-2xl text-sm leading-6 text-[#5F564C]">
                 {nomeUsuario
-                  ? `${nomeUsuario}, registre uma situação recente sem tentar enfeitar. O objetivo não é parecer bem. É observar o funcionamento real.`
-                  : "Registre uma situação recente sem tentar enfeitar. O objetivo não é parecer bem. É observar o funcionamento real."}
+                  ? `${nomeUsuario}, registre uma situação recente para observar como expectativa, pensamento, emoção e comportamento se conectaram.`
+                  : "Registre uma situação recente para observar como expectativa, pensamento, emoção e comportamento se conectaram."}
               </p>
             </div>
 
@@ -374,10 +374,9 @@ export default function NovaSituacaoPage() {
 
           <div className="mt-6 rounded-2xl border border-[#E5DDD2] bg-[#F7F3EC] p-4">
             <p className="text-sm leading-6 text-[#5F564C]">
-              Este registro não serve para julgar você. Serve para observar como
-              expectativa, pensamento e reação se conectam. Sim, aparentemente
-              olhar para o próprio padrão exige mais coragem do que instalar o
-              app. Quem diria.
+              Este registro não serve para julgar você. Ele ajuda a observar
+              como expectativa, pensamento, emoção e reação se conectam em uma
+              situação concreta.
             </p>
           </div>
 
