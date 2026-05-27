@@ -112,7 +112,7 @@ export default function VincularTerapeutaPage() {
       .maybeSingle();
     
     if (!erroTerapeuta && terapeutaEncontrado?.id) {
-      await fetch("/api/push/send", {
+      const respostaPush = await fetch("/api/push/send", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -126,6 +126,14 @@ export default function VincularTerapeutaPage() {
           url: "/clinico/painel",
         }),
       });
+      
+      const retornoPush = await respostaPush.json().catch(() => null);
+      
+      console.log("RETORNO DO PUSH:", {
+        status: respostaPush.status,
+        ok: respostaPush.ok,
+        retorno: retornoPush,
+      });   
     }
       setSucesso("Terapeuta vinculado com sucesso.");
       setEmailTerapeuta("");
