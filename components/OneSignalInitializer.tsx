@@ -10,6 +10,7 @@ declare global {
 }
 
 const ONESIGNAL_APP_ID = "04ff0276-7dd9-4a01-9b40-c93feaccbfb0";
+const ORIGEM_ONESIGNAL_PERMITIDA = "https://vpp-meu-padrao.vercel.app";
 
 export default function OneSignalInitializer() {
   const iniciou = useRef(false);
@@ -51,24 +52,31 @@ export default function OneSignalInitializer() {
   useEffect(() => {
     if (iniciou.current) return;
     iniciou.current = true;
-
+  
     if (typeof window === "undefined") return;
-
+  
+    const origemAtual = window.location.origin;
+  
+    if (origemAtual !== ORIGEM_ONESIGNAL_PERMITIDA) {
+      console.log("OneSignal ignorado fora da produção:", origemAtual);
+      return;
+    }
+  
     const temSuporte =
       "serviceWorker" in navigator &&
       "PushManager" in window &&
       "Notification" in window;
-
+  
     setSuportado(temSuporte);
-
+  
     if (!temSuporte) return;
-
+  
     setPermitido(Notification.permission === "granted");
-
+  
     window.OneSignalDeferred = window.OneSignalDeferred || [];
-
+  
     const scriptExistente = document.getElementById("onesignal-sdk");
-
+  
     if (!scriptExistente) {
       const script = document.createElement("script");
       script.id = "onesignal-sdk";
@@ -76,7 +84,7 @@ export default function OneSignalInitializer() {
       script.defer = true;
       document.head.appendChild(script);
     }
-
+  
     window.OneSignalDeferred.push(async function (OneSignal) {
       await OneSignal.init({
         appId: ONESIGNAL_APP_ID,
@@ -87,12 +95,11 @@ export default function OneSignalInitializer() {
         notifyButton: {
           enable: false,
         },
-        allowLocalhostAsSecureOrigin: true,
       });
-
+  
       const permissaoAtual = Notification.permission === "granted";
       setPermitido(permissaoAtual);
-
+  
       if (permissaoAtual) {
         await salvarInscricaoPush(OneSignal);
       }

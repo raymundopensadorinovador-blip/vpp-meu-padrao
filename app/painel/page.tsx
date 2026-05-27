@@ -24,9 +24,14 @@ export default function PainelPage() {
   const router = useRouter();
 
   const [carregando, setCarregando] = useState(true);
-const [nomeUsuario, setNomeUsuario] = useState("");
-const [roleUsuario, setRoleUsuario] = useState<Role | null>(null);
-const [resumoSituacoes, setResumoSituacoes] = useState<ResumoSituacoes>({
+  const [nomeUsuario, setNomeUsuario] = useState("");
+  const [roleUsuario, setRoleUsuario] = useState<Role | null>(null);
+  const [codigoTerapeuta, setCodigoTerapeuta] = useState("");
+  const [ativandoAreaClinica, setAtivandoAreaClinica] = useState(false);
+  const [mensagemAtivacaoClinica, setMensagemAtivacaoClinica] = useState("");
+  const [erroAtivacaoClinica, setErroAtivacaoClinica] = useState("");
+  
+  const [resumoSituacoes, setResumoSituacoes] = useState<ResumoSituacoes>({
     total: 0,
     areaMaisRecorrente: "Ainda sem registros",
     respostaMaisComum: "Ainda sem registros",
@@ -137,6 +142,61 @@ setNomeUsuario(perfil.name || "");
     verificarAcesso();
   }, [router]);
 
+  async function handleAtivarAreaClinica(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+  
+    const codigoLimpo = codigoTerapeuta.trim().toUpperCase();
+  
+    setMensagemAtivacaoClinica("");
+    setErroAtivacaoClinica("");
+  
+    if (!codigoLimpo) {
+      setErroAtivacaoClinica("Informe o código de terapeuta para ativar a área clínica.");
+      return;
+    }
+  
+    setAtivandoAreaClinica(true);
+  
+    const { error } = await supabase.rpc("activate_clinical_area_with_code", {
+      p_code: codigoLimpo,
+    });
+  
+    setAtivandoAreaClinica(false);
+  
+    if (error) {
+      console.error("ERRO AO ATIVAR ÁREA CLÍNICA:", error);
+  
+      if (error.message?.includes("invalid_or_used_therapist_code")) {
+        setErroAtivacaoClinica(
+          "Código inválido ou já utilizado. Confira o código e tente novamente."
+        );
+        return;
+      }
+  
+      if (error.message?.includes("clinical_area_already_enabled")) {
+        setRoleUsuario("ambos");
+        setMensagemAtivacaoClinica("Sua área clínica já estava ativada.");
+        return;
+      }
+  
+      if (error.message?.includes("user_already_therapist")) {
+        router.replace("/clinico/painel");
+        return;
+      }
+  
+      setErroAtivacaoClinica(
+        "Não foi possível ativar a área clínica agora. Tente novamente em instantes."
+      );
+      return;
+    }
+  
+    setCodigoTerapeuta("");
+    setRoleUsuario("ambos");
+    setMensagemAtivacaoClinica(
+      "Área clínica ativada com sucesso. Agora você também pode acessar o painel clínico."
+    );
+  }
+
   async function handleSair() {
     await supabase.auth.signOut();
     router.replace("/login");
@@ -212,9 +272,106 @@ setNomeUsuario(perfil.name || "");
               </button>
             </div>
           </div>
-        </header>
+          </header>
 
-        <section className="mb-6 rounded-3xl border border-[#E5DDD2] bg-white p-5 shadow-sm sm:p-7">
+{roleUsuario === "paciente" && (
+  <section className="mb-6 rounded-3xl border border-[#D8C7B1] bg-[#FFF8EE] p-5 shadow-sm sm:p-7">
+    <div className="grid gap-5 lg:grid-cols-[1.1fr_0.9fr] lg:items-start">
+      <div className="min-w-0">
+        <p className="mb-2 text-sm font-medium text-[#8A2E2B]">
+          Área clínica
+        </p>
+
+        <h2 className="text-xl font-semibold text-[#2F2A24]">
+          Ativar acesso como terapeuta
+        </h2>
+
+        <p className="mt-3 text-sm leading-6 text-[#5F564C]">
+          Se você também vai atuar como terapeuta no VPP — Meu Padrão,
+          informe um código de acesso de terapeuta para liberar o painel
+          clínico nesta mesma conta.
+        </p>
+
+        <p className="mt-3 text-sm leading-6 text-[#5F564C]">
+          Essa ativação transforma sua conta em perfil duplo: paciente e
+          terapeuta. Sem código válido, o painel clínico continua
+          bloqueado.
+        </p>
+      </div>
+
+      <form
+        onSubmit={handleAtivarAreaClinica}
+        className="rounded-2xl border border-[#E5DDD2] bg-white p-4 shadow-sm"
+      >
+        <label
+          htmlFor="codigo-terapeuta"
+          className="text-sm font-medium text-[#2F2A24]"
+        >
+          Código de terapeuta
+        </label>
+
+        <input
+          id="codigo-terapeuta"
+          type="text"
+          value={codigoTerapeuta}
+          onChange={(event) =>
+            setCodigoTerapeuta(event.target.value.toUpperCase())
+          }
+          placeholder="VPP-TERAPEUTA-000"
+          disabled={ativandoAreaClinica}
+          className="mt-2 min-h-11 w-full rounded-2xl border border-[#D8C7B1] bg-white px-4 text-sm text-[#2F2A24] outline-none transition placeholder:text-[#8A7A68] focus:border-[#8A2E2B] disabled:cursor-not-allowed disabled:opacity-70"
+        />
+
+        {erroAtivacaoClinica && (
+          <p className="mt-3 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm leading-6 text-red-700">
+            {erroAtivacaoClinica}
+          </p>
+        )}
+
+        {mensagemAtivacaoClinica && (
+          <p className="mt-3 rounded-2xl border border-green-200 bg-green-50 px-4 py-3 text-sm leading-6 text-green-700">
+            {mensagemAtivacaoClinica}
+          </p>
+        )}
+
+        <button
+          type="submit"
+          disabled={ativandoAreaClinica}
+          className="mt-4 inline-flex min-h-11 w-full items-center justify-center rounded-2xl bg-[#2F2A24] px-5 text-sm font-semibold text-white shadow-sm transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-70"
+        >
+          {ativandoAreaClinica
+            ? "Ativando área clínica..."
+            : "Ativar área clínica"}
+        </button>
+      </form>
+    </div>
+  </section>
+)}
+
+{roleUsuario === "ambos" && mensagemAtivacaoClinica && (
+  <section className="mb-6 rounded-3xl border border-green-200 bg-green-50 p-5 shadow-sm sm:p-6">
+    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div>
+        <p className="text-sm font-semibold text-green-800">
+          Área clínica liberada
+        </p>
+
+        <p className="mt-2 text-sm leading-6 text-green-800">
+          {mensagemAtivacaoClinica}
+        </p>
+      </div>
+
+      <Link
+        href="/clinico/painel"
+        className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl bg-[#2F2A24] px-5 text-sm font-semibold text-white shadow-sm transition hover:opacity-95 sm:w-auto"
+      >
+        Ir para área clínica
+      </Link>
+    </div>
+  </section>
+)}
+
+<section className="mb-6 rounded-3xl border border-[#E5DDD2] bg-white p-5 shadow-sm sm:p-7">
           <div className="flex flex-col gap-4">
             <div>
               <p className="mb-2 text-sm font-medium text-[#8A7A68]">
