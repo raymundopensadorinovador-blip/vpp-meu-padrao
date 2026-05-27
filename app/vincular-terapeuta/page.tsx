@@ -112,10 +112,13 @@ export default function VincularTerapeutaPage() {
       .maybeSingle();
     
     if (!erroTerapeuta && terapeutaEncontrado?.id) {
+      const { data: sessaoAtual } = await supabase.auth.getSession();
+
       const respostaPush = await fetch("/api/push/send", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${sessaoAtual.session?.access_token || ""}`,
         },
         body: JSON.stringify({
           userId: terapeutaEncontrado.id,
@@ -125,7 +128,7 @@ export default function VincularTerapeutaPage() {
             : "Um paciente vinculou você como terapeuta no VPP — Meu Padrão.",
           url: "/clinico/painel",
         }),
-      });
+      }); 
       
       const retornoPush = await respostaPush.json().catch(() => null);
       
