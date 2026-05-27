@@ -157,8 +157,9 @@ export async function POST(request: Request) {
       ok: true,
       sent: true,
       subscriptions: subscriptionIds.length,
+      subscriptionIds,
       oneSignal: respostaJson,
-    });
+    }); 
   } catch (error) {
     console.error("ERRO NA ROTA DE PUSH:", error);
 
