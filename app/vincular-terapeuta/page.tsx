@@ -17,8 +17,8 @@ export default function VincularTerapeutaPage() {
   const [nomeUsuario, setNomeUsuario] = useState("");
 
   const [erro, setErro] = useState("");
-const [sucesso, setSucesso] = useState("");
-const [debugPush, setDebugPush] = useState("");
+  const [sucesso, setSucesso] = useState("");
+  const [debugPush, setDebugPush] = useState("");
 
   useEffect(() => {
     async function verificarAcesso() {
@@ -47,7 +47,7 @@ const [debugPush, setDebugPush] = useState("");
       if (role !== "paciente" && role !== "ambos") {
         router.replace("/clinico/painel");
         return;
-      } 
+      }
 
       setNomeUsuario(perfil.name || "");
       setCarregandoAcesso(false);
@@ -65,6 +65,7 @@ const [debugPush, setDebugPush] = useState("");
 
     setErro("");
     setSucesso("");
+    setDebugPush("");
 
     const emailLimpo = emailTerapeuta.trim().toLowerCase();
 
@@ -82,22 +83,22 @@ const [debugPush, setDebugPush] = useState("");
 
       if (error) {
         console.error("ERRO AO VINCULAR TERAPEUTA:", error);
-      
+
         if (error.message.includes("therapist_not_found")) {
           setErro("Não encontramos um terapeuta cadastrado com esse e-mail.");
           return;
         }
-      
+
         if (error.message.includes("cannot_link_to_self")) {
           setErro("Você não pode vincular sua própria conta como terapeuta.");
           return;
         }
-      
+
         if (error.message.includes("only_patient_can_link")) {
           setErro("Esta conta não tem permissão para vincular terapeuta.");
           return;
         }
-      
+
         setErro(
           `Não foi possível vincular este terapeuta. Erro: ${
             error.message || "erro desconhecido"
@@ -105,75 +106,55 @@ const [debugPush, setDebugPush] = useState("");
         );
         return;
       }
-      console.log("INICIANDO BUSCA DO TERAPEUTA PARA PUSH:", emailLimpo);
-      setDebugPush("Buscando terapeuta para enviar push...");
-      
-      const { data: terapeutaEncontrado, error: erroTerapeuta } = await supabase
-        .from("profiles")
-        .select("id, name, email, role")
-        .eq("email", emailLimpo)
-        .in("role", ["terapeuta", "ambos"])
-        .maybeSingle();
-      
-      console.log("RESULTADO DA BUSCA DO TERAPEUTA PARA PUSH:", {
-        terapeutaEncontrado,
-        erroTerapeuta,
+
+      setDebugPush("Vínculo criado. Enviando push para o terapeuta...");
+
+      const { data: sessaoAtual } = await supabase.auth.getSession();
+
+      console.log("TOKEN PARA PUSH EXISTE?", {
+        temSessao: !!sessaoAtual.session,
+        temToken: !!sessaoAtual.session?.access_token,
       });
-      
-      if (erroTerapeuta) {
-        setDebugPush(
-          `Vínculo criado, mas houve erro ao buscar terapeuta para push: ${erroTerapeuta.message}`
-        );
-      } else if (!terapeutaEncontrado?.id) {
-        setDebugPush(
-          "Vínculo criado, mas o terapeuta não foi encontrado no profiles para envio do push."
-        );
-      } else {
-        setDebugPush("Terapeuta encontrado. Enviando push...");
-      
-        const { data: sessaoAtual } = await supabase.auth.getSession();
-      
-        console.log("TOKEN PARA PUSH EXISTE?", {
-          temSessao: !!sessaoAtual.session,
-          temToken: !!sessaoAtual.session?.access_token,
-        });
-      
-        const respostaPush = await fetch("/api/push/send", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${sessaoAtual.session?.access_token || ""}`,
-          },
-          body: JSON.stringify({
-            userId: terapeutaEncontrado.id,
-            title: "Novo paciente vinculado",
-            message: nomeUsuario
-              ? `${nomeUsuario} vinculou você como terapeuta no VPP — Meu Padrão.`
-              : "Um paciente vinculou você como terapeuta no VPP — Meu Padrão.",
-            url: "/clinico/painel",
-          }),
-        });
-      
-        const retornoPush = await respostaPush.json().catch(() => null);
-      
-        console.log("RETORNO DO PUSH:", {
-          status: respostaPush.status,
-          ok: respostaPush.ok,
-          retorno: retornoPush,
-        });
-      
-        setDebugPush(
-          `Push: status ${respostaPush.status} | ok: ${
-            respostaPush.ok ? "sim" : "não"
-          } | retorno: ${JSON.stringify(retornoPush)}`
-        );
-      } 
+
+      const respostaPush = await fetch("/api/push/send", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${sessaoAtual.session?.access_token || ""}`,
+        },
+        body: JSON.stringify({
+          therapistEmail: emailLimpo,
+          eventType: "patient_linked_therapist",
+          title: "Novo paciente vinculado",
+          message: nomeUsuario
+            ? `${nomeUsuario} vinculou você como terapeuta no VPP — Meu Padrão.`
+            : "Um paciente vinculou você como terapeuta no VPP — Meu Padrão.",
+          url: "/clinico/painel",
+        }),
+      });
+
+      const retornoPush = await respostaPush.json().catch(() => null);
+
+      console.log("RETORNO DO PUSH:", {
+        status: respostaPush.status,
+        ok: respostaPush.ok,
+        retorno: retornoPush,
+      });
+
+      setDebugPush(
+        `Push: status ${respostaPush.status} | ok: ${
+          respostaPush.ok ? "sim" : "não"
+        } | retorno: ${JSON.stringify(retornoPush)}`
+      );
+
       setSucesso("Terapeuta vinculado com sucesso.");
       setEmailTerapeuta("");
 
+      // Temporariamente sem redirecionar para conseguirmos ver o debug do push.
+      // Depois que o push estiver aprovado, reativamos o retorno automático.
       // setTimeout(() => {
-//   router.push("/painel");
-// }, 1200);
+      //   router.push("/painel");
+      // }, 1200);
     } finally {
       setSalvando(false);
     }
@@ -222,9 +203,9 @@ const [debugPush, setDebugPush] = useState("");
             </h1>
 
             <p className="mt-4 text-sm leading-6 text-[#5F564C]">
-            {nomeUsuario
-  ? `${nomeUsuario}, informe o e-mail do terapeuta que terá acesso aos seus registros no VPP — Meu Padrão.`
-  : "Informe o e-mail do terapeuta que terá acesso aos seus registros no VPP — Meu Padrão."}
+              {nomeUsuario
+                ? `${nomeUsuario}, informe o e-mail do terapeuta que terá acesso aos seus registros no VPP — Meu Padrão.`
+                : "Informe o e-mail do terapeuta que terá acesso aos seus registros no VPP — Meu Padrão."}
             </p>
           </div>
 
@@ -239,11 +220,13 @@ const [debugPush, setDebugPush] = useState("");
               {sucesso}
             </div>
           )}
-{debugPush && (
-  <div className="mb-5 rounded-2xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm leading-6 text-blue-800">
-    {debugPush}
-  </div>
-)}
+
+          {debugPush && (
+            <div className="mb-5 rounded-2xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm leading-6 text-blue-800">
+              {debugPush}
+            </div>
+          )}
+
           <form onSubmit={handleVincularTerapeuta} className="space-y-5">
             <div>
               <label
@@ -277,12 +260,12 @@ const [debugPush, setDebugPush] = useState("");
           </form>
 
           <div className="mt-6 rounded-2xl border border-[#E5DDD2] bg-[#F7F3EC] p-4">
-          <p className="text-sm leading-6 text-[#5F564C]">
-  O terapeuta só poderá acessar seus dados se estiver cadastrado como
-  terapeuta na plataforma e se este vínculo estiver ativo. Esse vínculo
-  pode ser encerrado quando necessário, preservando o cuidado com suas
-  informações.
-</p>
+            <p className="text-sm leading-6 text-[#5F564C]">
+              O terapeuta só poderá acessar seus dados se estiver cadastrado
+              como terapeuta na plataforma e se este vínculo estiver ativo. Esse
+              vínculo pode ser encerrado quando necessário, preservando o cuidado
+              com suas informações.
+            </p>
           </div>
         </div>
       </section>

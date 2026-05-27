@@ -10,9 +10,11 @@ const APP_URL = "https://vpp-meu-padrao.vercel.app";
 
 type PushBody = {
   userId?: string;
+  therapistEmail?: string;
   title?: string;
   message?: string;
   url?: string;
+  eventType?: "patient_linked_therapist" | "generic";
 };
 
 function montarUrlDestino(url: string) {
@@ -73,10 +75,72 @@ export async function POST(request: Request) {
 
     const body = (await request.json()) as PushBody;
 
-    const userId = String(body.userId || "").trim();
     const title = String(body.title || "").trim();
     const message = String(body.message || "").trim();
     const url = montarUrlDestino(String(body.url || "/").trim());
+    const eventType = body.eventType || "generic";
+
+    let userId = String(body.userId || "").trim();
+
+    if (!userId && body.therapistEmail) {
+      const therapistEmail = String(body.therapistEmail || "")
+        .trim()
+        .toLowerCase();
+
+      const { data: terapeuta, error: erroTerapeuta } = await supabaseAdmin
+        .from("profiles")
+        .select("id, email, role")
+        .eq("email", therapistEmail)
+        .in("role", ["terapeuta", "ambos"])
+        .maybeSingle();
+
+      if (erroTerapeuta) {
+        console.error("ERRO AO BUSCAR TERAPEUTA PARA PUSH:", erroTerapeuta);
+
+        return NextResponse.json(
+          { error: "Erro ao buscar terapeuta para envio push." },
+          { status: 500 }
+        );
+      }
+
+      if (!terapeuta?.id) {
+        return NextResponse.json(
+          { error: "Terapeuta não encontrado para envio push." },
+          { status: 404 }
+        );
+      }
+
+      userId = terapeuta.id;
+
+      if (eventType === "patient_linked_therapist") {
+        const { data: vinculo, error: erroVinculo } = await supabaseAdmin
+          .from("therapist_patient_links")
+          .select("id")
+          .eq("patient_id", usuarioAutenticado.user.id)
+          .eq("therapist_id", userId)
+          .in("status", ["ativo", "active"])
+          .maybeSingle();
+
+        if (erroVinculo) {
+          console.error("ERRO AO VALIDAR VÍNCULO PARA PUSH:", erroVinculo);
+
+          return NextResponse.json(
+            { error: "Erro ao validar vínculo para envio push." },
+            { status: 500 }
+          );
+        }
+
+        if (!vinculo?.id) {
+          return NextResponse.json(
+            {
+              error:
+                "Push bloqueado: não existe vínculo ativo entre paciente e terapeuta.",
+            },
+            { status: 403 }
+          );
+        }
+      }
+    }
 
     if (!userId || !title || !message) {
       return NextResponse.json(
@@ -110,7 +174,12 @@ export async function POST(request: Request) {
 
     if (subscriptionIds.length === 0) {
       return NextResponse.json(
-        { ok: true, sent: false, reason: "Usuário sem inscrição push ativa." },
+        {
+          ok: true,
+          sent: false,
+          reason: "Usuário sem inscrição push ativa.",
+          targetUserId: userId,
+        },
         { status: 200 }
       );
     }
@@ -156,10 +225,11 @@ export async function POST(request: Request) {
     return NextResponse.json({
       ok: true,
       sent: true,
+      targetUserId: userId,
       subscriptions: subscriptionIds.length,
       subscriptionIds,
       oneSignal: respostaJson,
-    }); 
+    });
   } catch (error) {
     console.error("ERRO NA ROTA DE PUSH:", error);
 
