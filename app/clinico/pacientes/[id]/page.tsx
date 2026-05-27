@@ -435,7 +435,14 @@ carregarPaciente();
       });
   
       if (error) {
-        setErro("Não foi possível encerrar o vínculo com este paciente.");
+        console.error("ERRO AO ENCERRAR VÍNCULO:", error);
+      
+        setErro(
+          `Não foi possível encerrar o vínculo com este paciente. Erro: ${
+            error.message || "erro desconhecido"
+          }`
+        );
+      
         return;
       }
   
