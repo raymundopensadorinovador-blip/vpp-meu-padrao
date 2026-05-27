@@ -17,7 +17,8 @@ export default function VincularTerapeutaPage() {
   const [nomeUsuario, setNomeUsuario] = useState("");
 
   const [erro, setErro] = useState("");
-  const [sucesso, setSucesso] = useState("");
+const [sucesso, setSucesso] = useState("");
+const [debugPush, setDebugPush] = useState("");
 
   useEffect(() => {
     async function verificarAcesso() {
@@ -104,46 +105,75 @@ export default function VincularTerapeutaPage() {
         );
         return;
       }
+      console.log("INICIANDO BUSCA DO TERAPEUTA PARA PUSH:", emailLimpo);
+      setDebugPush("Buscando terapeuta para enviar push...");
+      
       const { data: terapeutaEncontrado, error: erroTerapeuta } = await supabase
-      .from("profiles")
-      .select("id, name")
-      .eq("email", emailLimpo)
-      .in("role", ["terapeuta", "ambos"])
-      .maybeSingle();
-    
-    if (!erroTerapeuta && terapeutaEncontrado?.id) {
-      const { data: sessaoAtual } = await supabase.auth.getSession();
-
-      const respostaPush = await fetch("/api/push/send", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${sessaoAtual.session?.access_token || ""}`,
-        },
-        body: JSON.stringify({
-          userId: terapeutaEncontrado.id,
-          title: "Novo paciente vinculado",
-          message: nomeUsuario
-            ? `${nomeUsuario} vinculou você como terapeuta no VPP — Meu Padrão.`
-            : "Um paciente vinculou você como terapeuta no VPP — Meu Padrão.",
-          url: "/clinico/painel",
-        }),
-      }); 
+        .from("profiles")
+        .select("id, name, email, role")
+        .eq("email", emailLimpo)
+        .in("role", ["terapeuta", "ambos"])
+        .maybeSingle();
       
-      const retornoPush = await respostaPush.json().catch(() => null);
+      console.log("RESULTADO DA BUSCA DO TERAPEUTA PARA PUSH:", {
+        terapeutaEncontrado,
+        erroTerapeuta,
+      });
       
-      console.log("RETORNO DO PUSH:", {
-        status: respostaPush.status,
-        ok: respostaPush.ok,
-        retorno: retornoPush,
-      });   
-    }
+      if (erroTerapeuta) {
+        setDebugPush(
+          `Vínculo criado, mas houve erro ao buscar terapeuta para push: ${erroTerapeuta.message}`
+        );
+      } else if (!terapeutaEncontrado?.id) {
+        setDebugPush(
+          "Vínculo criado, mas o terapeuta não foi encontrado no profiles para envio do push."
+        );
+      } else {
+        setDebugPush("Terapeuta encontrado. Enviando push...");
+      
+        const { data: sessaoAtual } = await supabase.auth.getSession();
+      
+        console.log("TOKEN PARA PUSH EXISTE?", {
+          temSessao: !!sessaoAtual.session,
+          temToken: !!sessaoAtual.session?.access_token,
+        });
+      
+        const respostaPush = await fetch("/api/push/send", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${sessaoAtual.session?.access_token || ""}`,
+          },
+          body: JSON.stringify({
+            userId: terapeutaEncontrado.id,
+            title: "Novo paciente vinculado",
+            message: nomeUsuario
+              ? `${nomeUsuario} vinculou você como terapeuta no VPP — Meu Padrão.`
+              : "Um paciente vinculou você como terapeuta no VPP — Meu Padrão.",
+            url: "/clinico/painel",
+          }),
+        });
+      
+        const retornoPush = await respostaPush.json().catch(() => null);
+      
+        console.log("RETORNO DO PUSH:", {
+          status: respostaPush.status,
+          ok: respostaPush.ok,
+          retorno: retornoPush,
+        });
+      
+        setDebugPush(
+          `Push: status ${respostaPush.status} | ok: ${
+            respostaPush.ok ? "sim" : "não"
+          } | retorno: ${JSON.stringify(retornoPush)}`
+        );
+      } 
       setSucesso("Terapeuta vinculado com sucesso.");
       setEmailTerapeuta("");
 
-      setTimeout(() => {
-        router.push("/painel");
-      }, 1200);
+      // setTimeout(() => {
+//   router.push("/painel");
+// }, 1200);
     } finally {
       setSalvando(false);
     }
@@ -209,7 +239,11 @@ export default function VincularTerapeutaPage() {
               {sucesso}
             </div>
           )}
-
+{debugPush && (
+  <div className="mb-5 rounded-2xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm leading-6 text-blue-800">
+    {debugPush}
+  </div>
+)}
           <form onSubmit={handleVincularTerapeuta} className="space-y-5">
             <div>
               <label
