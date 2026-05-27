@@ -35,10 +35,16 @@ export async function POST(request: Request) {
   try {
     if (!supabaseUrl || !supabaseServiceKey) {
       return NextResponse.json(
-        { error: "Configuração do Supabase ausente." },
+        {
+          error: "Configuração do Supabase ausente.",
+          missing: {
+            NEXT_PUBLIC_SUPABASE_URL: !supabaseUrl,
+            SUPABASE_SERVICE_ROLE_KEY: !supabaseServiceKey,
+          },
+        },
         { status: 500 }
       );
-    }
+    } 
 
     if (!oneSignalAppId || !oneSignalRestApiKey) {
       return NextResponse.json(
