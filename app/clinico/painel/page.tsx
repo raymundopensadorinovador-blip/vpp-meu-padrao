@@ -15,6 +15,10 @@ type PacienteVinculado = {
   latest_profile: string | null;
   latest_test_at: string | null;
   situation_count: number;
+
+  anamnesis_status?: string | null;
+  anamnesis_current_version?: number | null;
+  anamnesis_last_submitted_at?: string | null;
 };
 
 export default function ClinicoPainelPage() {
@@ -76,8 +80,41 @@ const [erro, setErro] = useState("");
           return;
         }
 
-      setPacientes((pacientesVinculados || []) as PacienteVinculado[]);
-      setCarregando(false);
+        const listaPacientes = (pacientesVinculados || []) as PacienteVinculado[];
+        const idsPacientes = listaPacientes.map((paciente) => paciente.patient_id);
+        
+        if (idsPacientes.length === 0) {
+          setPacientes([]);
+          setCarregando(false);
+          return;
+        }
+        
+        const { data: anamnesesDosPacientes, error: erroAnamneses } = await supabase
+          .from("patient_anamneses")
+          .select("patient_id, status, current_version, last_submitted_at")
+          .in("patient_id", idsPacientes);
+        
+        if (erroAnamneses) {
+          console.error("ERRO AO BUSCAR ANAMNESES DOS PACIENTES:", erroAnamneses);
+        }
+        
+        const anamnesesPorPaciente = new Map(
+          (anamnesesDosPacientes || []).map((item) => [item.patient_id, item])
+        );
+        
+        const pacientesComAnamnese = listaPacientes.map((paciente) => {
+          const anamnese = anamnesesPorPaciente.get(paciente.patient_id);
+        
+          return {
+            ...paciente,
+            anamnesis_status: anamnese?.status || null,
+            anamnesis_current_version: anamnese?.current_version || null,
+            anamnesis_last_submitted_at: anamnese?.last_submitted_at || null,
+          };
+        });
+        
+        setPacientes(pacientesComAnamnese);
+        setCarregando(false);  
     }
 
     verificarAcesso();
@@ -346,17 +383,27 @@ const [erro, setErro] = useState("");
                       </div>
 
                       <div className="flex flex-wrap gap-2 sm:justify-end">
-                        <span className="rounded-2xl border border-blue-200 bg-blue-50/70 px-3 py-2 text-xs font-semibold text-blue-700">
-                          {paciente.latest_profile || "Sem teste"}
-                        </span>
+  <span className="rounded-2xl border border-blue-200 bg-blue-50/70 px-3 py-2 text-xs font-semibold text-blue-700">
+    {paciente.latest_profile || "Sem teste"}
+  </span>
 
-                        <span className="rounded-2xl border border-amber-200 bg-amber-50/80 px-3 py-2 text-xs font-semibold text-amber-700">
-                          {Number(paciente.situation_count || 0)} registro(s)
-                        </span>
-                      </div>
+  <span className="rounded-2xl border border-amber-200 bg-amber-50/80 px-3 py-2 text-xs font-semibold text-amber-700">
+    {Number(paciente.situation_count || 0)} registro(s)
+  </span>
+
+  {paciente.anamnesis_current_version && paciente.anamnesis_current_version > 0 ? (
+    <span className="rounded-2xl border border-green-200 bg-green-50 px-3 py-2 text-xs font-semibold text-green-700">
+      Anamnese v{paciente.anamnesis_current_version}
+    </span>
+  ) : (
+    <span className="rounded-2xl border border-[#D8C7B1] bg-white px-3 py-2 text-xs font-semibold text-[#8A7A68]">
+      Anamnese pendente
+    </span>
+  )}
+</div> 
                     </div>
 
-                    <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                    <div className="mt-4 grid gap-3 sm:grid-cols-3">
                       <div className="rounded-2xl bg-white p-3">
                         <p className="text-xs font-medium text-[#8A7A68]">
                           Último teste
@@ -376,6 +423,23 @@ const [erro, setErro] = useState("");
                           {paciente.latest_profile || "Ainda sem resultado"}
                         </p>
                       </div>
+                      <div className="rounded-2xl bg-white p-3">
+  <p className="text-xs font-medium text-[#8A7A68]">
+    Anamnese
+  </p>
+
+  <p className="mt-1 text-sm font-semibold text-[#2F2A24]">
+    {paciente.anamnesis_current_version && paciente.anamnesis_current_version > 0
+      ? `Versão ${paciente.anamnesis_current_version}`
+      : "Pendente"}
+  </p>
+
+  {paciente.anamnesis_last_submitted_at && (
+    <p className="mt-1 text-xs text-[#8A7A68]">
+      Atualizada em {formatarData(paciente.anamnesis_last_submitted_at)}
+    </p>
+  )}
+</div> 
                     </div>
                   </Link>
                 ))}
