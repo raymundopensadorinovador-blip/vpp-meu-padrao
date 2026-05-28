@@ -2,7 +2,13 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { FormEvent, ReactNode, useEffect, useMemo, useState } from "react";
+import {
+  FormEvent,
+  ReactNode,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { supabase } from "@/lib/supabase";
 
 type Role = "paciente" | "terapeuta" | "ambos";
@@ -150,7 +156,30 @@ const payloadInicial: AnamnesePayload = {
 };
 
 type AnamneseStatus = "rascunho" | "enviada" | "atualizada" | null;
+type TerapeutaVinculado = {
+  therapist_id: string;
+  therapist_name: string;
+  therapist_email: string;
+};
+function payloadTemConteudo(valor: unknown): boolean {
+  if (typeof valor === "string") {
+    return valor.trim().length > 0;
+  }
 
+  if (typeof valor === "boolean") {
+    return valor === true;
+  }
+
+  if (Array.isArray(valor)) {
+    return valor.some((item) => payloadTemConteudo(item));
+  }
+
+  if (valor && typeof valor === "object") {
+    return Object.values(valor).some((item) => payloadTemConteudo(item));
+  }
+
+  return false;
+}
 type TextareaFieldProps = {
   label: string;
   value: string;
@@ -284,10 +313,12 @@ export default function AnamnesePage() {
   const [nomeUsuario, setNomeUsuario] = useState("");
   const [payload, setPayload] = useState<AnamnesePayload>(payloadInicial);
   const [status, setStatus] = useState<AnamneseStatus>(null);
-  const [versaoAtual, setVersaoAtual] = useState(0);
+const [versaoAtual, setVersaoAtual] = useState(0);
+const [modoEdicao, setModoEdicao] = useState(false);
+const [rascunhoStatus, setRascunhoStatus] = useState("");
 
-  const [erro, setErro] = useState("");
-  const [sucesso, setSucesso] = useState("");
+const [erro, setErro] = useState("");
+const [sucesso, setSucesso] = useState("");
 
   useEffect(() => {
     async function carregarAnamnese() {
@@ -343,7 +374,43 @@ export default function AnamnesePage() {
 
     carregarAnamnese();
   }, [router]);
-
+  const anamneseConcluida = status === "enviada" || status === "atualizada";
+  const camposBloqueados = anamneseConcluida && !modoEdicao;
+  
+  const temConteudoNoRascunho = useMemo(() => {
+    return payloadTemConteudo(payload);
+  }, [payload]);
+  
+  useEffect(() => {
+    if (carregando || enviando || camposBloqueados || !temConteudoNoRascunho) {
+      return;
+    }
+  
+    setRascunhoStatus("Salvando automaticamente...");
+  
+    const timer = setTimeout(async () => {
+      const { error } = await supabase.rpc("save_patient_anamnesis_draft", {
+        p_payload: payload,
+      });
+  
+      if (error) {
+        console.error("ERRO AO SALVAR RASCUNHO AUTOMÁTICO:", error);
+        setRascunhoStatus("Não foi possível salvar automaticamente agora.");
+        return;
+      }
+  
+      setStatus((statusAtual) => statusAtual || "rascunho");
+      setRascunhoStatus("Rascunho salvo automaticamente.");
+    }, 1200);
+  
+    return () => clearTimeout(timer);
+  }, [
+    payload,
+    carregando,
+    enviando,
+    camposBloqueados,
+    temConteudoNoRascunho,
+  ]);
   const progresso = useMemo(() => {
     const campos = [
       payload.personal_context.living_context,
@@ -384,31 +451,51 @@ export default function AnamnesePage() {
 
   function validarAntesDeEnviar() {
     const contato = payload.trusted_contact;
-
+  
     if (!payload.main_complaint.reason_now.trim()) {
       return "Conte o que fez você buscar acompanhamento ou preencher esta anamnese agora.";
     }
-
+  
     if (!payload.main_complaint.main_difficulty.trim()) {
       return "Descreva a principal dificuldade que você está vivendo neste momento.";
     }
-
+  
+    if (!payload.emotional_history.emotional_state.trim()) {
+      return "Descreva como está seu estado emocional nos últimos meses.";
+    }
+  
+    if (!payload.family_history.family_structure.trim()) {
+      return "Conte um pouco sobre sua história familiar ou seu contexto familiar.";
+    }
+  
+    if (!payload.symptoms_and_risks.self_harm_or_risk.trim()) {
+      return "Responda o campo sobre pensamentos de se machucar, desistir da vida ou colocar-se em risco. Se não houver, escreva isso claramente.";
+    }
+  
+    if (!payload.perceived_patterns.repeated_reactions.trim()) {
+      return "Descreva alguma reação ou padrão que você percebe se repetindo em você.";
+    }
+  
+    if (!payload.final_notes.what_therapist_should_know.trim()) {
+      return "Informe o que você gostaria que o terapeuta soubesse antes de conversar com você.";
+    }
+  
     if (!contato.contact_name.trim()) {
       return "Informe o nome da pessoa de confiança.";
     }
-
+  
     if (!contato.relationship.trim()) {
       return "Informe qual é a relação da pessoa de confiança com você.";
     }
-
+  
     if (!contato.phone.trim()) {
       return "Informe o telefone ou WhatsApp da pessoa de confiança.";
     }
-
+  
     if (!contato.authorization_confirmed) {
       return "Confirme que você tem autorização para indicar essa pessoa como contato de confiança.";
     }
-
+  
     return "";
   }
 
@@ -486,9 +573,58 @@ export default function AnamnesePage() {
 
       const resultado = Array.isArray(data) ? data[0] : data;
 
-      setStatus((resultado?.status as AnamneseStatus) || "enviada");
-      setVersaoAtual(Number(resultado?.version_number || versaoAtual + 1));
-      setSucesso("Anamnese enviada com sucesso.");
+      const novoStatus = (resultado?.status as AnamneseStatus) || "enviada";
+      const novaVersao = Number(resultado?.version_number || versaoAtual + 1);
+      
+      setStatus(novoStatus);
+      setVersaoAtual(novaVersao);
+      setModoEdicao(false);
+      setRascunhoStatus("");
+      setSucesso(
+        "Anamnese enviada com sucesso. Esta versão foi salva no histórico."
+      );
+      
+      const { data: terapeutasVinculados, error: erroTerapeutas } =
+        await supabase.rpc("get_my_active_therapists_for_anamnesis");
+      
+      if (erroTerapeutas) {
+        console.error(
+          "ERRO AO BUSCAR TERAPEUTAS PARA PUSH DA ANAMNESE:",
+          erroTerapeutas
+        );
+      } else if (terapeutasVinculados && terapeutasVinculados.length > 0) {
+        const { data: sessaoAtual } = await supabase.auth.getSession();
+      
+        const terapeutas = terapeutasVinculados as TerapeutaVinculado[];
+      
+        await Promise.all(
+          terapeutas.map((terapeuta) =>
+            fetch("/api/push/send", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${sessaoAtual.session?.access_token || ""}`,
+              },
+              body: JSON.stringify({
+                userId: terapeuta.therapist_id,
+                title:
+                  novoStatus === "atualizada"
+                    ? "Anamnese atualizada"
+                    : "Nova anamnese recebida",
+                message:
+                  novoStatus === "atualizada"
+                    ? `${
+                        nomeUsuario || "Um paciente"
+                      } atualizou a anamnese no VPP — Meu Padrão.`
+                    : `${
+                        nomeUsuario || "Um paciente"
+                      } enviou a anamnese no VPP — Meu Padrão.`,
+                url: "/clinico/painel",
+              }),
+            })
+          )
+        );
+      }   
     } finally {
       setEnviando(false);
     }
@@ -569,24 +705,49 @@ export default function AnamnesePage() {
           </div>
 
           <div className="mt-5 flex flex-col gap-3 sm:flex-row">
-            <Link
-              href="/painel"
-              className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-[#D8C7B1] bg-white px-5 text-sm font-medium text-[#5F564C] shadow-sm transition hover:bg-[#FFF8EE] sm:w-auto"
-            >
-              Voltar ao painel
-            </Link>
+  <Link
+    href="/painel"
+    className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-[#D8C7B1] bg-white px-5 text-sm font-medium text-[#5F564C] shadow-sm transition hover:bg-[#FFF8EE] sm:w-auto"
+  >
+    Voltar ao painel
+  </Link>
 
-            <button
-              type="button"
-              onClick={salvarRascunho}
-              disabled={salvando || enviando}
-              className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-[#D8C7B1] bg-white px-5 text-sm font-semibold text-[#5F564C] shadow-sm transition hover:bg-[#FFF8EE] disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
-            >
-              {salvando ? "Salvando..." : "Salvar rascunho"}
-            </button>
-          </div>
+  {camposBloqueados && (
+    <button
+      type="button"
+      onClick={() => {
+        setModoEdicao(true);
+        setSucesso("");
+        setErro("");
+      }}
+      className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl bg-[#2F2A24] px-5 text-sm font-semibold text-white shadow-sm transition hover:opacity-95 sm:w-auto"
+    >
+      Editar anamnese
+    </button>
+  )}
+</div> 
         </header>
+        {camposBloqueados && (
+  <div className="mb-6 rounded-2xl border border-green-200 bg-green-50 px-4 py-3 text-sm leading-6 text-green-800">
+    Esta anamnese já foi enviada e está salva no histórico. Para modificar,
+    clique em “Editar anamnese”. Ao enviar novamente, uma nova versão será
+    criada sem apagar a anterior.
+  </div>
+)}
 
+{modoEdicao && anamneseConcluida && (
+  <div className="mb-6 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-800">
+    Você está editando uma anamnese já enviada. As alterações estão sendo
+    preservadas automaticamente como rascunho. Ao enviar, uma nova versão será
+    criada.
+  </div>
+)}
+
+{rascunhoStatus && !camposBloqueados && (
+  <div className="mb-6 rounded-2xl border border-[#D8C7B1] bg-white px-4 py-3 text-sm leading-6 text-[#5F564C] shadow-sm">
+    {rascunhoStatus}
+  </div>
+)}
         {erro && (
           <div className="mb-6 rounded-2xl border border-[#E8C7C0] bg-red-50 px-4 py-3 text-sm leading-6 text-[#8A2E2B]">
             {erro}
@@ -613,7 +774,7 @@ export default function AnamnesePage() {
                   atualizarSecao("personal_context", "age", valor)
                 }
                 placeholder="Ex: 36 anos"
-                disabled={enviando}
+                disabled={camposBloqueados || enviando}
               />
 
               <InputField
@@ -623,7 +784,7 @@ export default function AnamnesePage() {
                   atualizarSecao("personal_context", "city", valor)
                 }
                 placeholder="Ex: Campinas/SP"
-                disabled={enviando}
+                disabled={camposBloqueados || enviando}
               />
 
               <InputField
@@ -633,7 +794,7 @@ export default function AnamnesePage() {
                   atualizarSecao("personal_context", "occupation", valor)
                 }
                 placeholder="Ex: trabalho, estudo, casa, cuidado com família"
-                disabled={enviando}
+                disabled={camposBloqueados || enviando}
               />
 
               <TextareaField
@@ -643,7 +804,7 @@ export default function AnamnesePage() {
                   atualizarSecao("personal_context", "living_context", valor)
                 }
                 placeholder="Conte brevemente como é seu contexto atual de moradia, família e rotina."
-                disabled={enviando}
+                disabled={camposBloqueados || enviando}
               />
             </div>
           </SectionCard>
@@ -661,7 +822,7 @@ export default function AnamnesePage() {
               }
               placeholder="Conte o que está pesando mais neste momento."
               required
-              disabled={enviando}
+              disabled={camposBloqueados || enviando}
               help={
                 <p>
                   Pode ser uma crise, uma repetição, uma sensação antiga, um
@@ -679,7 +840,7 @@ export default function AnamnesePage() {
               }
               placeholder="Descreva a dificuldade principal com suas palavras."
               required
-              disabled={enviando}
+              disabled={camposBloqueados || enviando}
             />
 
             <TextareaField
@@ -693,7 +854,7 @@ export default function AnamnesePage() {
                 )
               }
               placeholder="Ex: por que eu reajo assim, por que repito escolhas, por que travo..."
-              disabled={enviando}
+              disabled={camposBloqueados || enviando}
             />
           </SectionCard>
 
@@ -709,7 +870,7 @@ export default function AnamnesePage() {
                 atualizarSecao("emotional_history", "emotional_state", valor)
               }
               placeholder="Fale sobre ansiedade, tristeza, irritação, vazio, medo, culpa, cansaço ou outros estados."
-              disabled={enviando}
+              disabled={camposBloqueados || enviando}
             />
 
             <TextareaField
@@ -719,7 +880,7 @@ export default function AnamnesePage() {
                 atualizarSecao("emotional_history", "recurring_feelings", valor)
               }
               placeholder="Ex: medo de decepcionar, sensação de abandono, culpa, raiva, insegurança..."
-              disabled={enviando}
+              disabled={camposBloqueados || enviando}
             />
 
             <TextareaField
@@ -729,7 +890,7 @@ export default function AnamnesePage() {
                 atualizarSecao("emotional_history", "difficult_periods", valor)
               }
               placeholder="Conte apenas o que se sentir confortável em registrar agora."
-              disabled={enviando}
+              disabled={camposBloqueados || enviando}
             />
 
             <TextareaField
@@ -743,7 +904,7 @@ export default function AnamnesePage() {
                 )
               }
               placeholder="Ex: crítica, silêncio, rejeição, cobrança, conflito, sensação de injustiça..."
-              disabled={enviando}
+              disabled={camposBloqueados || enviando}
             />
           </SectionCard>
 
@@ -759,7 +920,7 @@ export default function AnamnesePage() {
                 atualizarSecao("family_history", "family_structure", valor)
               }
               placeholder="Fale sobre criação, convivência, presença, ausência, separações, perdas ou figuras importantes."
-              disabled={enviando}
+              disabled={camposBloqueados || enviando}
             />
 
             <TextareaField
@@ -769,7 +930,7 @@ export default function AnamnesePage() {
                 atualizarSecao("family_history", "important_relationships", valor)
               }
               placeholder="Pode incluir mãe, pai, avós, irmãos, cuidadores, líderes, professores ou outras figuras."
-              disabled={enviando}
+              disabled={camposBloqueados || enviando}
             />
 
             <TextareaField
@@ -779,7 +940,7 @@ export default function AnamnesePage() {
                 atualizarSecao("family_history", "childhood_marks", valor)
               }
               placeholder="Responda com liberdade. Não precisa detalhar mais do que deseja agora."
-              disabled={enviando}
+              disabled={camposBloqueados || enviando}
             />
 
             <TextareaField
@@ -789,7 +950,7 @@ export default function AnamnesePage() {
                 atualizarSecao("family_history", "family_repetitions", valor)
               }
               placeholder="Ex: modo de reagir, silenciar, explodir, controlar, agradar, fugir, cuidar demais..."
-              disabled={enviando}
+              disabled={camposBloqueados || enviando}
             />
           </SectionCard>
 
@@ -805,7 +966,7 @@ export default function AnamnesePage() {
                 atualizarSecao("relationships", "current_relationships", valor)
               }
               placeholder="Fale sobre família, amizades, relacionamento amoroso, trabalho ou vínculos importantes."
-              disabled={enviando}
+              disabled={camposBloqueados || enviando}
             />
 
             <TextareaField
@@ -815,7 +976,7 @@ export default function AnamnesePage() {
                 atualizarSecao("relationships", "conflicts", valor)
               }
               placeholder="Ex: discussões parecidas, medo de falar, ciúmes, afastamento, dependência, cobranças..."
-              disabled={enviando}
+              disabled={camposBloqueados || enviando}
             />
 
             <TextareaField
@@ -825,7 +986,7 @@ export default function AnamnesePage() {
                 atualizarSecao("relationships", "support_network", valor)
               }
               placeholder="Liste pessoas ou grupos que funcionam como apoio real."
-              disabled={enviando}
+              disabled={camposBloqueados || enviando}
             />
 
             <TextareaField
@@ -839,7 +1000,7 @@ export default function AnamnesePage() {
                 )
               }
               placeholder="Ex: sempre cuidar demais, se sentir deixado de lado, se calar, explodir, se afastar..."
-              disabled={enviando}
+              disabled={camposBloqueados || enviando}
             />
           </SectionCard>
 
@@ -856,7 +1017,7 @@ export default function AnamnesePage() {
                   atualizarSecao("routine_and_body", "sleep", valor)
                 }
                 placeholder="Fale sobre dificuldade para dormir, acordar, pesadelos, sono excessivo ou cansaço."
-                disabled={enviando}
+                disabled={camposBloqueados || enviando}
               />
 
               <TextareaField
@@ -866,7 +1027,7 @@ export default function AnamnesePage() {
                   atualizarSecao("routine_and_body", "food", valor)
                 }
                 placeholder="Fale sobre apetite, compulsão, falta de fome, rotina alimentar ou mudanças recentes."
-                disabled={enviando}
+                disabled={camposBloqueados || enviando}
               />
 
               <TextareaField
@@ -876,7 +1037,7 @@ export default function AnamnesePage() {
                   atualizarSecao("routine_and_body", "energy", valor)
                 }
                 placeholder="Ex: energia baixa, agitação, dificuldade de começar tarefas, exaustão..."
-                disabled={enviando}
+                disabled={camposBloqueados || enviando}
               />
 
               <TextareaField
@@ -886,7 +1047,7 @@ export default function AnamnesePage() {
                   atualizarSecao("routine_and_body", "body_signals", valor)
                 }
                 placeholder="Ex: aperto no peito, dor de cabeça, nó na garganta, tensão, enjoo, tremor..."
-                disabled={enviando}
+                disabled={camposBloqueados || enviando}
               />
             </div>
 
@@ -901,7 +1062,7 @@ export default function AnamnesePage() {
                 )
               }
               placeholder="Informe apenas o que for relevante e confortável neste momento."
-              disabled={enviando}
+              disabled={camposBloqueados || enviando}
             />
           </SectionCard>
 
@@ -917,7 +1078,7 @@ export default function AnamnesePage() {
                 atualizarSecao("symptoms_and_risks", "anxiety_signs", valor)
               }
               placeholder="Ex: preocupação constante, falta de ar, aceleração, medo, antecipação, crise..."
-              disabled={enviando}
+              disabled={camposBloqueados || enviando}
             />
 
             <TextareaField
@@ -927,7 +1088,7 @@ export default function AnamnesePage() {
                 atualizarSecao("symptoms_and_risks", "sadness_signs", valor)
               }
               placeholder="Ex: vontade de sumir, choro, perda de interesse, isolamento, sensação de peso..."
-              disabled={enviando}
+              disabled={camposBloqueados || enviando}
             />
 
             <TextareaField
@@ -937,7 +1098,7 @@ export default function AnamnesePage() {
                 atualizarSecao("symptoms_and_risks", "anger_or_impulses", valor)
               }
               placeholder="Conte se isso acontece e em quais situações aparece mais."
-              disabled={enviando}
+              disabled={camposBloqueados || enviando}
             />
 
             <TextareaField
@@ -947,7 +1108,7 @@ export default function AnamnesePage() {
                 atualizarSecao("symptoms_and_risks", "self_harm_or_risk", valor)
               }
               placeholder="Responda com honestidade. Isso ajuda a definir cuidado e segurança."
-              disabled={enviando}
+              disabled={camposBloqueados || enviando}
               help={
                 <p>
                   Se isso estiver acontecendo agora ou se houver risco imediato,
@@ -968,7 +1129,7 @@ export default function AnamnesePage() {
                 )
               }
               placeholder="Escreva qualquer informação importante para cuidado imediato ou atenção especial."
-              disabled={enviando}
+              disabled={camposBloqueados || enviando}
             />
           </SectionCard>
 
@@ -988,7 +1149,7 @@ export default function AnamnesePage() {
                 )
               }
               placeholder="Conte quando fez, por quanto tempo, como foi a experiência e se ajudou."
-              disabled={enviando}
+              disabled={camposBloqueados || enviando}
             />
 
             <TextareaField
@@ -1002,7 +1163,7 @@ export default function AnamnesePage() {
                 )
               }
               placeholder="Informe se há acompanhamento atual ou anterior."
-              disabled={enviando}
+              disabled={camposBloqueados || enviando}
             />
 
             <TextareaField
@@ -1016,7 +1177,7 @@ export default function AnamnesePage() {
                 )
               }
               placeholder="Escreva apenas o que souber ou lembrar."
-              disabled={enviando}
+              disabled={camposBloqueados || enviando}
             />
 
             <TextareaField
@@ -1030,7 +1191,7 @@ export default function AnamnesePage() {
                 )
               }
               placeholder="Se preferir, pode responder de forma geral."
-              disabled={enviando}
+              disabled={camposBloqueados || enviando}
             />
           </SectionCard>
 
@@ -1046,7 +1207,7 @@ export default function AnamnesePage() {
                 atualizarSecao("perceived_patterns", "repeated_reactions", valor)
               }
               placeholder="Ex: evitar conversa, explodir, se calar, se culpar, controlar, agradar demais, sumir..."
-              disabled={enviando}
+              disabled={camposBloqueados || enviando}
               help={
                 <p>
                   Pense em algo que você faz quase automaticamente. Não precisa
@@ -1066,7 +1227,7 @@ export default function AnamnesePage() {
                 )
               }
               placeholder="Ex: quando sou cobrado, ignorado, contrariado, criticado, comparado ou pressionado."
-              disabled={enviando}
+              disabled={camposBloqueados || enviando}
             />
 
             <TextareaField
@@ -1076,7 +1237,7 @@ export default function AnamnesePage() {
                 atualizarSecao("perceived_patterns", "what_wants_to_change", valor)
               }
               placeholder="Fale do que você gostaria que fosse diferente na sua forma de sentir, pensar ou agir."
-              disabled={enviando}
+              disabled={camposBloqueados || enviando}
             />
 
             <TextareaField
@@ -1090,7 +1251,7 @@ export default function AnamnesePage() {
                 )
               }
               placeholder="Conte tentativas, estratégias, conversas, decisões ou mudanças que já tentou."
-              disabled={enviando}
+              disabled={camposBloqueados || enviando}
             />
           </SectionCard>
 
@@ -1120,7 +1281,7 @@ export default function AnamnesePage() {
                 }
                 placeholder="Nome completo ou nome pelo qual você conhece"
                 required
-                disabled={enviando}
+                disabled={camposBloqueados || enviando}
               />
 
               <InputField
@@ -1131,7 +1292,7 @@ export default function AnamnesePage() {
                 }
                 placeholder="Ex: mãe, irmão, amiga, esposo, líder, colega"
                 required
-                disabled={enviando}
+                disabled={camposBloqueados || enviando}
               />
 
               <InputField
@@ -1142,7 +1303,7 @@ export default function AnamnesePage() {
                 }
                 placeholder="Informe um número de contato"
                 required
-                disabled={enviando}
+                disabled={camposBloqueados || enviando}
               />
 
               <InputField
@@ -1153,7 +1314,7 @@ export default function AnamnesePage() {
                 }
                 placeholder="E-mail, se houver"
                 type="email"
-                disabled={enviando}
+                disabled={camposBloqueados || enviando}
               />
             </div>
 
@@ -1164,7 +1325,7 @@ export default function AnamnesePage() {
                 atualizarSecao("trusted_contact", "can_be_contacted_in", valor)
               }
               placeholder="Ex: crise emocional, risco, falta de resposta, necessidade de apoio familiar..."
-              disabled={enviando}
+              disabled={camposBloqueados || enviando}
             />
 
             <TextareaField
@@ -1174,7 +1335,7 @@ export default function AnamnesePage() {
                 atualizarSecao("trusted_contact", "notes", valor)
               }
               placeholder="Ex: melhor horário para contato, vínculo, cuidados, limites..."
-              disabled={enviando}
+              disabled={camposBloqueados || enviando}
             />
 
             <label className="flex items-start gap-3 rounded-2xl border border-[#E5DDD2] bg-[#F7F3EC] p-4">
@@ -1188,7 +1349,7 @@ export default function AnamnesePage() {
                     event.target.checked
                   )
                 }
-                disabled={enviando}
+                disabled={camposBloqueados || enviando}
                 className="mt-1 h-4 w-4 accent-[#8A2E2B]"
               />
 
@@ -1213,7 +1374,7 @@ export default function AnamnesePage() {
               }
               placeholder="Escreva livremente. Pode ser um resumo, uma preocupação, uma lembrança ou algo difícil de organizar."
               minHeight="min-h-36"
-              disabled={enviando}
+              disabled={camposBloqueados || enviando}
             />
 
             <TextareaField
@@ -1228,7 +1389,7 @@ export default function AnamnesePage() {
               }
               placeholder="Ex: tenho dificuldade de falar de tal assunto, me sinto inseguro, preciso de acolhimento, prefiro objetividade..."
               minHeight="min-h-32"
-              disabled={enviando}
+              disabled={camposBloqueados || enviando}
             />
           </SectionCard>
 
@@ -1238,35 +1399,61 @@ export default function AnamnesePage() {
             </h2>
 
             <p className="mt-3 text-sm leading-6 text-[#5F564C]">
-              Ao enviar, esta versão será preservada no histórico. Se você
-              alterar depois, uma nova versão será criada, sem apagar a anterior.
-            </p>
+  Suas respostas parciais são salvas automaticamente enquanto você preenche.
+  Ao enviar a anamnese completa, uma versão oficial será preservada no
+  histórico. Se você editar e enviar novamente, uma nova versão será criada,
+  sem apagar a anterior.
+</p>  
 
             <div className="mt-5 flex flex-col gap-3 sm:flex-row">
-              <button
-                type="button"
-                onClick={salvarRascunho}
-                disabled={salvando || enviando}
-                className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-[#D8C7B1] bg-white px-5 text-sm font-semibold text-[#5F564C] shadow-sm transition hover:bg-[#FFF8EE] disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
-              >
-                {salvando ? "Salvando..." : "Salvar rascunho"}
-              </button>
+  {camposBloqueados ? (
+    <button
+      type="button"
+      onClick={() => {
+        setModoEdicao(true);
+        setSucesso("");
+        setErro("");
+      }}
+      className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl bg-[#2F2A24] px-5 text-sm font-semibold text-white shadow-sm transition hover:opacity-95 sm:w-auto"
+    >
+      Editar anamnese
+    </button>
+  ) : (
+    <button
+      type="submit"
+      disabled={salvando || enviando}
+      className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl bg-[#2F2A24] px-5 text-sm font-semibold text-white shadow-sm transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+    >
+      {enviando
+        ? "Enviando..."
+        : anamneseConcluida
+          ? "Salvar nova versão"
+          : "Enviar anamnese"}
+    </button>
+  )}
 
-              <button
-                type="submit"
-                disabled={salvando || enviando}
-                className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl bg-[#2F2A24] px-5 text-sm font-semibold text-white shadow-sm transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
-              >
-                {enviando ? "Enviando..." : "Enviar anamnese"}
-              </button>
+  {modoEdicao && anamneseConcluida && (
+    <button
+      type="button"
+      onClick={() => {
+        setModoEdicao(false);
+        setErro("");
+        setSucesso("");
+      }}
+      disabled={enviando}
+      className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-[#D8C7B1] bg-white px-5 text-sm font-semibold text-[#5F564C] shadow-sm transition hover:bg-[#FFF8EE] disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+    >
+      Cancelar edição
+    </button>
+  )}
 
-              <Link
-                href="/painel"
-                className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-[#D8C7B1] bg-white px-5 text-sm font-medium text-[#5F564C] shadow-sm transition hover:bg-[#FFF8EE] sm:w-auto"
-              >
-                Voltar ao painel
-              </Link>
-            </div>
+  <Link
+    href="/painel"
+    className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-[#D8C7B1] bg-white px-5 text-sm font-medium text-[#5F564C] shadow-sm transition hover:bg-[#FFF8EE] sm:w-auto"
+  >
+    Voltar ao painel
+  </Link>
+</div> 
           </section>
         </form>
       </section>
