@@ -521,8 +521,9 @@ const [erro, setErro] = useState("");
                 </p>
               </div>
             ) : (
-              <div className="space-y-3">
-                {pacientes.map((paciente) => (
+              <div className="max-h-[70vh] overflow-y-auto pr-1 sm:max-h-[620px]">
+                <div className="space-y-3">
+                  {pacientes.map((paciente) => (
                   <Link
                     key={paciente.patient_id}
                     href={`/clinico/pacientes/${paciente.patient_id}`}
@@ -619,9 +620,10 @@ const [erro, setErro] = useState("");
 </div> 
                     </div>
                   </Link>
-                ))}
-              </div>
-            )}
+                      ))}
+                      </div>
+                    </div>
+                  )}
           </article>
 
           <aside className="space-y-4">
