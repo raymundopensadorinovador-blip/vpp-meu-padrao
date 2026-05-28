@@ -46,6 +46,19 @@ type PacienteBasico = {
   linked_at: string;
 };
 
+type NotaAnamnese = {
+  id: string;
+  anamnesis_id: string;
+  anamnesis_version_id: string;
+  patient_id: string;
+  therapist_id: string;
+  title: string;
+  note: string;
+  note_type: "observacao" | "hipotese" | "ponto_de_atencao" | "tema_para_sessao";
+  created_at: string;
+  updated_at: string;
+};
+
 function texto(valor: unknown) {
   if (typeof valor !== "string") return "";
   return valor.trim();
@@ -132,6 +145,17 @@ export default function ClinicoAnamnesePacientePage() {
   const [versaoSelecionada, setVersaoSelecionada] =
     useState<VersaoAnamnese | null>(null);
 
+    const [terapeutaId, setTerapeutaId] = useState("");
+    const [notasAnamnese, setNotasAnamnese] = useState<NotaAnamnese[]>([]);
+    const [tituloNota, setTituloNota] = useState("");
+    const [textoNota, setTextoNota] = useState("");
+    const [tipoNota, setTipoNota] =
+      useState<NotaAnamnese["note_type"]>("observacao");
+    const [notaEditandoId, setNotaEditandoId] = useState<string | null>(null);
+    const [salvandoNota, setSalvandoNota] = useState(false);
+    const [excluindoNotaId, setExcluindoNotaId] = useState<string | null>(null);
+    const [sucessoNota, setSucessoNota] = useState("");
+
   useEffect(() => {
     async function carregarAnamnese() {
       const { data: usuarioAtual, error: erroUsuario } =
@@ -160,6 +184,8 @@ export default function ClinicoAnamnesePacientePage() {
         router.replace("/painel");
         return;
       }
+
+      setTerapeutaId(usuarioAtual.user.id);
 
       const { data: detalhe, error: erroDetalhe } = await supabase.rpc(
         "get_linked_patient_details",
@@ -231,16 +257,34 @@ export default function ClinicoAnamnesePacientePage() {
 
       const listaVersoes = (versoesEncontradas || []) as VersaoAnamnese[];
 
-      setVersoes(listaVersoes);
-      setVersaoSelecionada(listaVersoes[0] || null);
-      setCarregando(false);
+setVersoes(listaVersoes);
+setVersaoSelecionada(listaVersoes[0] || null);
+
+const idsVersoes = listaVersoes.map((versao) => versao.id);
+
+if (idsVersoes.length > 0) {
+  const { data: notasEncontradas, error: erroNotas } = await supabase
+    .from("anamnesis_therapist_notes")
+    .select(
+      "id, anamnesis_id, anamnesis_version_id, patient_id, therapist_id, title, note, note_type, created_at, updated_at"
+    )
+    .eq("patient_id", pacienteId)
+    .in("anamnesis_version_id", idsVersoes)
+    .order("created_at", { ascending: false });
+
+  if (!erroNotas) {
+    setNotasAnamnese((notasEncontradas || []) as NotaAnamnese[]);
+  }
+}
+
+setCarregando(false);
     }
 
     carregarAnamnese();
   }, [router, pacienteId]);
 
   const leituraAtual = useMemo(() => {
-    if (!versaoSelecionada) return null;
+   if (!versaoSelecionada) return null;
 
     return {
       personal: versaoSelecionada.personal_context || {},
@@ -256,7 +300,155 @@ export default function ClinicoAnamnesePacientePage() {
       fechamento: versaoSelecionada.final_notes || {},
     };
   }, [versaoSelecionada]);
-
+  const notasDaVersaoSelecionada = useMemo(() => {
+    if (!versaoSelecionada) return [];
+  
+    return notasAnamnese.filter(
+      (nota) => nota.anamnesis_version_id === versaoSelecionada.id
+    );
+  }, [notasAnamnese, versaoSelecionada]);
+  
+  async function recarregarNotasDaAnamnese() {
+    if (!paciente || versoes.length === 0) return;
+  
+    const idsVersoes = versoes.map((versao) => versao.id);
+  
+    const { data: notasEncontradas, error: erroNotas } = await supabase
+      .from("anamnesis_therapist_notes")
+      .select(
+        "id, anamnesis_id, anamnesis_version_id, patient_id, therapist_id, title, note, note_type, created_at, updated_at"
+      )
+      .eq("patient_id", paciente.patient_id)
+      .in("anamnesis_version_id", idsVersoes)
+      .order("created_at", { ascending: false });
+  
+    if (erroNotas) {
+      setErro("Não foi possível atualizar as observações da anamnese.");
+      return;
+    }
+  
+    setNotasAnamnese((notasEncontradas || []) as NotaAnamnese[]);
+  }
+  
+  async function handleSalvarNotaAnamnese() {
+    if (!paciente || !anamnese || !versaoSelecionada || !terapeutaId) return;
+  
+    setErro("");
+    setSucessoNota("");
+  
+    if (!tituloNota.trim() || !textoNota.trim()) {
+      setErro("Informe um título e uma observação sobre a anamnese.");
+      return;
+    }
+  
+    setSalvandoNota(true);
+  
+    try {
+      if (notaEditandoId) {
+        const { error } = await supabase
+          .from("anamnesis_therapist_notes")
+          .update({
+            title: tituloNota.trim(),
+            note: textoNota.trim(),
+            note_type: tipoNota,
+          })
+          .eq("id", notaEditandoId)
+          .eq("therapist_id", terapeutaId)
+          .eq("patient_id", paciente.patient_id);
+  
+        if (error) {
+          setErro("Não foi possível atualizar a observação da anamnese.");
+          return;
+        }
+  
+        await recarregarNotasDaAnamnese();
+  
+        setTituloNota("");
+        setTextoNota("");
+        setTipoNota("observacao");
+        setNotaEditandoId(null);
+        setSucessoNota("Observação atualizada com sucesso.");
+        return;
+      }
+  
+      const { error } = await supabase.from("anamnesis_therapist_notes").insert({
+        anamnesis_id: anamnese.id,
+        anamnesis_version_id: versaoSelecionada.id,
+        patient_id: paciente.patient_id,
+        therapist_id: terapeutaId,
+        title: tituloNota.trim(),
+        note: textoNota.trim(),
+        note_type: tipoNota,
+      });
+  
+      if (error) {
+        setErro("Não foi possível salvar a observação da anamnese.");
+        return;
+      }
+  
+      await recarregarNotasDaAnamnese();
+  
+      setTituloNota("");
+      setTextoNota("");
+      setTipoNota("observacao");
+      setSucessoNota("Observação salva com sucesso.");
+    } finally {
+      setSalvandoNota(false);
+    }
+  }
+  
+  function handleEditarNotaAnamnese(nota: NotaAnamnese) {
+    setErro("");
+    setSucessoNota("");
+  
+    setNotaEditandoId(nota.id);
+    setTituloNota(nota.title);
+    setTextoNota(nota.note);
+    setTipoNota(nota.note_type);
+  }
+  
+  function handleCancelarEdicaoNotaAnamnese() {
+    setErro("");
+    setSucessoNota("");
+  
+    setNotaEditandoId(null);
+    setTituloNota("");
+    setTextoNota("");
+    setTipoNota("observacao");
+  }
+  
+  async function handleExcluirNotaAnamnese(notaId: string) {
+    if (!paciente || !terapeutaId) return;
+  
+    const confirmar = window.confirm(
+      "Tem certeza que deseja excluir esta observação sobre a anamnese?"
+    );
+  
+    if (!confirmar) return;
+  
+    setErro("");
+    setSucessoNota("");
+    setExcluindoNotaId(notaId);
+  
+    try {
+      const { error } = await supabase
+        .from("anamnesis_therapist_notes")
+        .delete()
+        .eq("id", notaId)
+        .eq("therapist_id", terapeutaId)
+        .eq("patient_id", paciente.patient_id);
+  
+      if (error) {
+        setErro("Não foi possível excluir a observação da anamnese.");
+        return;
+      }
+  
+      await recarregarNotasDaAnamnese();
+      setSucessoNota("Observação excluída com sucesso.");
+    } finally {
+      setExcluindoNotaId(null);
+    }
+  }
   if (carregando) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-[#F7F3EC] px-4 text-[#2F2A24]">
@@ -469,7 +661,184 @@ export default function ClinicoAnamnesePacientePage() {
       ))}
     </div>
   </div>
-</section>  
+  </section>
+
+<section className="mb-6 rounded-3xl border border-[#E5DDD2] bg-white p-5 shadow-sm sm:p-7">
+  <div className="mb-5">
+    <p className="mb-2 text-sm font-medium text-[#8A2E2B]">
+      Observações do terapeuta
+    </p>
+
+    <h2 className="text-xl font-semibold text-[#2F2A24]">
+      Anotações sobre a versão {versaoSelecionada.version_number}
+    </h2>
+
+    <p className="mt-3 text-sm leading-6 text-[#5F564C]">
+      Registre hipóteses, pontos de atenção ou temas para trabalhar em sessão.
+      Estas observações ficam vinculadas à versão aberta da anamnese e não são
+      visíveis para o paciente.
+    </p>
+  </div>
+
+  {sucessoNota && (
+    <div className="mb-5 rounded-2xl border border-[#D8C7B1] bg-[#F7F3EC] px-4 py-3 text-sm leading-6 text-[#5F564C]">
+      {sucessoNota}
+    </div>
+  )}
+
+  {notaEditandoId && (
+    <div className="mb-5 rounded-2xl border border-amber-200 bg-amber-50/80 px-4 py-3 text-sm leading-6 text-[#5F564C]">
+      Você está editando uma observação existente. Salve as alterações ou
+      cancele para criar uma nova.
+    </div>
+  )}
+
+  <div className="rounded-2xl border border-[#E5DDD2] bg-[#F7F3EC] p-4">
+    <div className="grid gap-4 md:grid-cols-[1fr_220px]">
+      <label className="block">
+        <span className="text-sm font-medium text-[#2F2A24]">
+          Título da observação
+        </span>
+
+        <input
+          type="text"
+          value={tituloNota}
+          onChange={(event) => setTituloNota(event.target.value)}
+          placeholder="Ex: ponto inicial para próxima sessão"
+          disabled={salvandoNota}
+          className="mt-2 min-h-11 w-full rounded-2xl border border-[#D8C7B1] bg-white px-4 text-sm text-[#2F2A24] outline-none transition placeholder:text-[#8A7A68] focus:border-[#8A2E2B] disabled:cursor-not-allowed disabled:opacity-60"
+        />
+      </label>
+
+      <label className="block">
+        <span className="text-sm font-medium text-[#2F2A24]">
+          Tipo
+        </span>
+
+        <select
+          value={tipoNota}
+          onChange={(event) =>
+            setTipoNota(event.target.value as NotaAnamnese["note_type"])
+          }
+          disabled={salvandoNota}
+          className="mt-2 min-h-11 w-full rounded-2xl border border-[#D8C7B1] bg-white px-4 text-sm text-[#2F2A24] outline-none focus:border-[#8A2E2B] disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          <option value="observacao">Observação</option>
+          <option value="hipotese">Hipótese</option>
+          <option value="ponto_de_atencao">Ponto de atenção</option>
+          <option value="tema_para_sessao">Tema para sessão</option>
+        </select>
+      </label>
+    </div>
+
+    <label className="mt-4 block">
+      <span className="text-sm font-medium text-[#2F2A24]">
+        Observação clínica sobre esta versão
+      </span>
+
+      <textarea
+        value={textoNota}
+        onChange={(event) => setTextoNota(event.target.value)}
+        placeholder="Escreva uma leitura clínica, hipótese, ponto de atenção ou tema para retomar na sessão."
+        disabled={salvandoNota}
+        className="mt-2 min-h-32 w-full resize-none rounded-2xl border border-[#D8C7B1] bg-white px-4 py-3 text-sm leading-6 text-[#2F2A24] outline-none transition placeholder:text-[#8A7A68] focus:border-[#8A2E2B] disabled:cursor-not-allowed disabled:opacity-60"
+      />
+    </label>
+
+    <div className="mt-4 flex flex-col gap-3 sm:flex-row">
+      <button
+        type="button"
+        onClick={handleSalvarNotaAnamnese}
+        disabled={salvandoNota}
+        className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl bg-[#2F2A24] px-5 text-sm font-semibold text-white shadow-sm transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+      >
+        {salvandoNota
+          ? "Salvando..."
+          : notaEditandoId
+            ? "Salvar alterações"
+            : "Salvar observação"}
+      </button>
+
+      {notaEditandoId && (
+        <button
+          type="button"
+          onClick={handleCancelarEdicaoNotaAnamnese}
+          disabled={salvandoNota}
+          className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-[#D8C7B1] bg-white px-5 text-sm font-semibold text-[#5F564C] shadow-sm transition hover:bg-[#FFF8EE] disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+        >
+          Cancelar edição
+        </button>
+      )}
+    </div>
+  </div>
+
+  <div className="mt-5">
+    {notasDaVersaoSelecionada.length === 0 ? (
+      <div className="rounded-2xl border border-dashed border-[#D8C7B1] bg-[#F7F3EC] p-5">
+        <p className="text-sm font-medium text-[#2F2A24]">
+          Nenhuma observação registrada para esta versão.
+        </p>
+
+        <p className="mt-2 text-sm leading-6 text-[#5F564C]">
+          As observações criadas aqui ficam disponíveis apenas para o terapeuta.
+        </p>
+      </div>
+    ) : (
+      <div className="max-h-96 overflow-y-auto pr-1">
+        <div className="space-y-3">
+          {notasDaVersaoSelecionada.map((nota) => (
+            <article
+              key={nota.id}
+              className="min-w-0 rounded-2xl border border-[#E5DDD2] bg-white p-4"
+            >
+              <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                <div className="min-w-0">
+                  <p className="break-words text-sm font-semibold text-[#2F2A24] [overflow-wrap:anywhere]">
+                    {nota.title}
+                  </p>
+
+                  <p className="mt-1 text-xs text-[#8A7A68]">
+                    {formatarData(nota.created_at)}
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap gap-2 sm:justify-end">
+                  <span className="w-fit rounded-2xl border border-[#D8C7B1] bg-[#F7F3EC] px-3 py-2 text-xs font-semibold capitalize text-[#5F564C]">
+                    {nota.note_type.replaceAll("_", " ")}
+                  </span>
+
+                  <button
+                    type="button"
+                    onClick={() => handleEditarNotaAnamnese(nota)}
+                    disabled={salvandoNota || excluindoNotaId === nota.id}
+                    className="w-fit rounded-2xl border border-[#D8C7B1] bg-white px-3 py-2 text-xs font-semibold text-[#5F564C] transition hover:bg-[#FFF8EE] disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    Editar
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => handleExcluirNotaAnamnese(nota.id)}
+                    disabled={excluindoNotaId === nota.id}
+                    className="w-fit rounded-2xl border border-[#E8C7C0] bg-white px-3 py-2 text-xs font-semibold text-[#9A4A3F] transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {excluindoNotaId === nota.id ? "Excluindo..." : "Excluir"}
+                  </button>
+                </div>
+              </div>
+
+              <div className="max-h-48 overflow-y-auto pr-1">
+                <p className="whitespace-pre-wrap break-words text-sm leading-6 text-[#5F564C] [overflow-wrap:anywhere]">
+                  {nota.note}
+                </p>
+              </div>
+            </article>
+          ))}
+        </div>
+      </div>
+    )}
+  </div>
+</section>
 
 <div className="space-y-6 overflow-hidden">
           <SecaoLeitura
