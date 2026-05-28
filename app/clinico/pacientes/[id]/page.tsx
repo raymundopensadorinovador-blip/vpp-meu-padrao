@@ -445,8 +445,25 @@ carregarPaciente();
       
         return;
       }
-  
-      router.replace("/clinico/painel");
+      
+      const { data: sessaoAtual } = await supabase.auth.getSession();
+      
+      await fetch("/api/push/send", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${sessaoAtual.session?.access_token || ""}`,
+        },
+        body: JSON.stringify({
+          userId: paciente.patient_id,
+          title: "Atualização no vínculo terapêutico",
+          message:
+            "Seu vínculo terapêutico foi encerrado no VPP — Meu Padrão. Seus registros continuam disponíveis para você.",
+          url: "/painel",
+        }),
+      });
+      
+      router.replace("/clinico/painel");  
     } finally {
       setEncerrandoVinculo(false);
     }
