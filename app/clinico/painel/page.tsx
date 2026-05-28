@@ -19,6 +19,19 @@ type PacienteVinculado = {
   anamnesis_status?: string | null;
   anamnesis_current_version?: number | null;
   anamnesis_last_submitted_at?: string | null;
+
+  next_session_date?: string | null;
+  next_session_title?: string | null;
+  next_session_status?: string | null;
+};
+
+type ProximaSessaoPainel = {
+  patient_id: string;
+  patient_name: string;
+  title: string | null;
+  session_status: string | null;
+  session_date: string | null;
+  next_session_date: string | null;
 };
 
 export default function ClinicoPainelPage() {
@@ -29,6 +42,9 @@ const [nomeUsuario, setNomeUsuario] = useState("");
 const [roleUsuario, setRoleUsuario] = useState<Role | null>(null);
 const [ativandoModoPaciente, setAtivandoModoPaciente] = useState(false);
 const [pacientes, setPacientes] = useState<PacienteVinculado[]>([]);
+const [proximasSessoesPainel, setProximasSessoesPainel] = useState<
+  ProximaSessaoPainel[]
+>([]);
 const [erro, setErro] = useState("");
 
   useEffect(() => {
@@ -85,9 +101,10 @@ const [erro, setErro] = useState("");
         
         if (idsPacientes.length === 0) {
           setPacientes([]);
+          setProximasSessoesPainel([]);
           setCarregando(false);
           return;
-        }
+        }  
         
         const { data: anamnesesDosPacientes, error: erroAnamneses } = await supabase
           .from("patient_anamneses")
@@ -102,19 +119,64 @@ const [erro, setErro] = useState("");
           (anamnesesDosPacientes || []).map((item) => [item.patient_id, item])
         );
         
-        const pacientesComAnamnese = listaPacientes.map((paciente) => {
+        const agoraIso = new Date().toISOString();
+        
+        const { data: sessoesDosPacientes, error: erroSessoes } = await supabase
+          .from("clinical_sessions")
+          .select("patient_id, title, session_status, session_date, next_session_date")
+          .in("patient_id", idsPacientes)
+          .in("session_status", ["agendada", "remarcada"])
+          .not("next_session_date", "is", null)
+          .gte("next_session_date", agoraIso)
+          .order("next_session_date", { ascending: true });
+        
+        if (erroSessoes) {
+          console.error("ERRO AO BUSCAR PRÓXIMAS SESSÕES:", erroSessoes);
+        }
+        
+        const nomesPacientesPorId = new Map(
+          listaPacientes.map((paciente) => [paciente.patient_id, paciente.patient_name])
+        );
+        
+        const todasProximasSessoes = (sessoesDosPacientes || []).map((sessao) => ({
+          patient_id: sessao.patient_id,
+          patient_name: nomesPacientesPorId.get(sessao.patient_id) || "Paciente",
+          title: sessao.title || null,
+          session_status: sessao.session_status || null,
+          session_date: sessao.session_date || null,
+          next_session_date: sessao.next_session_date || null,
+        }));
+        
+        setProximasSessoesPainel(todasProximasSessoes);
+        
+        const proximasSessoesPorPaciente = new Map<
+          string,
+          ProximaSessaoPainel
+        >();
+        
+        todasProximasSessoes.forEach((sessao) => {
+          if (!proximasSessoesPorPaciente.has(sessao.patient_id)) {
+            proximasSessoesPorPaciente.set(sessao.patient_id, sessao);
+          }
+        });
+        
+        const pacientesComDadosClinicos = listaPacientes.map((paciente) => {
           const anamnese = anamnesesPorPaciente.get(paciente.patient_id);
+          const proximaSessao = proximasSessoesPorPaciente.get(paciente.patient_id);
         
           return {
             ...paciente,
             anamnesis_status: anamnese?.status || null,
             anamnesis_current_version: anamnese?.current_version || null,
             anamnesis_last_submitted_at: anamnese?.last_submitted_at || null,
+            next_session_date: proximaSessao?.next_session_date || null,
+            next_session_title: proximaSessao?.title || null,
+            next_session_status: proximaSessao?.session_status || null,
           };
         });
         
-        setPacientes(pacientesComAnamnese);
-        setCarregando(false);  
+        setPacientes(pacientesComDadosClinicos);
+        setCarregando(false);      
     }
 
     verificarAcesso();
@@ -161,7 +223,17 @@ const [erro, setErro] = useState("");
       year: "numeric",
     }).format(new Date(data));
   }
-
+  function formatarDataHora(data: string | null | undefined) {
+    if (!data) return "Não informado";
+  
+    return new Intl.DateTimeFormat("pt-BR", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    }).format(new Date(data));
+  }
   const totalPacientes = pacientes.length;
 
   const totalComTeste = useMemo(() => {
@@ -180,7 +252,9 @@ const [erro, setErro] = useState("");
       (paciente) => Number(paciente.situation_count || 0) > 0
     ).length;
   }, [pacientes]);
-
+  const proximaSessaoDoPainel = useMemo(() => {
+    return proximasSessoesPainel[0] || null;
+  }, [proximasSessoesPainel]);
   if (carregando) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-[#F7F3EC] px-4 text-[#2F2A24]">
@@ -326,9 +400,96 @@ const [erro, setErro] = useState("");
               Com pelo menos 1 situação registrada.
             </p>
           </article>
-        </section>
+          </section>
 
-        <section className="grid gap-4 lg:grid-cols-[1.15fr_0.85fr]">
+          <section className="mb-6 rounded-3xl border border-[#D8C7B1] bg-[#FFF8EE] p-5 shadow-sm sm:p-7">
+  <div className="mb-5 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+    <div className="min-w-0">
+      <p className="mb-2 text-sm font-medium text-[#8A2E2B]">
+        Próximas sessões
+      </p>
+
+      {proximaSessaoDoPainel?.next_session_date ? (
+        <>
+          <h2 className="break-words text-xl font-semibold text-[#2F2A24] [overflow-wrap:anywhere]">
+            Mais próxima: {proximaSessaoDoPainel.patient_name} —{" "}
+            {formatarDataHora(proximaSessaoDoPainel.next_session_date)}
+          </h2>
+
+          <p className="mt-3 text-sm leading-6 text-[#5F564C]">
+            Lista de próximas sessões registradas no controle clínico.
+          </p>
+        </>
+      ) : (
+        <>
+          <h2 className="text-xl font-semibold text-[#2F2A24]">
+            Nenhuma próxima sessão registrada
+          </h2>
+
+          <p className="mt-3 text-sm leading-6 text-[#5F564C]">
+            Quando você registrar uma próxima sessão em algum paciente, ela
+            aparecerá aqui no painel.
+          </p>
+        </>
+      )}
+    </div>
+
+    {proximaSessaoDoPainel?.patient_id && (
+      <Link
+        href={`/clinico/pacientes/${proximaSessaoDoPainel.patient_id}/sessoes`}
+        className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl bg-[#2F2A24] px-5 text-sm font-semibold text-white shadow-sm transition hover:opacity-95 lg:w-auto"
+      >
+        Abrir mais próxima
+      </Link>
+    )}
+  </div>
+
+  {proximasSessoesPainel.length > 0 && (
+    <div className="max-h-64 overflow-y-auto pr-1">
+      <div className="space-y-3">
+        {proximasSessoesPainel.map((sessao) => (
+          <div
+            key={`${sessao.patient_id}-${sessao.next_session_date}`}
+            className="rounded-2xl border border-[#D8C7B1] bg-white p-4"
+          >
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+              <div className="min-w-0">
+                <p className="break-words text-sm font-semibold text-[#2F2A24] [overflow-wrap:anywhere]">
+                  {sessao.patient_name}
+                </p>
+
+                <p className="mt-1 text-sm leading-6 text-[#5F564C]">
+                  {formatarDataHora(sessao.next_session_date)}
+                </p>
+
+                {sessao.title && (
+                  <p className="mt-1 break-words text-xs text-[#8A7A68] [overflow-wrap:anywhere]">
+                    {sessao.title}
+                  </p>
+                )}
+              </div>
+
+              <div className="flex flex-wrap gap-2 sm:justify-end">
+                <span className="w-fit rounded-2xl border border-[#D8C7B1] bg-[#F7F3EC] px-3 py-2 text-xs font-semibold capitalize text-[#5F564C]">
+                  {sessao.session_status || "agendada"}
+                </span>
+
+                <Link
+                  href={`/clinico/pacientes/${sessao.patient_id}/sessoes`}
+                  className="w-fit rounded-2xl border border-[#D8C7B1] bg-white px-3 py-2 text-xs font-semibold text-[#5F564C] transition hover:bg-[#FFF8EE]"
+                >
+                  Abrir
+                </Link>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )}
+</section>
+
+<section className="grid gap-4 lg:grid-cols-[1.15fr_0.85fr]">
           <article className="rounded-3xl border border-[#E5DDD2] bg-white p-5 shadow-sm sm:p-7">
             <div className="mb-5">
               <p className="mb-2 text-sm font-medium text-[#8A2E2B]">
@@ -400,10 +561,26 @@ const [erro, setErro] = useState("");
       Anamnese pendente
     </span>
   )}
+{paciente.next_session_date && (
+  <span className="rounded-2xl border border-[#D8C7B1] bg-[#FFF8EE] px-3 py-2 text-xs font-semibold text-[#8A2E2B]">
+    Sessão marcada
+  </span>
+)}  
 </div> 
+<div className="rounded-2xl bg-white p-3">
+  <p className="text-xs font-medium text-[#8A7A68]">
+    Próxima sessão
+  </p>
+
+  <p className="mt-1 text-sm font-semibold text-[#2F2A24]">
+    {paciente.next_session_date
+      ? formatarDataHora(paciente.next_session_date)
+      : "Não agendada"}
+  </p>
+</div>
                     </div>
 
-                    <div className="mt-4 grid gap-3 sm:grid-cols-3">
+                    <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
                       <div className="rounded-2xl bg-white p-3">
                         <p className="text-xs font-medium text-[#8A7A68]">
                           Último teste

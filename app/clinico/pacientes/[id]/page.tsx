@@ -573,6 +573,19 @@ carregarPaciente();
 >
   Ver anamnese
 </Link>
+<Link
+  href={`/clinico/pacientes/${paciente.patient_id}/pre-sessao`}
+  className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-[#D8C7B1] bg-white px-5 text-sm font-semibold text-[#5F564C] shadow-sm transition hover:bg-[#FFF8EE] lg:w-auto"
+>
+  Preparar sessão
+</Link>
+
+<Link
+  href={`/clinico/pacientes/${paciente.patient_id}/sessoes`}
+  className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-[#D8C7B1] bg-white px-5 text-sm font-semibold text-[#5F564C] shadow-sm transition hover:bg-[#FFF8EE] lg:w-auto"
+>
+  Sessões
+</Link>
       <Link
         href="/clinico/painel"
         className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-[#D8C7B1] bg-white px-5 text-sm font-medium text-[#5F564C] shadow-sm transition hover:bg-[#FFF8EE] lg:w-auto"
