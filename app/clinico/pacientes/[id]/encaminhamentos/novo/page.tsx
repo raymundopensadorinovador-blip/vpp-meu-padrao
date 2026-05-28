@@ -69,8 +69,7 @@ export default function NovoEncaminhamentoPage() {
   });
 
   const [erro, setErro] = useState("");
-  const [sucesso, setSucesso] = useState("");
-  const [debugPush, setDebugPush] = useState(""); 
+  const [sucesso, setSucesso] = useState(""); 
 
   useEffect(() => {
     async function carregarDados() {
@@ -168,8 +167,7 @@ export default function NovoEncaminhamentoPage() {
     event.preventDefault();
 
     setErro("");
-    setSucesso("");
-    setDebugPush(""); 
+    setSucesso(""); 
 
     if (!paciente || !terapeutaId) {
       setErro("Paciente ou terapeuta não identificado.");
@@ -224,11 +222,10 @@ export default function NovoEncaminhamentoPage() {
         }
         
         setSucesso("Encaminhamento salvo com sucesso.");
-        setDebugPush("Encaminhamento salvo. Enviando notificação ao paciente...");
-        
+
         const { data: sessaoAtual } = await supabase.auth.getSession();
         
-        const respostaPush = await fetch("/api/push/send", {
+        await fetch("/api/push/send", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -240,29 +237,15 @@ export default function NovoEncaminhamentoPage() {
             message: nomeTerapeuta
               ? `${nomeTerapeuta} emitiu um novo encaminhamento para você no VPP — Meu Padrão.`
               : "Seu terapeuta emitiu um novo encaminhamento para você no VPP — Meu Padrão.",
-            url: `/painel`,
+            url: "/painel",
           }),
         });
-        
-        const retornoPush = await respostaPush.json().catch(() => null);
-        
-        console.log("RETORNO DO PUSH DO ENCAMINHAMENTO:", {
-          status: respostaPush.status,
-          ok: respostaPush.ok,
-          retorno: retornoPush,
-        });
-        
-        setDebugPush(
-          `Push: status ${respostaPush.status} | ok: ${
-            respostaPush.ok ? "sim" : "não"
-          } | retorno: ${JSON.stringify(retornoPush)}`
-        );
         
         setTimeout(() => {
           router.push(
             `/clinico/pacientes/${paciente.patient_id}/encaminhamentos/${data.id}`
           );
-        }, 1800); 
+        }, 1000);    
     } finally {
       setSalvando(false);
     }
@@ -358,11 +341,7 @@ export default function NovoEncaminhamentoPage() {
             {sucesso}
           </div>
         )}
-{debugPush && (
-  <div className="mb-6 rounded-2xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm leading-6 text-blue-800">
-    {debugPush}
-  </div>
-)}
+
         <form
           onSubmit={handleSalvarEncaminhamento}
           className="space-y-6 rounded-3xl border border-[#E5DDD2] bg-white p-5 shadow-sm sm:p-7"
