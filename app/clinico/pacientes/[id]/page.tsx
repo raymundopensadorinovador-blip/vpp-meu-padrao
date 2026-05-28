@@ -143,8 +143,9 @@ export default function ClinicoPacienteDetalhePage() {
   const pacienteId = String(params.id || "");
   const formularioNotaRef = useRef<HTMLDivElement | null>(null);
   const [carregando, setCarregando] = useState(true);
-const [paciente, setPaciente] = useState<PacienteDetalhe | null>(null);
-const [situacoes, setSituacoes] = useState<SituacaoPaciente[]>([]);
+  const [paciente, setPaciente] = useState<PacienteDetalhe | null>(null);
+  const [nomeTerapeutaLogado, setNomeTerapeutaLogado] = useState("");
+  const [situacoes, setSituacoes] = useState<SituacaoPaciente[]>([]);
 const [notasClinicas, setNotasClinicas] = useState<NotaClinica[]>([]);
 const [encaminhamentos, setEncaminhamentos] = useState<EncaminhamentoClinico[]>(
     []
@@ -178,10 +179,10 @@ const [sucessoNota, setSucessoNota] = useState("");
       }
 
       const { data: perfil, error: erroPerfil } = await supabase
-        .from("profiles")
-        .select("role")
-        .eq("id", usuarioAtual.user.id)
-        .maybeSingle();
+      .from("profiles")
+      .select("name, role")
+      .eq("id", usuarioAtual.user.id)
+      .maybeSingle(); 
 
       if (erroPerfil || !perfil) {
         await supabase.auth.signOut();
@@ -195,7 +196,7 @@ const [sucessoNota, setSucessoNota] = useState("");
   router.replace("/painel");
   return;
 }
-
+setNomeTerapeutaLogado(perfil.name || "Seu terapeuta");
       const { data: detalhe, error: erroDetalhe } = await supabase.rpc(
         "get_linked_patient_details",
         {
@@ -457,11 +458,10 @@ carregarPaciente();
         body: JSON.stringify({
           userId: paciente.patient_id,
           title: "Atualização no vínculo terapêutico",
-          message:
-            "Seu vínculo terapêutico foi encerrado no VPP — Meu Padrão. Seus registros continuam disponíveis para você.",
+          message: `${nomeTerapeutaLogado || "Seu terapeuta"} encerrou o vínculo terapêutico com você no VPP — Meu Padrão. Seus registros continuam disponíveis na sua área do paciente.`,
           url: "/painel",
         }),
-      });
+      });  
       
       router.replace("/clinico/painel");  
     } finally {
