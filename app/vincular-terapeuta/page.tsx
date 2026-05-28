@@ -18,7 +18,6 @@ export default function VincularTerapeutaPage() {
 
   const [erro, setErro] = useState("");
   const [sucesso, setSucesso] = useState("");
-  const [debugPush, setDebugPush] = useState("");
 
   useEffect(() => {
     async function verificarAcesso() {
@@ -65,7 +64,6 @@ export default function VincularTerapeutaPage() {
 
     setErro("");
     setSucesso("");
-    setDebugPush("");
 
     const emailLimpo = emailTerapeuta.trim().toLowerCase();
 
@@ -107,16 +105,9 @@ export default function VincularTerapeutaPage() {
         return;
       }
 
-      setDebugPush("Vínculo criado. Enviando push para o terapeuta...");
-
       const { data: sessaoAtual } = await supabase.auth.getSession();
 
-      console.log("TOKEN PARA PUSH EXISTE?", {
-        temSessao: !!sessaoAtual.session,
-        temToken: !!sessaoAtual.session?.access_token,
-      });
-
-      const respostaPush = await fetch("/api/push/send", {
+      await fetch("/api/push/send", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -132,29 +123,13 @@ export default function VincularTerapeutaPage() {
           url: "/clinico/painel",
         }),
       });
-
-      const retornoPush = await respostaPush.json().catch(() => null);
-
-      console.log("RETORNO DO PUSH:", {
-        status: respostaPush.status,
-        ok: respostaPush.ok,
-        retorno: retornoPush,
-      });
-
-      setDebugPush(
-        `Push: status ${respostaPush.status} | ok: ${
-          respostaPush.ok ? "sim" : "não"
-        } | retorno: ${JSON.stringify(retornoPush)}`
-      );
-
+      
       setSucesso("Terapeuta vinculado com sucesso.");
       setEmailTerapeuta("");
-
-      // Temporariamente sem redirecionar para conseguirmos ver o debug do push.
-      // Depois que o push estiver aprovado, reativamos o retorno automático.
-      // setTimeout(() => {
-      //   router.push("/painel");
-      // }, 1200);
+      
+      setTimeout(() => {
+        router.push("/painel");
+      }, 1200);
     } finally {
       setSalvando(false);
     }
@@ -218,12 +193,6 @@ export default function VincularTerapeutaPage() {
           {sucesso && (
             <div className="mb-5 rounded-2xl border border-[#D8C7B1] bg-[#F7F3EC] px-4 py-3 text-sm leading-6 text-[#5F564C]">
               {sucesso}
-            </div>
-          )}
-
-          {debugPush && (
-            <div className="mb-5 rounded-2xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm leading-6 text-blue-800">
-              {debugPush}
             </div>
           )}
 
