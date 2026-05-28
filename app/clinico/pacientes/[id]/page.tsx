@@ -567,7 +567,12 @@ carregarPaciente();
       >
         Novo encaminhamento
       </Link>
-
+      <Link
+  href={`/clinico/pacientes/${paciente.patient_id}/anamnese`}
+  className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-[#D8C7B1] bg-[#FFF8EE] px-5 text-sm font-semibold text-[#5F564C] shadow-sm transition hover:bg-white lg:w-auto"
+>
+  Ver anamnese
+</Link>
       <Link
         href="/clinico/painel"
         className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-[#D8C7B1] bg-white px-5 text-sm font-medium text-[#5F564C] shadow-sm transition hover:bg-[#FFF8EE] lg:w-auto"
