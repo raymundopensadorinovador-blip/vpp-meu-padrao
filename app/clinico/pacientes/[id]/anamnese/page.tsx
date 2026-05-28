@@ -540,7 +540,10 @@ setCarregando(false);
   }
 
   return (
-    <main className="min-h-screen bg-[#F7F3EC] px-4 py-6 text-[#2F2A24] sm:px-6 lg:px-8">
+    <main
+      id="topo-anamnese-clinica"
+      className="min-h-screen bg-[#F7F3EC] px-4 py-6 text-[#2F2A24] sm:px-6 lg:px-8"
+    >
       <section className="mx-auto w-full max-w-6xl">
         <header className="mb-6 rounded-3xl border border-[#E5DDD2] bg-white p-5 shadow-sm sm:p-7">
           <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
@@ -662,6 +665,131 @@ setCarregando(false);
     </div>
   </div>
   </section>
+
+<section className="mb-6 rounded-3xl border border-[#D8C7B1] bg-[#FFF8EE] p-5 shadow-sm sm:p-7">
+  <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+    <div>
+      <p className="mb-2 text-sm font-medium text-[#8A2E2B]">
+        Resumo clínico rápido
+      </p>
+
+      <h2 className="text-xl font-semibold text-[#2F2A24]">
+        Pontos principais da versão {versaoSelecionada.version_number}
+      </h2>
+
+      <p className="mt-3 text-sm leading-6 text-[#5F564C]">
+        Este resumo não é diagnóstico. É apenas uma leitura rápida dos pontos
+        que podem ajudar o terapeuta a se localizar antes da sessão.
+      </p>
+    </div>
+
+    <span className="w-fit rounded-2xl border border-[#D8C7B1] bg-white px-3 py-2 text-xs font-semibold text-[#5F564C]">
+      Versão aberta
+    </span>
+  </div>
+
+  <div className="grid gap-4 lg:grid-cols-2">
+    <div className="min-w-0 rounded-2xl border border-[#D8C7B1] bg-white p-4">
+      <p className="text-xs font-semibold uppercase tracking-wide text-[#8A7A68]">
+        Motivo da busca
+      </p>
+
+      <div className="mt-2 max-h-40 overflow-y-auto pr-1">
+        <p className="whitespace-pre-wrap break-words text-sm leading-6 text-[#2F2A24] [overflow-wrap:anywhere]">
+          {texto(leituraAtual.queixa.reason_now) || "Não informado"}
+        </p>
+      </div>
+    </div>
+
+    <div className="min-w-0 rounded-2xl border border-[#D8C7B1] bg-white p-4">
+      <p className="text-xs font-semibold uppercase tracking-wide text-[#8A7A68]">
+        Principal dificuldade
+      </p>
+
+      <div className="mt-2 max-h-40 overflow-y-auto pr-1">
+        <p className="whitespace-pre-wrap break-words text-sm leading-6 text-[#2F2A24] [overflow-wrap:anywhere]">
+          {texto(leituraAtual.queixa.main_difficulty) || "Não informado"}
+        </p>
+      </div>
+    </div>
+
+    <div className="min-w-0 rounded-2xl border border-[#D8C7B1] bg-white p-4">
+      <p className="text-xs font-semibold uppercase tracking-wide text-[#8A7A68]">
+        Padrão percebido
+      </p>
+
+      <div className="mt-2 max-h-40 overflow-y-auto pr-1">
+        <p className="whitespace-pre-wrap break-words text-sm leading-6 text-[#2F2A24] [overflow-wrap:anywhere]">
+          {texto(leituraAtual.padroes.repeated_reactions) || "Não informado"}
+        </p>
+      </div>
+    </div>
+
+    <div className="min-w-0 rounded-2xl border border-[#E8C7C0] bg-red-50 p-4">
+      <p className="text-xs font-semibold uppercase tracking-wide text-[#9A4A3F]">
+        Risco / autocuidado
+      </p>
+
+      <div className="mt-2 max-h-40 overflow-y-auto pr-1">
+        <p className="whitespace-pre-wrap break-words text-sm leading-6 text-[#2F2A24] [overflow-wrap:anywhere]">
+          {texto(leituraAtual.riscos.self_harm_or_risk) || "Não informado"}
+        </p>
+      </div>
+    </div>
+
+    <div className="min-w-0 rounded-2xl border border-[#D8C7B1] bg-white p-4">
+      <p className="text-xs font-semibold uppercase tracking-wide text-[#8A7A68]">
+        Pessoa de confiança
+      </p>
+
+      <div className="mt-2 space-y-2 text-sm leading-6 text-[#2F2A24]">
+        <p className="break-words [overflow-wrap:anywhere]">
+          <span className="font-semibold">Nome:</span>{" "}
+          {texto(leituraAtual.contato.contact_name) || "Não informado"}
+        </p>
+
+        <p className="break-words [overflow-wrap:anywhere]">
+          <span className="font-semibold">Relação:</span>{" "}
+          {texto(leituraAtual.contato.relationship) || "Não informado"}
+        </p>
+
+        <p className="break-words [overflow-wrap:anywhere]">
+          <span className="font-semibold">Telefone:</span>{" "}
+          {texto(leituraAtual.contato.phone) || "Não informado"}
+        </p>
+      </div>
+    </div>
+
+    <div className="min-w-0 rounded-2xl border border-[#D8C7B1] bg-white p-4">
+      <p className="text-xs font-semibold uppercase tracking-wide text-[#8A7A68]">
+        O que o terapeuta deve saber
+      </p>
+
+      <div className="mt-2 max-h-40 overflow-y-auto pr-1">
+        <p className="whitespace-pre-wrap break-words text-sm leading-6 text-[#2F2A24] [overflow-wrap:anywhere]">
+          {texto(leituraAtual.fechamento.what_therapist_should_know) ||
+            "Não informado"}
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div className="mt-5 flex flex-col gap-3 sm:flex-row">
+    <a
+      href="#sofrimento-e-riscos"
+      className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-[#E8C7C0] bg-white px-5 text-sm font-semibold text-[#9A4A3F] shadow-sm transition hover:bg-red-50 sm:w-auto"
+    >
+      Ir para sofrimento e riscos
+    </a>
+
+    <a
+      href="#pessoa-de-confianca"
+      className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-[#D8C7B1] bg-white px-5 text-sm font-semibold text-[#5F564C] shadow-sm transition hover:bg-[#FFF8EE] sm:w-auto"
+    >
+      Ir para pessoa de confiança
+    </a>
+  </div>
+</section>
 
 <section className="mb-6 rounded-3xl border border-[#E5DDD2] bg-white p-5 shadow-sm sm:p-7">
   <div className="mb-5">
@@ -841,256 +969,258 @@ setCarregando(false);
 </section>
 
 <div className="space-y-6 overflow-hidden">
-          <SecaoLeitura
-            titulo="01. Contexto atual"
-            subtitulo="Informações básicas sobre momento de vida, rotina e contexto de onde o paciente fala."
-          >
-            <CampoLeitura titulo="Idade" valor={leituraAtual.personal.age} />
-            <CampoLeitura titulo="Cidade" valor={leituraAtual.personal.city} />
-            <CampoLeitura
-              titulo="Ocupação ou rotina principal"
-              valor={leituraAtual.personal.occupation}
-            />
-            <CampoLeitura
-              titulo="Contexto de vida"
-              valor={leituraAtual.personal.living_context}
-            />
-          </SecaoLeitura>
+  <SecaoLeitura
+    titulo="01. Contexto atual"
+    subtitulo="Informações básicas sobre momento de vida, rotina e contexto de onde o paciente fala."
+  >
+    <CampoLeitura titulo="Idade" valor={leituraAtual.personal.age} />
+    <CampoLeitura titulo="Cidade" valor={leituraAtual.personal.city} />
+    <CampoLeitura
+      titulo="Ocupação ou rotina principal"
+      valor={leituraAtual.personal.occupation}
+    />
+    <CampoLeitura
+      titulo="Contexto de vida"
+      valor={leituraAtual.personal.living_context}
+    />
+  </SecaoLeitura>
 
-          <SecaoLeitura
-            titulo="02. Motivo da busca"
-            subtitulo="Ponto de entrada subjetivo: o que fez o paciente procurar cuidado agora."
-          >
-            <CampoLeitura
-              titulo="O que trouxe o paciente agora"
-              valor={leituraAtual.queixa.reason_now}
-              destaque
-            />
-            <CampoLeitura
-              titulo="Principal dificuldade atual"
-              valor={leituraAtual.queixa.main_difficulty}
-              destaque
-            />
-            <CampoLeitura
-              titulo="O que espera compreender"
-              valor={leituraAtual.queixa.what_hopes_to_understand}
-            />
-          </SecaoLeitura>
+  <SecaoLeitura
+    titulo="02. Motivo da busca"
+    subtitulo="Ponto de entrada subjetivo: o que fez o paciente procurar cuidado agora."
+  >
+    <CampoLeitura
+      titulo="O que trouxe o paciente agora"
+      valor={leituraAtual.queixa.reason_now}
+      destaque
+    />
+    <CampoLeitura
+      titulo="Principal dificuldade atual"
+      valor={leituraAtual.queixa.main_difficulty}
+      destaque
+    />
+    <CampoLeitura
+      titulo="O que espera compreender"
+      valor={leituraAtual.queixa.what_hopes_to_understand}
+    />
+  </SecaoLeitura>
 
-          <SecaoLeitura
-            titulo="03. Vida emocional"
-            subtitulo="Estados emocionais recorrentes, fases difíceis e possíveis gatilhos."
-          >
-            <CampoLeitura
-              titulo="Estado emocional recente"
-              valor={leituraAtual.emocional.emotional_state}
-            />
-            <CampoLeitura
-              titulo="Sentimentos recorrentes"
-              valor={leituraAtual.emocional.recurring_feelings}
-            />
-            <CampoLeitura
-              titulo="Fases difíceis"
-              valor={leituraAtual.emocional.difficult_periods}
-            />
-            <CampoLeitura
-              titulo="Gatilhos emocionais"
-              valor={leituraAtual.emocional.what_usually_triggers}
-            />
-          </SecaoLeitura>
+  <SecaoLeitura
+    titulo="03. Vida emocional"
+    subtitulo="Estados emocionais recorrentes, fases difíceis e possíveis gatilhos."
+  >
+    <CampoLeitura
+      titulo="Estado emocional recente"
+      valor={leituraAtual.emocional.emotional_state}
+    />
+    <CampoLeitura
+      titulo="Sentimentos recorrentes"
+      valor={leituraAtual.emocional.recurring_feelings}
+    />
+    <CampoLeitura
+      titulo="Fases difíceis"
+      valor={leituraAtual.emocional.difficult_periods}
+    />
+    <CampoLeitura
+      titulo="Gatilhos emocionais"
+      valor={leituraAtual.emocional.what_usually_triggers}
+    />
+  </SecaoLeitura>
 
-          <SecaoLeitura
-            titulo="04. Família e marcas"
-            subtitulo="Referências familiares, vínculos formativos e repetições percebidas."
-          >
-            <CampoLeitura
-              titulo="História familiar"
-              valor={leituraAtual.familia.family_structure}
-            />
-            <CampoLeitura
-              titulo="Relações importantes na formação"
-              valor={leituraAtual.familia.important_relationships}
-            />
-            <CampoLeitura
-              titulo="Marcas da infância ou adolescência"
-              valor={leituraAtual.familia.childhood_marks}
-            />
-            <CampoLeitura
-              titulo="Repetições familiares percebidas"
-              valor={leituraAtual.familia.family_repetitions}
-            />
-          </SecaoLeitura>
+  <SecaoLeitura
+    titulo="04. Família e marcas"
+    subtitulo="Referências familiares, vínculos formativos e repetições percebidas."
+  >
+    <CampoLeitura
+      titulo="História familiar"
+      valor={leituraAtual.familia.family_structure}
+    />
+    <CampoLeitura
+      titulo="Relações importantes na formação"
+      valor={leituraAtual.familia.important_relationships}
+    />
+    <CampoLeitura
+      titulo="Marcas da infância ou adolescência"
+      valor={leituraAtual.familia.childhood_marks}
+    />
+    <CampoLeitura
+      titulo="Repetições familiares percebidas"
+      valor={leituraAtual.familia.family_repetitions}
+    />
+  </SecaoLeitura>
 
-          <SecaoLeitura
-            titulo="05. Relações e vínculos"
-            subtitulo="Como o paciente percebe seus vínculos atuais e repetições relacionais."
-          >
-            <CampoLeitura
-              titulo="Relações atuais"
-              valor={leituraAtual.relacoes.current_relationships}
-            />
-            <CampoLeitura
-              titulo="Conflitos recorrentes"
-              valor={leituraAtual.relacoes.conflicts}
-            />
-            <CampoLeitura
-              titulo="Rede de apoio"
-              valor={leituraAtual.relacoes.support_network}
-            />
-            <CampoLeitura
-              titulo="Padrões nas relações"
-              valor={leituraAtual.relacoes.repeated_relationship_patterns}
-            />
-          </SecaoLeitura>
+  <SecaoLeitura
+    titulo="05. Relações e vínculos"
+    subtitulo="Como o paciente percebe seus vínculos atuais e repetições relacionais."
+  >
+    <CampoLeitura
+      titulo="Relações atuais"
+      valor={leituraAtual.relacoes.current_relationships}
+    />
+    <CampoLeitura
+      titulo="Conflitos recorrentes"
+      valor={leituraAtual.relacoes.conflicts}
+    />
+    <CampoLeitura
+      titulo="Rede de apoio"
+      valor={leituraAtual.relacoes.support_network}
+    />
+    <CampoLeitura
+      titulo="Padrões nas relações"
+      valor={leituraAtual.relacoes.repeated_relationship_patterns}
+    />
+  </SecaoLeitura>
 
-          <SecaoLeitura
-            titulo="06. Rotina, corpo e sinais físicos"
-            subtitulo="Sono, alimentação, energia, corpo e fatores relevantes para o cuidado."
-          >
-            <CampoLeitura titulo="Sono" valor={leituraAtual.rotina.sleep} />
-            <CampoLeitura
-              titulo="Alimentação"
-              valor={leituraAtual.rotina.food}
-            />
-            <CampoLeitura
-              titulo="Energia"
-              valor={leituraAtual.rotina.energy}
-            />
-            <CampoLeitura
-              titulo="Sinais físicos em momentos emocionais"
-              valor={leituraAtual.rotina.body_signals}
-            />
-            <CampoLeitura
-              titulo="Medicação, substâncias ou algo relevante"
-              valor={leituraAtual.rotina.substances_or_medication}
-            />
-          </SecaoLeitura>
+  <SecaoLeitura
+    titulo="06. Rotina, corpo e sinais físicos"
+    subtitulo="Sono, alimentação, energia, corpo e fatores relevantes para o cuidado."
+  >
+    <CampoLeitura titulo="Sono" valor={leituraAtual.rotina.sleep} />
+    <CampoLeitura titulo="Alimentação" valor={leituraAtual.rotina.food} />
+    <CampoLeitura titulo="Energia" valor={leituraAtual.rotina.energy} />
+    <CampoLeitura
+      titulo="Sinais físicos em momentos emocionais"
+      valor={leituraAtual.rotina.body_signals}
+    />
+    <CampoLeitura
+      titulo="Medicação, substâncias ou algo relevante"
+      valor={leituraAtual.rotina.substances_or_medication}
+    />
+  </SecaoLeitura>
 
-          <SecaoLeitura
-            titulo="07. Sofrimento e riscos"
-            subtitulo="Sinais que podem indicar intensidade, urgência ou necessidade de atenção especial."
-          >
-            <CampoLeitura
-              titulo="Sinais de ansiedade"
-              valor={leituraAtual.riscos.anxiety_signs}
-            />
-            <CampoLeitura
-              titulo="Sinais de tristeza, desânimo ou vazio"
-              valor={leituraAtual.riscos.sadness_signs}
-            />
-            <CampoLeitura
-              titulo="Raiva intensa, impulsos ou perda de controle"
-              valor={leituraAtual.riscos.anger_or_impulses}
-            />
-            <CampoLeitura
-              titulo="Pensamentos de se machucar, desistir da vida ou risco"
-              valor={leituraAtual.riscos.self_harm_or_risk}
-              destaque
-            />
-            <CampoLeitura
-              titulo="Algo urgente para o terapeuta saber"
-              valor={leituraAtual.riscos.urgent_observations}
-              destaque
-            />
-          </SecaoLeitura>
+  <div id="sofrimento-e-riscos" className="scroll-mt-6">
+    <SecaoLeitura
+      titulo="07. Sofrimento e riscos"
+      subtitulo="Sinais que podem indicar intensidade, urgência ou necessidade de atenção especial."
+    >
+      <CampoLeitura
+        titulo="Sinais de ansiedade"
+        valor={leituraAtual.riscos.anxiety_signs}
+      />
+      <CampoLeitura
+        titulo="Sinais de tristeza, desânimo ou vazio"
+        valor={leituraAtual.riscos.sadness_signs}
+      />
+      <CampoLeitura
+        titulo="Raiva intensa, impulsos ou perda de controle"
+        valor={leituraAtual.riscos.anger_or_impulses}
+      />
+      <CampoLeitura
+        titulo="Pensamentos de se machucar, desistir da vida ou risco"
+        valor={leituraAtual.riscos.self_harm_or_risk}
+        destaque
+      />
+      <CampoLeitura
+        titulo="Algo urgente para o terapeuta saber"
+        valor={leituraAtual.riscos.urgent_observations}
+        destaque
+      />
+    </SecaoLeitura>
+  </div>
 
-          <SecaoLeitura
-            titulo="08. Histórico terapêutico e médico"
-            subtitulo="Experiências anteriores de cuidado, acompanhamento, hipóteses e medicação."
-          >
-            <CampoLeitura
-              titulo="Terapia ou acompanhamento anterior"
-              valor={leituraAtual.historico.previous_therapy}
-            />
-            <CampoLeitura
-              titulo="Acompanhamento médico ou psiquiátrico"
-              valor={leituraAtual.historico.medical_follow_up}
-            />
-            <CampoLeitura
-              titulo="Diagnóstico, hipótese ou orientação profissional"
-              valor={leituraAtual.historico.diagnosis_or_suspicion}
-            />
-            <CampoLeitura
-              titulo="Histórico de medicação"
-              valor={leituraAtual.historico.medication_history}
-            />
-          </SecaoLeitura>
+  <SecaoLeitura
+    titulo="08. Histórico terapêutico e médico"
+    subtitulo="Experiências anteriores de cuidado, acompanhamento, hipóteses e medicação."
+  >
+    <CampoLeitura
+      titulo="Terapia ou acompanhamento anterior"
+      valor={leituraAtual.historico.previous_therapy}
+    />
+    <CampoLeitura
+      titulo="Acompanhamento médico ou psiquiátrico"
+      valor={leituraAtual.historico.medical_follow_up}
+    />
+    <CampoLeitura
+      titulo="Diagnóstico, hipótese ou orientação profissional"
+      valor={leituraAtual.historico.diagnosis_or_suspicion}
+    />
+    <CampoLeitura
+      titulo="Histórico de medicação"
+      valor={leituraAtual.historico.medication_history}
+    />
+  </SecaoLeitura>
 
-          <SecaoLeitura
-            titulo="09. Padrões percebidos"
-            subtitulo="Ponte direta com a leitura do VPP: repetições, situações e tentativas de mudança."
-          >
-            <CampoLeitura
-              titulo="Reações que se repetem"
-              valor={leituraAtual.padroes.repeated_reactions}
-              destaque
-            />
-            <CampoLeitura
-              titulo="Situações em que isso acontece"
-              valor={leituraAtual.padroes.situations_that_repeat}
-            />
-            <CampoLeitura
-              titulo="O que gostaria de mudar"
-              valor={leituraAtual.padroes.what_wants_to_change}
-            />
-            <CampoLeitura
-              titulo="O que já tentou fazer"
-              valor={leituraAtual.padroes.what_has_already_tried}
-            />
-          </SecaoLeitura>
+  <SecaoLeitura
+    titulo="09. Padrões percebidos"
+    subtitulo="Ponte direta com a leitura do VPP: repetições, situações e tentativas de mudança."
+  >
+    <CampoLeitura
+      titulo="Reações que se repetem"
+      valor={leituraAtual.padroes.repeated_reactions}
+      destaque
+    />
+    <CampoLeitura
+      titulo="Situações em que isso acontece"
+      valor={leituraAtual.padroes.situations_that_repeat}
+    />
+    <CampoLeitura
+      titulo="O que gostaria de mudar"
+      valor={leituraAtual.padroes.what_wants_to_change}
+    />
+    <CampoLeitura
+      titulo="O que já tentou fazer"
+      valor={leituraAtual.padroes.what_has_already_tried}
+    />
+  </SecaoLeitura>
 
-          <SecaoLeitura
-            titulo="10. Pessoa de confiança"
-            subtitulo="Contato indicado pelo paciente para apoio, cuidado ou situações de urgência."
-          >
-            <CampoLeitura
-              titulo="Nome"
-              valor={leituraAtual.contato.contact_name}
-              destaque
-            />
-            <CampoLeitura
-              titulo="Relação"
-              valor={leituraAtual.contato.relationship}
-            />
-            <CampoLeitura
-              titulo="Telefone ou WhatsApp"
-              valor={leituraAtual.contato.phone}
-              destaque
-            />
-            <CampoLeitura
-              titulo="E-mail"
-              valor={leituraAtual.contato.email}
-            />
-            <CampoLeitura
-              titulo="Quando pode ser acionada"
-              valor={leituraAtual.contato.can_be_contacted_in}
-            />
-            <CampoLeitura
-              titulo="Autorização confirmada"
-              valor={leituraAtual.contato.authorization_confirmed}
-            />
-            <CampoLeitura
-              titulo="Observações"
-              valor={leituraAtual.contato.notes}
-            />
-          </SecaoLeitura>
+  <div id="pessoa-de-confianca" className="scroll-mt-6">
+    <SecaoLeitura
+      titulo="10. Pessoa de confiança"
+      subtitulo="Contato indicado pelo paciente para apoio, cuidado ou situações de urgência."
+    >
+      <CampoLeitura
+        titulo="Nome"
+        valor={leituraAtual.contato.contact_name}
+        destaque
+      />
+      <CampoLeitura
+        titulo="Relação"
+        valor={leituraAtual.contato.relationship}
+      />
+      <CampoLeitura
+        titulo="Telefone ou WhatsApp"
+        valor={leituraAtual.contato.phone}
+        destaque
+      />
+      <CampoLeitura titulo="E-mail" valor={leituraAtual.contato.email} />
+      <CampoLeitura
+        titulo="Quando pode ser acionada"
+        valor={leituraAtual.contato.can_be_contacted_in}
+      />
+      <CampoLeitura
+        titulo="Autorização confirmada"
+        valor={leituraAtual.contato.authorization_confirmed}
+      />
+      <CampoLeitura
+        titulo="Observações"
+        valor={leituraAtual.contato.notes}
+      />
+    </SecaoLeitura>
+  </div>
 
-          <SecaoLeitura
-            titulo="11. Fechamento"
-            subtitulo="Relato livre e pontos que o paciente deseja que o terapeuta saiba."
-          >
-            <CampoLeitura
-              titulo="Relato livre"
-              valor={leituraAtual.fechamento.free_report}
-            />
-            <CampoLeitura
-              titulo="O que o terapeuta deve saber antes de conversar"
-              valor={leituraAtual.fechamento.what_therapist_should_know}
-              destaque
-            />
-          </SecaoLeitura>
-        </div>
-      </section>
-    </main>
-  );
+  <SecaoLeitura
+    titulo="11. Fechamento"
+    subtitulo="Relato livre e pontos que o paciente deseja que o terapeuta saiba."
+  >
+    <CampoLeitura
+      titulo="Relato livre"
+      valor={leituraAtual.fechamento.free_report}
+    />
+    <CampoLeitura
+      titulo="O que o terapeuta deve saber antes de conversar"
+      valor={leituraAtual.fechamento.what_therapist_should_know}
+      destaque
+    />
+  </SecaoLeitura>
+  </div>
+
+<a
+  href="#topo-anamnese-clinica"
+  className="fixed bottom-5 right-4 z-40 inline-flex min-h-11 items-center justify-center rounded-full border border-[#D8C7B1] bg-white px-4 text-sm font-semibold text-[#5F564C] shadow-lg transition hover:bg-[#FFF8EE] sm:right-6"
+>
+  ↑ Topo
+</a>
+</section>
+</main>
+);
 }
