@@ -257,8 +257,8 @@ export default function PerfilPage() {
 
           <div className="mt-6 rounded-2xl border border-[#E5DDD2] bg-[#F7F3EC] p-4">
           <p className="text-sm leading-6 text-[#5F564C]">
-  Se você errou o nome no cadastro, corrija aqui. O e-mail e o tipo
-  de conta permanecem bloqueados nesta etapa porque estão ligados ao
+  Use este espaço para corrigir ou atualizar seu nome de exibição. O e-mail
+  e o tipo de conta permanecem bloqueados nesta etapa porque estão ligados ao
   login, à segurança e às permissões de acesso.
 </p>
           </div>

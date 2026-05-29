@@ -247,7 +247,7 @@ export default function PerfilProfissionalPage() {
                 onChange={(event) =>
                   setProfessionalRegistry(event.target.value)
                 }
-                placeholder="Ex: CRP, formação, registro ou identificação profissional"
+                placeholder="Ex: CRP, registro profissional, formação ou identificação"
                 className="mt-2 min-h-11 w-full rounded-2xl border border-[#D8C7B1] bg-[#F7F3EC] px-4 text-sm text-[#2F2A24] outline-none transition placeholder:text-[#8A7A68] focus:border-[#8A2E2B] focus:bg-white"
                 disabled={salvando}
               />
