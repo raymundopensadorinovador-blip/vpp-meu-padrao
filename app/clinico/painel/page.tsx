@@ -311,19 +311,26 @@ const [erro, setErro] = useState("");
 >
   {ativandoModoPaciente ? "Ativando..." : "Usar como paciente"}
 </button>
-              <Link
-                href="/clinico/perfil-profissional"
-                className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl bg-[#2F2A24] px-5 text-sm font-semibold text-white shadow-sm transition hover:opacity-95 lg:w-auto"
-              >
-                Perfil profissional
-              </Link>
+<Link
+  href="/clinico/perfil-profissional"
+  className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl bg-[#2F2A24] px-5 text-sm font-semibold text-white shadow-sm transition hover:opacity-95 lg:w-auto"
+>
+  Perfil profissional
+</Link>
 
-              <Link
-                href="/clinico/sobre"
-                className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-[#D8C7B1] bg-white px-5 text-sm font-medium text-[#5F564C] shadow-sm transition hover:bg-[#FFF8EE] lg:w-auto"
-              >
-                Sobre a área clínica
-              </Link>
+<Link
+  href="/clinico/financeiro"
+  className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-[#D8C7B1] bg-[#FFF8EE] px-5 text-sm font-semibold text-[#8A2E2B] shadow-sm transition hover:bg-white lg:w-auto"
+>
+  Financeiro
+</Link>
+
+<Link
+  href="/clinico/sobre"
+  className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-[#D8C7B1] bg-white px-5 text-sm font-medium text-[#5F564C] shadow-sm transition hover:bg-[#FFF8EE] lg:w-auto"
+>
+  Sobre a área clínica
+</Link> 
 
               <button
                 type="button"

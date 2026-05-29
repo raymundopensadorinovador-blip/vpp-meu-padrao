@@ -587,6 +587,12 @@ carregarPaciente();
   Sessões
 </Link>
 <Link
+  href={`/clinico/financeiro/${paciente.patient_id}`}
+  className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-[#D8C7B1] bg-[#FFF8EE] px-5 text-sm font-semibold text-[#8A2E2B] shadow-sm transition hover:bg-white lg:w-auto"
+>
+  Financeiro
+</Link>
+<Link
   href={`/clinico/pacientes/${paciente.patient_id}/sonhos`}
   className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-[#D8C7B1] bg-white px-5 text-sm font-semibold text-[#5F564C] shadow-sm transition hover:bg-[#FFF8EE] lg:w-auto"
 >

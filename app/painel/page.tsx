@@ -20,6 +20,94 @@ type ResultadoResumo = {
   observation_focus: string | null;
 };
 
+type PlanoFinanceiroPaciente = {
+  id: string;
+  therapist_id: string;
+  patient_id: string;
+  plan_type:
+    | "sessao_avulsa"
+    | "semanal"
+    | "quinzenal"
+    | "mensal"
+    | "pacote"
+    | "personalizado";
+  agreed_amount: number;
+  payment_day: number;
+  started_at: string;
+  status: "ativo" | "pausado" | "encerrado";
+  notes: string | null;
+};
+
+type PagamentoPaciente = {
+  id: string;
+  therapist_id: string;
+  patient_id: string;
+  amount: number;
+  payment_date: string;
+  reference_month: string;
+  payment_method: "pix" | "dinheiro" | "cartao" | "transferencia" | "outro";
+  status: "recebido" | "pendente" | "cancelado" | "estornado";
+  notified_patient: boolean;
+  created_at: string;
+};
+
+type SessaoPaciente = {
+  id: string;
+  title: string;
+  session_date: string;
+  session_status: string;
+  next_session_date: string | null;
+};
+
+const nomesPlanoPaciente: Record<PlanoFinanceiroPaciente["plan_type"], string> = {
+  sessao_avulsa: "Sessão avulsa",
+  semanal: "Semanal",
+  quinzenal: "Quinzenal",
+  mensal: "Mensal",
+  pacote: "Pacote",
+  personalizado: "Personalizado",
+};
+
+function formatarMoeda(valor: number | string | null | undefined) {
+  const numero = Number(valor || 0);
+
+  return new Intl.NumberFormat("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  }).format(numero);
+}
+
+function formatarDataHora(data: string | null | undefined) {
+  if (!data) return "Não informado";
+
+  return new Intl.DateTimeFormat("pt-BR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(new Date(data));
+}
+
+function formatarDataSimples(data: string | null | undefined) {
+  if (!data) return "Não informado";
+
+  return new Intl.DateTimeFormat("pt-BR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  }).format(new Date(data));
+}
+
+function formatarMesReferencia(data: string | null | undefined) {
+  if (!data) return "Não informado";
+
+  return new Intl.DateTimeFormat("pt-BR", {
+    month: "long",
+    year: "numeric",
+  }).format(new Date(data));
+}
+
 export default function PainelPage() {
   const router = useRouter();
 
@@ -30,7 +118,12 @@ export default function PainelPage() {
   const [ativandoAreaClinica, setAtivandoAreaClinica] = useState(false);
   const [mensagemAtivacaoClinica, setMensagemAtivacaoClinica] = useState("");
   const [erroAtivacaoClinica, setErroAtivacaoClinica] = useState("");
-  
+  const [planoFinanceiro, setPlanoFinanceiro] =
+  useState<PlanoFinanceiroPaciente | null>(null);
+  const [ultimoPagamento, setUltimoPagamento] =
+  useState<PagamentoPaciente | null>(null);
+  const [proximaSessao, setProximaSessao] =
+  useState<SessaoPaciente | null>(null);
   const [resumoSituacoes, setResumoSituacoes] = useState<ResumoSituacoes>({
     total: 0,
     areaMaisRecorrente: "Ainda sem registros",
@@ -135,8 +228,46 @@ setNomeUsuario(perfil.name || "");
         .limit(1)
         .maybeSingle();
 
-      setResultadoResumo((resultadoEncontrado as ResultadoResumo) || null);
-      setCarregando(false);
+        setResultadoResumo((resultadoEncontrado as ResultadoResumo) || null);
+
+        const { data: planoEncontrado } = await supabase
+          .from("clinical_financial_plans")
+          .select("id, therapist_id, patient_id, plan_type, agreed_amount, payment_day, started_at, status, notes")
+          .eq("patient_id", usuarioAtual.user.id)
+          .neq("status", "encerrado")
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        
+        setPlanoFinanceiro((planoEncontrado as PlanoFinanceiroPaciente) || null);
+        
+        const { data: pagamentoEncontrado } = await supabase
+          .from("clinical_payments")
+          .select("id, therapist_id, patient_id, amount, payment_date, reference_month, payment_method, status, notified_patient, created_at")
+          .eq("patient_id", usuarioAtual.user.id)
+          .eq("status", "recebido")
+          .order("payment_date", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        
+        setUltimoPagamento((pagamentoEncontrado as PagamentoPaciente) || null);
+        
+        const agoraIso = new Date().toISOString();
+        
+        const { data: sessaoEncontrada } = await supabase
+          .from("clinical_sessions")
+          .select("id, title, session_date, session_status, next_session_date")
+          .eq("patient_id", usuarioAtual.user.id)
+          .in("session_status", ["agendada", "remarcada"])
+          .not("next_session_date", "is", null)
+          .gte("next_session_date", agoraIso)
+          .order("next_session_date", { ascending: true })
+          .limit(1)
+          .maybeSingle();
+        
+        setProximaSessao((sessaoEncontrada as SessaoPaciente) || null);
+        
+        setCarregando(false);  
     }
 
     verificarAcesso();
@@ -370,14 +501,113 @@ setNomeUsuario(perfil.name || "");
     </div>
   </section>
 )}
+ <section className="mb-6 rounded-3xl border border-[#D8C7B1] bg-[#FFF8EE] p-5 shadow-sm sm:p-7">
+  <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+    <div className="min-w-0">
+      <p className="mb-2 text-sm font-medium text-[#8A2E2B]">
+        Meu acompanhamento
+      </p>
 
+      <h2 className="text-xl font-semibold text-[#2F2A24]">
+        Plano combinado e próximos avisos
+      </h2>
+
+      <p className="mt-3 text-sm leading-6 text-[#5F564C]">
+        Consulte as principais informações do acompanhamento registradas pelo
+        terapeuta: plano combinado, vencimento, último pagamento confirmado e
+        próxima sessão.
+      </p>
+    </div>
+  </div>
+
+  <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+    <article className="rounded-2xl bg-white p-4 shadow-sm">
+      <p className="text-xs font-semibold uppercase tracking-wide text-[#8A7A68]">
+        Plano
+      </p>
+
+      <p className="mt-2 text-lg font-semibold text-[#2F2A24]">
+        {planoFinanceiro
+          ? nomesPlanoPaciente[planoFinanceiro.plan_type]
+          : "Não informado"}
+      </p>
+
+      <p className="mt-2 text-sm leading-6 text-[#5F564C]">
+        {planoFinanceiro
+          ? `Status: ${planoFinanceiro.status}`
+          : "O terapeuta ainda não configurou um plano financeiro."}
+      </p>
+    </article>
+
+    <article className="rounded-2xl bg-white p-4 shadow-sm">
+      <p className="text-xs font-semibold uppercase tracking-wide text-[#8A7A68]">
+        Valor combinado
+      </p>
+
+      <p className="mt-2 text-lg font-semibold text-[#2F2A24]">
+        {planoFinanceiro
+          ? formatarMoeda(planoFinanceiro.agreed_amount)
+          : "Não informado"}
+      </p>
+
+      <p className="mt-2 text-sm leading-6 text-[#5F564C]">
+        {planoFinanceiro
+          ? `Vencimento: dia ${planoFinanceiro.payment_day}`
+          : "Quando houver um valor registrado, ele aparecerá aqui."}
+      </p>
+    </article>
+
+    <article className="rounded-2xl bg-white p-4 shadow-sm">
+      <p className="text-xs font-semibold uppercase tracking-wide text-[#8A7A68]">
+        Último pagamento confirmado
+      </p>
+
+      <p className="mt-2 text-lg font-semibold text-[#2F2A24]">
+        {ultimoPagamento
+          ? formatarMoeda(ultimoPagamento.amount)
+          : "Nenhum confirmado"}
+      </p>
+
+      <p className="mt-2 text-sm leading-6 text-[#5F564C]">
+        {ultimoPagamento
+          ? `${formatarMesReferencia(
+              ultimoPagamento.reference_month
+            )} • ${formatarDataSimples(ultimoPagamento.payment_date)}`
+          : "Pagamentos confirmados pelo terapeuta aparecerão aqui."}
+      </p>
+    </article>
+
+    <article className="rounded-2xl bg-white p-4 shadow-sm">
+      <p className="text-xs font-semibold uppercase tracking-wide text-[#8A7A68]">
+        Próxima sessão
+      </p>
+
+      <p className="mt-2 text-lg font-semibold text-[#2F2A24]">
+        {proximaSessao?.next_session_date
+          ? formatarDataHora(proximaSessao.next_session_date)
+          : "Não agendada"}
+      </p>
+
+      <p className="mt-2 text-sm leading-6 text-[#5F564C]">
+        {proximaSessao?.title || "Quando houver uma próxima sessão registrada, ela aparecerá aqui."}
+      </p>
+    </article>
+  </div>
+
+  <div className="mt-5 rounded-2xl border border-[#E5DDD2] bg-white/70 p-4">
+    <p className="text-sm leading-6 text-[#5F564C]">
+      Esta área é apenas informativa. Alterações de plano, vencimento,
+      confirmação de pagamento e datas de sessão são registradas pelo terapeuta.
+    </p>
+  </div>
+</section>
 <section className="mb-6 rounded-3xl border border-[#E5DDD2] bg-white p-5 shadow-sm sm:p-7">
           <div className="flex flex-col gap-4">
             <div>
               <p className="mb-2 text-sm font-medium text-[#8A7A68]">
                 Status atual
               </p>
-
+             
               {resultadoResumo ? (
                 <>
                   <h2 className="text-xl font-semibold text-[#2F2A24]">
