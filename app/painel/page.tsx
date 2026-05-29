@@ -528,52 +528,32 @@ setNomeUsuario(perfil.name || "");
           </div>
         </section>
 
-        <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <article className="rounded-3xl border border-[#E5DDD2] bg-white p-5 shadow-sm">
+        <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+        <article className="rounded-3xl border border-[#E5DDD2] bg-white p-5 shadow-sm">
             <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-2xl bg-[#F7F3EC] text-lg">
-              01
+              03
             </div>
 
             <h3 className="text-lg font-semibold text-[#2F2A24]">
-              Fazer teste VPP
+              Diário de sonhos
             </h3>
 
             <p className="mt-3 text-sm leading-6 text-[#5F564C]">
-              Responda às perguntas para identificar seu perfil predominante e
-              pontos iniciais de observação.
+              Registre sonhos, emoções, pessoas, lugares e imagens marcantes
+              para organizar material clínico sem interpretações automáticas.
             </p>
 
             <Link
-              href="/teste"
-              className="mt-5 inline-flex min-h-11 w-full items-center justify-center rounded-2xl bg-[#2F2A24] px-5 text-sm font-semibold text-white shadow-sm transition hover:opacity-95"
+              href="/sonhos"
+              className="mt-5 inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-[#D8C7B1] bg-white px-5 text-sm font-semibold text-[#5F564C] shadow-sm transition hover:bg-[#FFF8EE]"
             >
-              Fazer teste VPP
+              Abrir diário
             </Link>
           </article>
-          <article className="rounded-3xl border border-[#E5DDD2] bg-white p-5 shadow-sm">
-  <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-2xl bg-[#F7F3EC] text-lg">
-    02
-  </div>
 
-  <h3 className="text-lg font-semibold text-[#2F2A24]">
-    Minha anamnese
-  </h3>
-
-  <p className="mt-3 text-sm leading-6 text-[#5F564C]">
-    Responda a uma conversa guiada sobre sua história, rotina, relações,
-    sintomas, padrões percebidos e pessoa de confiança.
-  </p>
-
-  <Link
-    href="/anamnese"
-    className="mt-5 inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-[#D8C7B1] bg-white px-5 text-sm font-semibold text-[#5F564C] shadow-sm transition hover:bg-[#FFF8EE]"
-  >
-    Preencher anamnese
-  </Link>
-</article>
           <article className="rounded-3xl border border-[#E5DDD2] bg-white p-5 shadow-sm">
             <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-2xl bg-[#F7F3EC] text-lg">
-              03
+              04
             </div>
 
             <h3 className="text-lg font-semibold text-[#2F2A24]">
@@ -604,7 +584,7 @@ setNomeUsuario(perfil.name || "");
 
           <article className="rounded-3xl border border-[#E5DDD2] bg-white p-5 shadow-sm sm:col-span-2 lg:col-span-1">
             <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-2xl bg-[#F7F3EC] text-lg">
-              04
+              05
             </div>
 
             <h3 className="text-lg font-semibold text-[#2F2A24]">
@@ -622,7 +602,7 @@ setNomeUsuario(perfil.name || "");
             >
               Ver meu resultado
             </Link>
-          </article>
+          </article>   
         </section>
 
         <section className="mt-6 grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">

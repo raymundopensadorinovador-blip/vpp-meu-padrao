@@ -77,6 +77,21 @@ type PreparacaoSessao = {
   updated_at: string;
 };
 
+type SonhoPaciente = {
+    id: string;
+    patient_id: string;
+    dream_date: string;
+    title: string;
+    dream_report: string;
+    main_emotions: string | null;
+    recurring_people: string | null;
+    recurring_places: string | null;
+    symbols_or_images: string | null;
+    waking_feeling: string | null;
+    possible_context: string | null;
+    created_at: string;
+  };
+
 type ItemResumo = {
   nome: string;
   total: number;
@@ -152,7 +167,8 @@ export default function PreSessaoPacientePage() {
     null
   );
   const [notasAnamnese, setNotasAnamnese] = useState<NotaAnamnese[]>([]);
-  const [preparacoes, setPreparacoes] = useState<PreparacaoSessao[]>([]);
+const [sonhosPaciente, setSonhosPaciente] = useState<SonhoPaciente[]>([]);
+const [preparacoes, setPreparacoes] = useState<PreparacaoSessao[]>([]);
 
   const [preparacaoEditandoId, setPreparacaoEditandoId] = useState<
     string | null
@@ -258,7 +274,17 @@ export default function PreSessaoPacientePage() {
 
         setNotasAnamnese((notas || []) as NotaAnamnese[]);
       }
-
+      const { data: sonhosEncontrados } = await supabase
+      .from("patient_dream_entries")
+      .select(
+        "id, patient_id, dream_date, title, dream_report, main_emotions, recurring_people, recurring_places, symbols_or_images, waking_feeling, possible_context, created_at"
+      )
+      .eq("patient_id", pacienteId)
+      .order("dream_date", { ascending: false })
+      .order("created_at", { ascending: false })
+      .limit(5);
+    
+    setSonhosPaciente((sonhosEncontrados || []) as SonhoPaciente[]);
       const { data: preparacoesEncontradas } = await supabase
         .from("clinical_session_preparations")
         .select(
@@ -298,6 +324,10 @@ export default function PreSessaoPacientePage() {
       ) / situacoes.length
     );
   }, [situacoes]);
+
+  const ultimoSonho = useMemo(() => {
+    return sonhosPaciente[0] || null;
+  }, [sonhosPaciente]);
 
   async function recarregarPreparacoes() {
     if (!paciente || !terapeutaId) return;
@@ -664,7 +694,134 @@ export default function PreSessaoPacientePage() {
             </div>
           </div>
         </section>
+        <section className="print-card mb-6 rounded-3xl border border-[#E5DDD2] bg-white p-5 shadow-sm sm:p-7">
+          <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+              <p className="mb-2 text-sm font-medium text-[#8A2E2B]">
+                Material do diário de sonhos
+              </p>
 
+              <h2 className="text-xl font-semibold text-[#2F2A24]">
+                Registros recentes do paciente
+              </h2>
+
+              <p className="mt-3 text-sm leading-6 text-[#5F564C]">
+                Estes registros não são interpretados automaticamente. Eles
+                servem como apoio para observar relatos, emoções, figuras,
+                lugares, imagens e contextos que possam ser retomados na sessão.
+              </p>
+            </div>
+
+            <Link
+  href={`/clinico/pacientes/${paciente.patient_id}/sonhos?voltar=pre-sessao`}
+  className="no-print inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-[#D8C7B1] bg-white px-5 text-sm font-semibold text-[#5F564C] shadow-sm transition hover:bg-[#FFF8EE] sm:w-auto"
+>
+  Ver diário completo
+</Link>   
+          </div>
+
+          {!ultimoSonho ? (
+            <div className="rounded-2xl border border-dashed border-[#D8C7B1] bg-[#F7F3EC] p-5">
+              <p className="text-sm font-medium text-[#2F2A24]">
+                Nenhum sonho registrado até o momento.
+              </p>
+
+              <p className="mt-2 text-sm leading-6 text-[#5F564C]">
+                Quando o paciente registrar sonhos, os dados recentes aparecerão
+                aqui como material complementar para a preparação da sessão.
+              </p>
+            </div>
+          ) : (
+            <div className="grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
+              <article className="min-w-0 rounded-2xl border border-[#D8C7B1] bg-[#FFF8EE] p-4">
+                <p className="text-xs font-semibold uppercase tracking-wide text-[#8A7A68]">
+                  Último sonho registrado
+                </p>
+
+                <h3 className="mt-2 break-words text-lg font-semibold text-[#2F2A24] [overflow-wrap:anywhere]">
+                  {ultimoSonho.title}
+                </h3>
+
+                <p className="mt-1 text-xs text-[#8A7A68]">
+                  Data do sonho: {formatarData(ultimoSonho.dream_date)}
+                </p>
+
+                <div className="mt-4 rounded-2xl bg-white p-4">
+                  <p className="whitespace-pre-wrap break-words text-sm leading-6 text-[#5F564C] [overflow-wrap:anywhere]">
+                    {ultimoSonho.dream_report}
+                  </p>
+                </div>
+              </article>
+
+              <article className="min-w-0 rounded-2xl border border-[#E5DDD2] bg-[#F7F3EC] p-4">
+                <p className="text-xs font-semibold uppercase tracking-wide text-[#8A7A68]">
+                  Elementos informados
+                </p>
+
+                <div className="mt-3 space-y-3">
+                  <ResumoCampo
+                    titulo="Emoções principais"
+                    texto={ultimoSonho.main_emotions}
+                  />
+
+                  <ResumoCampo
+                    titulo="Sensação ao acordar"
+                    texto={ultimoSonho.waking_feeling}
+                  />
+
+                  <ResumoCampo
+                    titulo="Pessoas ou figuras"
+                    texto={ultimoSonho.recurring_people}
+                  />
+
+                  <ResumoCampo
+                    titulo="Lugares"
+                    texto={ultimoSonho.recurring_places}
+                  />
+
+                  <ResumoCampo
+                    titulo="Imagens ou cenas marcantes"
+                    texto={ultimoSonho.symbols_or_images}
+                  />
+
+                  <ResumoCampo
+                    titulo="Contexto possível"
+                    texto={ultimoSonho.possible_context}
+                  />
+                </div>
+              </article>
+
+              {sonhosPaciente.length > 1 && (
+                <article className="lg:col-span-2 rounded-2xl border border-[#E5DDD2] bg-white p-4">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-[#8A7A68]">
+                    Sonhos recentes
+                  </p>
+
+                  <div className="mt-3 max-h-72 space-y-3 overflow-y-auto pr-1">
+                    {sonhosPaciente.slice(1).map((sonho) => (
+                      <div
+                        key={sonho.id}
+                        className="rounded-2xl border border-[#E5DDD2] bg-[#F7F3EC] p-4"
+                      >
+                        <p className="break-words text-sm font-semibold text-[#2F2A24] [overflow-wrap:anywhere]">
+                          {sonho.title}
+                        </p>
+
+                        <p className="mt-1 text-xs text-[#8A7A68]">
+                          {formatarData(sonho.dream_date)}
+                        </p>
+
+                        <p className="mt-2 line-clamp-3 break-words text-sm leading-6 text-[#5F564C] [overflow-wrap:anywhere]">
+                          {sonho.dream_report}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </article>
+              )}
+            </div>
+          )}
+        </section>
         <section className="print-card mb-6 grid gap-4 lg:grid-cols-2">
           <article className="rounded-3xl border border-[#E5DDD2] bg-white p-5 shadow-sm sm:p-7">
             <p className="mb-2 text-sm font-medium text-[#8A2E2B]">
@@ -747,11 +904,11 @@ export default function PreSessaoPacientePage() {
           </article>
         </section>
 
-        <section className="print-card mb-6 rounded-3xl border border-[#E5DDD2] bg-white p-5 shadow-sm sm:p-7">
-          <div className="mb-5">
-            <p className="mb-2 text-sm font-medium text-[#8A2E2B]">
-              Preparação do terapeuta
-            </p>
+        <section className="no-print mb-6 rounded-3xl border border-[#E5DDD2] bg-white p-5 shadow-sm sm:p-7">
+  <div className="mb-5">
+    <p className="mb-2 text-sm font-medium text-[#8A2E2B]">
+      Preparação do terapeuta
+    </p>
 
             <h2 className="text-xl font-semibold text-[#2F2A24]">
               {preparacaoEditandoId
@@ -1008,3 +1165,22 @@ export default function PreSessaoPacientePage() {
     </main>
   );
 }
+function ResumoCampo({
+    titulo,
+    texto: conteudo,
+  }: {
+    titulo: string;
+    texto: string | null;
+  }) {
+    return (
+      <div className="rounded-2xl bg-white p-3">
+        <p className="text-xs font-semibold uppercase tracking-wide text-[#8A7A68]">
+          {titulo}
+        </p>
+  
+        <p className="mt-2 whitespace-pre-wrap break-words text-sm leading-6 text-[#5F564C] [overflow-wrap:anywhere]">
+          {conteudo?.trim() || "Não informado."}
+        </p>
+      </div>
+    );
+  }
