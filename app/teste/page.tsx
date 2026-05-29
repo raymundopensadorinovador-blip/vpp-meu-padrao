@@ -260,172 +260,243 @@ const leiturasPorPerfil: Record<
   }
 > = {
   "Simão Pedro — Vetor da Prova": {
-    description: "Perfil de iniciativa, reação rápida e intensidade emocional.",
-    functioning_reading:
-      "Seu funcionamento tende a responder rapidamente à realidade, com coragem, presença e impulso. O ponto central é observar se a ação nasce de clareza ou de urgência emocional.",
-    attention_point:
-      "Cuidado com decisões tomadas no calor da reação, especialmente quando há medo, culpa ou necessidade de provar valor.",
-    potential:
-      "Força de liderança, coragem para começar e capacidade de se reposicionar depois do erro.",
-    observation_focus:
-      "Observe situações em que você age antes de compreender o que realmente sentiu.",
-    self_observation_question:
-      "Eu estou agindo com clareza ou apenas tentando aliviar uma tensão interna?",
+    description:
+    "Você tende a funcionar com uma necessidade forte de demonstrar presença, valor e lealdade. Existe em você uma energia de resposta rápida, coragem e disposição para se posicionar. Muitas vezes, você não quer apenas sentir que está comprometido; você precisa provar isso por meio de atitudes, decisões, enfrentamentos ou sacrifícios. Esse padrão pode fazer com que você entre intensamente nas situações, principalmente quando sente que sua identidade, sua importância ou sua fidelidade estão sendo colocadas em dúvida.",
+  
+  functioning_reading:
+    "Na prática, esse funcionamento pode aparecer como impulso para agir antes de elaborar, defender antes de escutar tudo, prometer mais do que consegue sustentar ou tentar mostrar força quando, por dentro, existe insegurança. Você pode ter grande capacidade de iniciativa, mas também pode sofrer quando percebe que não conseguiu manter aquilo que declarou com tanta certeza. O conflito costuma surgir entre a imagem de força que você tenta sustentar e os limites reais que aparecem no caminho.",
+  
+  attention_point:
+    "O ponto de atenção está em perceber quando a necessidade de provar valor começa a comandar suas decisões. Nem toda situação exige uma demonstração imediata. Às vezes, maturidade não está em reagir com força, mas em reconhecer o próprio limite antes que ele vire queda, culpa ou arrependimento.",
+  
+  potential:
+    "Seu potencial está na coragem, na prontidão e na capacidade de recomeçar depois de perceber seus próprios excessos. Quando esse vetor fica mais consciente, você deixa de viver tentando provar quem é e começa a sustentar sua identidade com mais estabilidade, humildade e presença real.",
+  
+  observation_focus:
+    "Observe situações em que você sente necessidade de responder rápido, se defender, se afirmar ou mostrar que é forte.",
+  
+  self_observation_question:
+    "Estou agindo porque isso é realmente necessário ou porque sinto que preciso provar meu valor para alguém?", 
   },
 
   "André — Vetor da Ponte": {
-    description: "Perfil de ponte, apoio, aproximação e sensibilidade ao outro.",
-    functioning_reading:
-      "Seu funcionamento tende a perceber necessidades, conectar pessoas e sustentar vínculos. O ponto central é observar se o cuidado com o outro não está apagando sua própria voz.",
-    attention_point:
-      "Cuidado para não virar apenas suporte dos outros e deixar suas próprias necessidades invisíveis.",
-    potential:
-      "Capacidade de acolher, aproximar, facilitar caminhos e fortalecer relações.",
-    observation_focus:
-      "Observe quando você ajuda para contribuir e quando ajuda para evitar conflito ou rejeição.",
-    self_observation_question:
-      "Eu estou escolhendo ajudar ou estou tentando garantir meu lugar sendo útil?",
+    description:
+    "Você tende a funcionar como alguém que percebe caminhos entre pessoas, ideias e situações. Existe em você uma disposição para aproximar, traduzir e criar ligação onde outros enxergam distância. Esse padrão pode fazer com que você assuma, muitas vezes sem perceber, o papel de ponte entre mundos diferentes: entre quem fala e quem não consegue se expressar, entre quem decide e quem precisa ser incluído, entre o que está separado e o que ainda pode ser conectado.",
+  
+  functioning_reading:
+    "Na prática, esse funcionamento costuma aparecer quando você sente necessidade de facilitar relações, explicar intenções, evitar rupturas ou ajudar alguém a encontrar o próprio lugar. Você pode ter facilidade para perceber o que está faltando em uma conversa, em um grupo ou em uma situação. O risco é começar a medir seu valor pela sua capacidade de unir, ajudar ou sustentar vínculos. Quando isso acontece, você pode se envolver demais em problemas que não são seus, carregar tensões de outras pessoas e sentir culpa quando não consegue manter todos próximos ou em paz.",
+  
+  attention_point:
+    "O ponto de atenção está em perceber quando a ponte começa a virar peso. Aproximar pessoas é uma força, mas não significa que você precisa atravessar por elas, decidir por elas ou impedir toda distância. Algumas separações são necessárias, algumas escolhas pertencem ao outro, e nem toda ruptura é sinal de fracasso seu.",
+  
+  potential:
+    "Seu potencial está na capacidade de criar conexão com sensibilidade e presença. Quando esse vetor está mais consciente, você consegue aproximar sem se perder, ajudar sem assumir tudo, traduzir sem manipular e participar das relações sem abandonar seus próprios limites.",
+  
+  observation_focus:
+    "Observe em quais situações você sente que precisa resolver, unir ou explicar algo para que os outros fiquem bem.",
+  
+  self_observation_question:
+    "Estou ajudando a construir uma ponte ou estou tentando carregar sozinho uma travessia que também pertence ao outro?", 
   },
 
   "Tiago filho de Zebedeu — Vetor da Intensidade": {
-    description: "Perfil de força, intensidade, defesa e posicionamento.",
-    functioning_reading:
-      "Seu funcionamento tende a sustentar posições com firmeza e energia. O ponto central é observar se a força está servindo à direção ou à rigidez.",
-    attention_point:
-      "Cuidado com reações duras quando a realidade parece lenta, injusta ou desalinhada com o que você esperava.",
-    potential:
-      "Determinação, coragem para defender valores e resistência diante de pressão.",
-    observation_focus:
-      "Observe quando sua firmeza se transforma em dureza.",
-    self_observation_question:
-      "Eu estou defendendo algo importante ou apenas reagindo contra uma frustração?",
+    description:
+    "Você tende a funcionar com intensidade emocional, senso de urgência e forte envolvimento com aquilo que considera importante. Quando algo toca seu valor, sua justiça, sua família, sua fé, seu projeto ou sua identidade, dificilmente isso passa de forma neutra por dentro. Esse padrão pode fazer com que você viva as experiências com força, profundidade e reação imediata, como se algumas situações pedissem uma resposta à altura do impacto que causaram em você.",
+  
+  functioning_reading:
+    "Na prática, esse funcionamento pode aparecer como dedicação intensa, fala firme, reações fortes, dificuldade de esperar o tempo das coisas ou incômodo diante de pessoas que parecem frias, lentas ou indiferentes. Você pode carregar uma energia potente para defender, construir e se entregar, mas também pode se desgastar quando transforma toda frustração em urgência e toda diferença em confronto interno. O sofrimento costuma aparecer quando a realidade não acompanha a velocidade ou a força da sua expectativa.",
+  
+  attention_point:
+    "O ponto de atenção está em perceber quando sua intensidade deixa de servir à construção e começa a dominar sua leitura das situações. Sentir muito não é erro. O problema é quando a força do sentimento decide tudo antes que você consiga compreender o que realmente está acontecendo.",
+  
+  potential:
+    "Seu potencial está na paixão direcionada, na coragem de se envolver e na capacidade de colocar energia onde muitos permaneceriam passivos. Quando esse vetor está mais organizado, sua intensidade deixa de ser explosão e se transforma em presença, firmeza, proteção e compromisso maduro.",
+  
+  observation_focus:
+    "Observe situações em que sua reação parece maior do que o fato imediato, principalmente quando há frustração, demora, injustiça ou sensação de desrespeito.",
+  
+  self_observation_question:
+    "Minha intensidade está me ajudando a agir com verdade ou está me fazendo reagir antes de compreender?", 
   },
 
   "João filho de Zebedeu — Vetor da Profundidade": {
-    description: "Perfil de vínculo, profundidade emocional e lealdade afetiva.",
-    functioning_reading:
-      "Seu funcionamento tende a buscar profundidade, presença e conexão. O ponto central é observar quando a necessidade de vínculo aumenta sua vulnerabilidade à dor da distância.",
-    attention_point:
-      "Cuidado com dependência emocional de sinais de presença, aprovação ou proximidade.",
-    potential:
-      "Afeto profundo, lealdade, sensibilidade e capacidade de sustentar vínculos verdadeiros.",
-    observation_focus:
-      "Observe quando a ausência do outro começa a definir seu estado interno.",
-    self_observation_question:
-      "Eu estou buscando conexão real ou tentando confirmar se ainda sou importante?",
+    description:
+    "Você tende a funcionar com uma percepção mais profunda das relações, dos sentimentos e dos significados por trás das experiências. Nem sempre você se prende apenas ao que foi dito ou feito; muitas vezes, percebe o clima, a intenção, a ausência, a mudança de tom e aquilo que ficou escondido nas entrelinhas. Esse padrão pode fazer com que você viva os vínculos com muita intensidade interna, buscando sentido, conexão verdadeira e coerência emocional.",
+  
+  functioning_reading:
+    "Na prática, esse funcionamento pode aparecer como sensibilidade para perceber pessoas, profundidade afetiva, necessidade de vínculos verdadeiros e dificuldade com relações superficiais. Você pode captar detalhes que outros ignoram, mas também pode sofrer por interpretar demais, guardar demais ou esperar que o outro tenha a mesma profundidade com que você sente. O conflito costuma surgir quando sua leitura interna fica mais forte do que os fatos disponíveis, fazendo você sofrer por sinais, silêncios ou distâncias que talvez ainda precisem ser compreendidos com mais calma.",
+  
+  attention_point:
+    "O ponto de atenção está em perceber quando a profundidade vira peso. Sentir profundamente é uma força, mas pode se tornar sofrimento quando tudo precisa ter um significado oculto, quando todo silêncio vira rejeição ou quando toda distância é interpretada como perda de valor.",
+  
+  potential:
+    "Seu potencial está na capacidade de enxergar pessoas e experiências com sensibilidade, presença e profundidade. Quando esse vetor está mais consciente, você consegue transformar percepção em cuidado, escuta e vínculo maduro, sem se perder em interpretações que aumentam sua dor.",
+  
+  observation_focus:
+    "Observe situações em que você percebe sinais pequenos, mudanças de tom, silêncios ou distâncias e começa a construir internamente uma explicação antes de confirmar os fatos.",
+  
+  self_observation_question:
+    "Estou percebendo algo real ou estou preenchendo o silêncio do outro com uma dor que já existia em mim?",
   },
 
   "Filipe — Vetor da Análise": {
-    description: "Perfil de compreensão, análise e busca por clareza concreta.",
-    functioning_reading:
-      "Seu funcionamento tende a buscar explicação, evidência e estrutura antes de confiar. O ponto central é observar se a necessidade de entender está ajudando ou paralisando.",
-    attention_point:
-      "Cuidado com adiamento constante da ação porque ainda falta uma explicação perfeita.",
-    potential:
-      "Clareza racional, organização de ideias e capacidade de tornar o abstrato compreensível.",
-    observation_focus:
-      "Observe quando você usa análise para avançar e quando usa análise para não se expor.",
-    self_observation_question:
-      "Eu preciso mesmo de mais clareza ou estou usando a dúvida para não agir?",
+    description:
+    "Você tende a funcionar buscando clareza, explicação e organização antes de se entregar totalmente a uma decisão ou experiência. Existe em você uma necessidade de entender como as coisas funcionam, qual é o caminho, quais são os riscos e se aquilo faz sentido de forma concreta. Esse padrão pode trazer prudência, lucidez e capacidade de análise, mas também pode gerar travamento quando a mente exige garantias demais antes de permitir movimento.",
+  
+  functioning_reading:
+    "Na prática, esse funcionamento pode aparecer como tendência a perguntar, comparar, calcular possibilidades, revisar decisões e procurar uma explicação segura para aquilo que sente ou precisa fazer. Você pode ter boa capacidade de observar detalhes e evitar impulsos, mas também pode sofrer quando transforma toda escolha em um problema que precisa ser resolvido perfeitamente. O conflito costuma surgir quando a necessidade de entender tudo impede você de viver, decidir ou confiar em processos que ainda não estão completamente claros.",
+  
+  attention_point:
+    "O ponto de atenção está em perceber quando a análise deixa de iluminar o caminho e começa a adiar a caminhada. Pensar é importante, mas nem toda decisão terá garantia total. Às vezes, a busca por segurança vira uma forma discreta de medo.",
+  
+  potential:
+    "Seu potencial está na lucidez, na capacidade de organizar ideias e na habilidade de transformar confusão em compreensão. Quando esse vetor está mais consciente, você usa a análise como ferramenta de direção, não como prisão. Você aprende a pensar com profundidade sem perder a capacidade de agir.",
+  
+  observation_focus:
+    "Observe situações em que você sente que precisa entender tudo, prever tudo ou ter certeza absoluta antes de dar um passo.",
+  
+  self_observation_question:
+    "Estou analisando para agir melhor ou estou usando a análise para evitar o risco de decidir?",
   },
 
   "Natanael/Bartolomeu — Vetor da Inteireza": {
-    description: "Perfil de autenticidade, coerência e rejeição à falsidade.",
-    functioning_reading:
-      "Seu funcionamento tende a valorizar verdade, integridade e coerência. O ponto central é observar se a busca por autenticidade não está virando intolerância com ambiguidades humanas.",
-    attention_point:
-      "Cuidado com julgamentos rápidos quando percebe contradições nos outros.",
-    potential:
-      "Lealdade, transparência, sinceridade e capacidade de reconhecer o que é verdadeiro.",
-    observation_focus:
-      "Observe quando sua exigência de verdade aproxima e quando afasta.",
-    self_observation_question:
-      "Eu estou buscando coerência ou estou usando a verdade como defesa?",
+    description:
+    "Você tende a funcionar com uma busca forte por verdade, coerência e autenticidade. Existe em você uma necessidade de que as coisas façam sentido por inteiro, sem falsidade, manipulação ou aparência forçada. Esse padrão pode fazer com que você tenha dificuldade em aceitar ambientes, relações ou discursos que parecem contraditórios. Para você, não basta parecer correto; precisa ser verdadeiro por dentro.",
+  
+  functioning_reading:
+    "Na prática, esse funcionamento pode aparecer como franqueza, observação crítica, incômodo com hipocrisia e desejo de relações mais limpas e diretas. Você pode ter boa capacidade de perceber incoerências, mas também pode se fechar rápido quando sente que alguém não é confiável ou quando uma situação parece artificial. O conflito costuma surgir quando sua busca por inteireza se transforma em rigidez, fazendo com que você descarte pessoas, oportunidades ou processos antes de compreender melhor suas camadas.",
+  
+  attention_point:
+    "O ponto de atenção está em perceber quando a busca por verdade começa a virar defesa. Ser inteiro não significa exigir perfeição absoluta dos outros. Pessoas reais são contraditórias, imaturas em alguns pontos e ainda assim podem estar em processo sincero de mudança.",
+  
+  potential:
+    "Seu potencial está na autenticidade, na honestidade interna e na capacidade de sustentar relações e decisões com coerência. Quando esse vetor está mais consciente, você consegue discernir o que é falso sem se tornar duro, preservar sua verdade sem se isolar e buscar inteireza sem exigir perfeição de tudo.",
+  
+  observation_focus:
+    "Observe situações em que você sente rejeição imediata por perceber incoerência, falsidade, exagero ou contradição em alguém.",
+  
+  self_observation_question:
+    "Estou protegendo minha verdade ou estou usando minha exigência de coerência para me afastar antes de compreender melhor?", 
   },
 
   "Mateus/Levi — Vetor da Inclusão": {
-    description: "Perfil de análise prática, organização e leitura de sistemas.",
-    functioning_reading:
-      "Seu funcionamento tende a perceber estruturas, trocas e consequências. O ponto central é observar se a análise está servindo à consciência ou ao controle.",
-    attention_point:
-      "Cuidado com distanciamento emocional por excesso de cálculo, controle ou autoproteção.",
-    potential:
-      "Capacidade de organizar dados, perceber padrões e transformar experiência em leitura prática.",
-    observation_focus:
-      "Observe quando você entende muito, mas sente pouco ou expressa pouco.",
-    self_observation_question:
-      "Eu estou analisando para compreender ou para não entrar em contato com o que sinto?",
+    description:
+    "Você tende a funcionar com uma sensibilidade especial para pertencimento, aceitação e reconstrução de valor pessoal. Existe em você uma percepção forte sobre estar dentro ou fora, ser reconhecido ou rejeitado, ser visto apenas pelo passado ou pelo que ainda pode se tornar. Esse padrão pode fazer com que você valorize muito os espaços onde se sente recebido, mas também pode gerar medo de exclusão, necessidade de compensar erros antigos ou tentativa de provar que merece um novo lugar.",
+  
+  functioning_reading:
+    "Na prática, esse funcionamento pode aparecer como desejo de recomeçar, busca por aceitação, atenção ao modo como os outros olham para você e esforço para ser útil, confiável ou necessário. Você pode ter grande capacidade de acolher pessoas que também se sentem deslocadas, justamente porque conhece o peso de não se sentir plenamente incluído. O conflito costuma surgir quando sua história, suas falhas ou antigas marcas passam a definir demais sua forma de se enxergar. Nesses momentos, você pode tentar se encaixar a qualquer custo ou se afastar antes que alguém confirme uma rejeição que você já teme.",
+  
+  attention_point:
+    "O ponto de atenção está em perceber quando a necessidade de ser aceito começa a enfraquecer sua liberdade interna. Pertencer é importante, mas não deve exigir que você apague sua história, force uma imagem perfeita ou aceite qualquer lugar só para não se sentir excluído.",
+  
+  potential:
+    "Seu potencial está na capacidade de reconstrução, acolhimento e transformação de história. Quando esse vetor está mais consciente, você deixa de viver tentando provar que merece estar ali e começa a ocupar seu lugar com mais verdade, maturidade e dignidade.",
+  
+  observation_focus:
+    "Observe situações em que você sente medo de ser deixado de fora, julgado pelo passado ou visto como insuficiente.",
+  
+  self_observation_question:
+    "Estou buscando pertencimento com verdade ou estou tentando ser aceito ao custo de esconder partes importantes de mim?",
   },
 
   "Tomé — Vetor da Evidência": {
-    description: "Perfil de cautela, dúvida, verificação e compromisso profundo.",
-    functioning_reading:
-      "Seu funcionamento tende a buscar segurança antes de se entregar. O ponto central é observar se a dúvida está protegendo sua lucidez ou mantendo você distante da vida.",
-    attention_point:
-      "Cuidado para não transformar necessidade de confirmação em bloqueio permanente.",
-    potential:
-      "Profundidade, prudência, compromisso real depois da confiança e busca honesta por verdade.",
-    observation_focus:
-      "Observe quando sua dúvida é investigação e quando é medo de confiar.",
-    self_observation_question:
-      "Eu estou buscando verdade ou tentando evitar vulnerabilidade?",
+    description:
+    "Você tende a funcionar buscando confirmação, consistência e sinais concretos antes de confiar plenamente. Existe em você uma necessidade de não se entregar apenas por discurso, promessa ou aparência. Esse padrão pode trazer prudência e honestidade intelectual, porque você não aceita facilmente respostas prontas. Ao mesmo tempo, pode gerar sofrimento quando a necessidade de evidência se transforma em dificuldade de confiar, mesmo diante de vínculos, processos ou experiências que ainda estão se construindo.",
+  
+  functioning_reading:
+    "Na prática, esse funcionamento pode aparecer como perguntas diretas, necessidade de provas, cautela antes de acreditar e resistência a conclusões apressadas. Você pode ter boa capacidade de perceber inconsistências e evitar ilusões, mas também pode ficar preso na exigência de confirmação total. O conflito costuma surgir quando você até deseja confiar, pertencer ou avançar, mas uma parte sua continua dizendo que ainda falta algo, ainda falta prova, ainda falta segurança. Isso pode fazer você parecer frio ou resistente, quando na verdade muitas vezes está tentando se proteger de uma decepção.",
+  
+  attention_point:
+    "O ponto de atenção está em perceber quando a busca por evidência deixa de ser discernimento e começa a virar defesa contra a vulnerabilidade. Nem tudo que é real aparece completo de imediato. Algumas certezas só amadurecem quando você participa do processo, não quando espera todas as garantias de fora.",
+  
+  potential:
+    "Seu potencial está na honestidade, na clareza e na capacidade de buscar uma confiança mais madura, que não depende de ingenuidade. Quando esse vetor está mais consciente, você aprende a perguntar sem se fechar, verificar sem paralisar e confiar sem abandonar o discernimento.",
+  
+  observation_focus:
+    "Observe situações em que você sente que precisa de mais provas, mais confirmação ou mais garantia antes de se permitir confiar ou avançar.",
+  
+  self_observation_question:
+    "Estou buscando evidência para enxergar melhor ou estou exigindo uma prova impossível para não precisar me envolver?",  
   },
 
   "Tiago filho de Alfeu — Vetor da Sustentação": {
-    description: "Perfil de discrição, permanência e presença silenciosa.",
-    functioning_reading:
-      "Seu funcionamento tende a permanecer, observar e sustentar sem exigir destaque. O ponto central é observar se a discrição não está escondendo suas necessidades.",
-    attention_point:
-      "Cuidado com invisibilidade emocional e dificuldade de pedir espaço.",
-    potential:
-      "Constância, humildade, resistência silenciosa e confiabilidade.",
-    observation_focus:
-      "Observe quando você se adapta demais para não incomodar.",
-    self_observation_question:
-      "Eu estou sendo discreto por escolha ou por medo de ocupar espaço?",
+    description:
+    "Você tende a funcionar de forma discreta, constante e sustentadora. Existe em você uma capacidade de permanecer, cumprir, apoiar e manter processos que talvez não recebam tanta visibilidade. Esse padrão pode fazer com que você seja alguém confiável, presente e necessário nos bastidores. Ao mesmo tempo, pode gerar sofrimento quando sua constância é confundida com obrigação, quando sua presença é pouco reconhecida ou quando você se acostuma a sustentar tudo em silêncio.",
+  
+  functioning_reading:
+    "Na prática, esse funcionamento pode aparecer como responsabilidade, paciência, lealdade e disposição para fazer o que precisa ser feito, mesmo sem aplauso. Você pode ser a pessoa que mantém a rotina, segura detalhes, lembra compromissos e evita que as coisas desmoronem. O conflito costuma surgir quando você começa a acreditar que só tem valor se estiver sustentando algo ou alguém. Nesses momentos, pode engolir cansaço, evitar pedir ajuda e continuar funcionando mesmo quando por dentro já passou do limite.",
+  
+  attention_point:
+    "O ponto de atenção está em perceber quando a sustentação vira invisibilidade. Ser constante é uma força, mas não significa aceitar sobrecarga, ausência de reconhecimento ou relações onde você apenas mantém tudo funcionando enquanto suas necessidades ficam sempre por último.",
+  
+  potential:
+    "Seu potencial está na firmeza silenciosa, na confiabilidade e na capacidade de construir segurança ao longo do tempo. Quando esse vetor está mais consciente, você aprende a sustentar sem se apagar, servir sem se anular e permanecer sem carregar sozinho aquilo que precisa ser compartilhado.",
+  
+  observation_focus:
+    "Observe situações em que você continua sustentando responsabilidades mesmo cansado, calado ou sem se sentir reconhecido.",
+  
+  self_observation_question:
+    "Estou sustentando algo por escolha consciente ou porque aprendi que meu valor depende de continuar aguentando?", 
   },
 
   "Tadeu — Vetor do Sentido": {
-    description: "Perfil de pergunta, busca de sentido e necessidade de direção.",
-    functioning_reading:
-      "Seu funcionamento tende a buscar explicação, sentido e direção. O ponto central é observar se a pergunta abre caminho ou vira inquietação repetitiva.",
-    attention_point:
-      "Cuidado com ansiedade por respostas quando a realidade ainda pede processo.",
-    potential:
-      "Capacidade de investigar, aprofundar e encontrar sentido em experiências confusas.",
-    observation_focus:
-      "Observe quando sua pergunta nasce de busca real e quando nasce de insegurança.",
-    self_observation_question:
-      "Eu quero compreender o caminho ou quero uma resposta para não sentir incerteza?",
+    description:
+    "Você tende a funcionar buscando sentido, direção e coerência maior para aquilo que vive. Nem sempre basta cumprir uma tarefa, manter uma rotina ou seguir um caminho porque todos seguem. Algo em você precisa entender por que aquilo importa, para onde aponta e qual valor existe por trás da experiência. Esse padrão pode fazer com que você tenha sensibilidade para perguntas profundas, mas também pode gerar inquietação quando a vida parece repetitiva, vazia ou desconectada de um propósito mais claro.",
+  
+  functioning_reading:
+    "Na prática, esse funcionamento pode aparecer como necessidade de compreender o significado das situações, das escolhas, das dores e dos vínculos. Você pode se sentir mais vivo quando percebe que está contribuindo para algo que faz sentido, mas pode se desanimar quando tudo parece mecânico, superficial ou sem direção. O conflito costuma surgir quando a busca por sentido se transforma em peso: você começa a exigir que cada fase da vida entregue uma resposta completa, e quando isso não acontece, pode sentir confusão, frustração ou sensação de estar fora do lugar.",
+  
+  attention_point:
+    "O ponto de atenção está em perceber quando a busca por sentido deixa de orientar e começa a paralisar. Nem toda fase revela seu significado de imediato. Às vezes, o sentido não aparece antes da caminhada; ele vai sendo construído enquanto você observa, escolhe, permanece e reorganiza sua própria leitura da vida.",
+  
+  potential:
+    "Seu potencial está na capacidade de formular perguntas importantes, buscar direção e conectar experiências isoladas a uma visão mais ampla. Quando esse vetor está mais consciente, você deixa de depender de respostas prontas e aprende a construir sentido com mais maturidade, sem negar a realidade concreta do presente.",
+  
+  observation_focus:
+    "Observe situações em que você se sente desanimado, confuso ou desconectado porque não consegue enxergar claramente o sentido daquilo que está vivendo.",
+  
+  self_observation_question:
+    "Estou buscando sentido para caminhar melhor ou estou exigindo uma resposta completa antes de dar o próximo passo?",  
   },
 
   "Simão, o Zelote — Vetor da Causa": {
-    description: "Perfil de causa, intensidade, missão e inconformismo.",
-    functioning_reading:
-      "Seu funcionamento tende a se mover por convicção e senso de missão. O ponto central é observar se a causa está organizada ou se virou descarga de tensão.",
-    attention_point:
-      "Cuidado com conflitos criados pela necessidade de combater algo o tempo todo.",
-    potential:
-      "Energia de transformação, coragem, posicionamento e força para mobilizar mudanças.",
-    observation_focus:
-      "Observe quando sua intensidade constrói e quando apenas confronta.",
-    self_observation_question:
-      "Eu estou servindo a uma causa ou usando uma causa para dar destino à minha raiva?",
+    description:
+    "Você tende a funcionar com forte ligação a causas, princípios, valores e convicções. Existe em você uma energia voltada para defender aquilo que considera justo, verdadeiro ou necessário. Esse padrão pode dar força, coragem e senso de direção, principalmente quando você acredita que algo precisa ser protegido ou transformado. Ao mesmo tempo, pode gerar tensão quando a causa fica tão grande por dentro que começa a ocupar o lugar do diálogo, da escuta e da flexibilidade.",
+  
+  functioning_reading:
+    "Na prática, esse funcionamento pode aparecer como posicionamento firme, incômodo diante de injustiças, necessidade de defender ideias e dificuldade de ficar neutro quando algo fere seus valores. Você pode ter grande capacidade de mobilização e compromisso, mas também pode sofrer quando percebe o mundo como campo de ameaça constante. O conflito costuma surgir quando pessoas deixam de ser vistas em sua complexidade e passam a ser lidas apenas como aliadas, opositoras ou indiferentes àquilo que você defende.",
+  
+  attention_point:
+    "O ponto de atenção está em perceber quando a causa começa a endurecer sua escuta. Ter convicção é uma força, mas quando tudo vira combate, até relações importantes podem ser interpretadas como disputa. Nem toda discordância é ameaça, nem toda diferença é traição, e nem toda pausa significa abandono daquilo em que você acredita.",
+  
+  potential:
+    "Seu potencial está na coragem, na fidelidade a valores e na capacidade de se comprometer com algo maior que interesses imediatos. Quando esse vetor está mais consciente, você consegue defender causas sem perder humanidade, sustentar convicções sem destruir vínculos e transformar indignação em ação organizada.",
+  
+  observation_focus:
+    "Observe situações em que você sente necessidade de defender uma ideia, corrigir alguém ou se posicionar com força diante de algo que considera errado.",
+  
+  self_observation_question:
+    "Estou defendendo uma causa com consciência ou estou transformando toda diferença em ameaça?", 
   },
 
   "Judas Iscariotes — Vetor Interrompido": {
     description:
-      "Perfil de controle, expectativa frustrada e conflitos internos escondidos.",
-    functioning_reading:
-      "Seu funcionamento tende a tentar controlar a realidade quando expectativas profundas são frustradas. O ponto central é observar o que fica escondido por trás da estratégia.",
-    attention_point:
-      "Cuidado com manipulação, fechamento emocional e tentativas indiretas de resolver frustrações.",
-    potential:
-      "Quando consciente, pode desenvolver lucidez sobre desejo, intenção, expectativa e consequência.",
-    observation_focus:
-      "Observe quando você tenta controlar a cena em vez de nomear sua frustração.",
-    self_observation_question:
-      "O que eu não estou conseguindo dizer diretamente e estou tentando resolver por controle?",
+    "Você tende a funcionar com uma tensão interna entre expectativa, controle e frustração. Pode existir em você uma necessidade forte de que as coisas sigam determinada direção, produzam determinado resultado ou confirmem uma expectativa que parecia muito importante. Quando isso não acontece, o impacto pode ser profundo. Esse padrão não fala de caráter, culpa ou condenação. Fala de um funcionamento em que a frustração pode fechar a escuta, endurecer a percepção e interromper processos que ainda poderiam ser compreendidos, conversados ou reorganizados.",
+  
+  functioning_reading:
+    "Na prática, esse funcionamento pode aparecer quando você investe muito em uma ideia, relação, projeto ou expectativa e, ao perceber que a realidade não corresponde ao que esperava, sente decepção, irritação, perda de sentido ou vontade de se afastar. Em alguns momentos, a dor da expectativa frustrada pode virar controle, silêncio, cálculo, fechamento emocional ou decisão tomada por dentro antes de ser conversada por fora. O conflito costuma surgir quando uma parte sua ainda deseja vínculo, pertencimento ou resultado, mas outra parte já começou a se proteger pela ruptura, pela desconfiança ou pela tentativa de controlar o desfecho.",
+  
+  attention_point:
+    "O ponto de atenção está em perceber quando a frustração começa a decidir por você. Quando uma expectativa muito forte é quebrada, existe o risco de interpretar tudo como perda, engano ou impossibilidade. Nesse estado, decisões podem ser tomadas a partir da dor, não da clareza. O cuidado principal é não transformar uma decepção em sentença definitiva sobre você, sobre o outro ou sobre o caminho inteiro.",
+  
+  potential:
+    "Seu potencial está na possibilidade de transformar fechamento em consciência. Quando esse vetor é observado com honestidade, ele pode revelar expectativas antigas, feridas de controle, medo de perder valor e formas de proteção que já não ajudam. A reorganização começa quando você consegue nomear a frustração antes de agir por ela, abrir conversa antes de romper por dentro e reconhecer que nem toda expectativa frustrada precisa terminar em interrupção.",
+  
+  observation_focus:
+    "Observe situações em que uma expectativa quebrada faz você se fechar, controlar, calcular, desconfiar ou decidir se afastar antes de conversar com clareza.",
+  
+  self_observation_question:
+    "Estou enxergando a realidade com clareza ou estou deixando uma expectativa frustrada decidir o final da história por mim?",
   },
 };
 export default function TestePage() {

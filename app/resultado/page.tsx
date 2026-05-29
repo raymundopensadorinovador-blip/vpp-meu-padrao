@@ -245,12 +245,14 @@ export default function ResultadoPage() {
           {perfilSeparado.vetor}
         </p>
       )}
-
-      {resultado.description && (
-        <p className="mt-5 max-w-3xl text-sm leading-6 text-white/75">
-          {resultado.description}
-        </p>
-      )}
+{resultado.description && (
+  <div className="mt-5 max-h-44 max-w-3xl overflow-y-auto rounded-2xl border border-white/10 bg-white/5 p-4 pr-3">
+    <p className="break-words text-sm leading-6 text-white/75 [overflow-wrap:anywhere]">
+      {resultado.description}
+    </p>
+  </div>
+)}
+      
     </div>
 
     <div className="rounded-2xl border border-white/15 bg-white/10 p-4">
@@ -294,10 +296,12 @@ export default function ResultadoPage() {
       Como esse padrão pode aparecer na prática
     </h2>
 
-    <p className="mt-4 text-sm leading-6 text-[#5F564C]">
-      {resultado.functioning_reading ||
-        "Ainda não há leitura registrada para este perfil."}
-    </p>
+    <div className="mt-4 max-h-64 overflow-y-auto rounded-2xl border border-[#E5DDD2] bg-[#FFF8EE] p-4 pr-3">
+  <p className="break-words text-sm leading-6 text-[#5F564C] [overflow-wrap:anywhere]">
+    {resultado.functioning_reading ||
+      "Ainda não há leitura registrada para este perfil."}
+  </p>
+</div> 
 
     <div className="mt-5 rounded-2xl border border-[#E5DDD2] bg-[#F7F3EC] p-4">
       <p className="text-sm leading-6 text-[#5F564C]">
@@ -317,10 +321,12 @@ export default function ResultadoPage() {
       Onde esse padrão pode gerar sofrimento
     </h2>
 
-    <p className="mt-4 text-sm leading-6 text-[#5F564C]">
-      {resultado.attention_point ||
-        "Ainda não há ponto de atenção registrado para este perfil."}
-    </p>
+    <div className="mt-4 max-h-56 overflow-y-auto rounded-2xl border border-[#E8C7C0] bg-white/70 p-4 pr-3">
+  <p className="break-words text-sm leading-6 text-[#5F564C] [overflow-wrap:anywhere]">
+    {resultado.attention_point ||
+      "Ainda não há ponto de atenção registrado para este perfil."}
+  </p>
+</div> 
 
     <p className="mt-5 text-sm leading-6 text-[#5F564C]">
       Esse ponto não deve ser lido como falha pessoal. Ele indica uma região do
@@ -339,10 +345,12 @@ export default function ResultadoPage() {
       O que pode se tornar força
     </h2>
 
-    <p className="mt-4 text-sm leading-6 text-[#5F564C]">
-      {resultado.potential ||
-        "Ainda não há potencial registrado para este perfil."}
-    </p>
+    <div className="mt-4 max-h-52 overflow-y-auto rounded-2xl border border-green-200 bg-white/70 p-4 pr-3">
+  <p className="break-words text-sm leading-6 text-[#5F564C] [overflow-wrap:anywhere]">
+    {resultado.potential ||
+      "Ainda não há potencial registrado para este perfil."}
+  </p>
+</div>
   </article>
 
   <article className="rounded-3xl border border-amber-200 bg-amber-50/80 p-5 shadow-sm sm:p-7">
@@ -354,10 +362,12 @@ export default function ResultadoPage() {
       Comece observando isto
     </h2>
 
-    <p className="mt-4 text-sm leading-6 text-[#5F564C]">
-      {resultado.observation_focus ||
-        "Ainda não há foco de observação registrado para este perfil."}
-    </p>
+    <div className="mt-4 max-h-52 overflow-y-auto rounded-2xl border border-amber-200 bg-white/70 p-4 pr-3">
+  <p className="break-words text-sm leading-6 text-[#5F564C] [overflow-wrap:anywhere]">
+    {resultado.observation_focus ||
+      "Ainda não há foco de observação registrado para este perfil."}
+  </p>
+</div>
   </article>
 </section> 
 
@@ -370,12 +380,12 @@ export default function ResultadoPage() {
     Uma pergunta para levar para a vida real
   </h2>
 
-  <div className="mt-5 rounded-3xl border border-[#D8C7B1] bg-[#FFF8EE] p-5">
-    <p className="text-lg font-semibold leading-8 text-[#2F2A24]">
-      {resultado.self_observation_question ||
-        "Ainda não há pergunta registrada para este perfil."}
-    </p>
-  </div>
+  <div className="mt-5 max-h-52 overflow-y-auto rounded-3xl border border-[#D8C7B1] bg-[#FFF8EE] p-5 pr-3">
+  <p className="break-words text-lg font-semibold leading-8 text-[#2F2A24] [overflow-wrap:anywhere]">
+    {resultado.self_observation_question ||
+      "Ainda não há pergunta registrada para este perfil."}
+  </p>
+</div> 
 
   <p className="mt-4 text-sm leading-6 text-[#5F564C]">
     Anote situações em que essa pergunta fizer sentido. A repetição observada no
