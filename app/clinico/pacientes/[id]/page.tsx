@@ -492,8 +492,8 @@ carregarPaciente();
           </h1>
 
           <p className="mt-3 text-sm leading-6 text-[#5F564C]">
-            Estamos confirmando o vínculo antes de abrir os registros.
-          </p>
+  Estamos confirmando o vínculo clínico antes de abrir os registros do paciente.
+</p>
         </div>
       </main>
     );
@@ -513,9 +513,9 @@ carregarPaciente();
             </h1>
 
             <p className="mt-4 text-sm leading-6 text-[#5F564C]">
-              {erro ||
-                "O paciente pode não estar vinculado a você ou o vínculo pode ter sido removido."}
-            </p>
+  {erro ||
+    "O paciente pode não estar vinculado a este terapeuta ou o vínculo pode ter sido encerrado."}
+</p>
             
             <Link
   href="/clinico/painel"
@@ -613,9 +613,8 @@ carregarPaciente();
       </h2>
 
       <p className="mt-3 text-sm leading-6 text-[#5F564C]">
-  O vínculo será encerrado e o paciente deixará de aparecer na sua lista
-  ativa. O histórico clínico já registrado será preservado para consulta
-  profissional.
+  O vínculo será encerrado e o paciente deixará de aparecer na lista ativa.
+  O histórico clínico já registrado será preservado para consulta profissional.
 </p>
     </div>
 
@@ -652,7 +651,7 @@ carregarPaciente();
           type="text"
           value={observacaoEncerramento}
           onChange={(event) => setObservacaoEncerramento(event.target.value)}
-          placeholder="Ex: encerrado após devolutiva final"
+          placeholder="Ex: encerramento após devolutiva final" 
           className="mt-2 min-h-11 w-full rounded-2xl border border-[#D8C7B1] bg-[#F7F3EC] px-4 text-sm text-[#2F2A24] outline-none transition placeholder:text-[#8A7A68] focus:border-[#8A2E2B] focus:bg-white"
           disabled={encerrandoVinculo}
         />
@@ -661,9 +660,9 @@ carregarPaciente();
 
     <div className="mt-5 rounded-2xl border border-[#E5DDD2] bg-[#F7F3EC] p-4">
     <p className="text-sm leading-6 text-[#5F564C]">
-  Esta ação preserva os registros já criados e encerra apenas o vínculo
-  ativo. Caso o acompanhamento seja retomado no futuro, o paciente poderá
-  iniciar um novo vínculo pelo próprio painel.
+  Esta ação preserva os registros já criados e encerra apenas o vínculo ativo.
+  Caso o acompanhamento seja retomado no futuro, o paciente poderá iniciar um
+  novo vínculo pelo próprio painel.
 </p>
     </div>
 
@@ -819,7 +818,7 @@ carregarPaciente();
 
             <article className="rounded-3xl border border-red-200 bg-red-50/70 p-5 shadow-sm sm:p-7">
               <p className="mb-2 text-sm font-medium text-red-700">
-                Onde pode prender
+              Ponto de atenção clínica
               </p>
 
               <h2 className="text-xl font-semibold text-[#2F2A24]">
@@ -838,7 +837,7 @@ carregarPaciente();
               </p>
 
               <h2 className="text-xl font-semibold text-[#2F2A24]">
-                O que pode virar força
+              Potencial observado
               </h2>
 
               <p className="mt-4 text-sm leading-6 text-[#5F564C]">
@@ -849,7 +848,7 @@ carregarPaciente();
 
             <article className="rounded-3xl border border-amber-200 bg-amber-50/80 p-5 shadow-sm sm:p-7">
               <p className="mb-2 text-sm font-medium text-amber-700">
-                Comece por aqui
+              Foco inicial
               </p>
 
               <h2 className="text-xl font-semibold text-[#2F2A24]">
@@ -889,22 +888,21 @@ carregarPaciente();
             </h2>
 
             <p className="mt-3 text-sm leading-6 text-[#5F564C]">
-  Esta leitura considera apenas as situações registradas pelo paciente. Não
-  se trata de diagnóstico, mas de material de observação para a conversa
-  clínica.
+  Esta leitura considera apenas as situações registradas pelo paciente. Não se
+  trata de diagnóstico, mas de material de observação para a conversa clínica.
 </p>
           </div>
 
           {situacoes.length === 0 ? (
             <div className="rounded-2xl border border-dashed border-[#D8C7B1] bg-[#F7F3EC] p-5">
-              <p className="text-sm font-medium text-[#2F2A24]">
-                Nenhum registro de situação ainda.
-              </p>
+           <p className="text-sm font-medium text-[#2F2A24]">
+  Nenhuma situação registrada até o momento.
+</p>
 
-              <p className="mt-2 text-sm leading-6 text-[#5F564C]">
-                Quando o paciente registrar situações reais, elas aparecerão
-                aqui para análise clínica.
-              </p>
+<p className="mt-2 text-sm leading-6 text-[#5F564C]">
+  Quando o paciente registrar situações reais, elas aparecerão aqui como
+  material de acompanhamento clínico.
+</p>   
             </div>
           ) : (
             <div className="grid gap-4 lg:grid-cols-2">
@@ -968,9 +966,9 @@ carregarPaciente();
       </h2>
 
       <p className="mt-3 text-sm leading-6 text-[#5F564C]">
-        Consulte os encaminhamentos já criados ou emita um novo documento para
-        acompanhamento complementar.
-      </p>
+  Consulte encaminhamentos já criados ou emita um novo documento para
+  acompanhamento complementar.
+</p>
     </div>
 
     <Link
@@ -989,7 +987,7 @@ carregarPaciente();
 
       <p className="mt-2 text-sm leading-6 text-[#5F564C]">
   Quando um encaminhamento for salvo, ele aparecerá aqui para consulta,
-  impressão ou salvamento em PDF.
+  impressão ou geração em PDF.
 </p>
     </div>
   ) : (
@@ -1042,8 +1040,8 @@ carregarPaciente();
     </h2>
 
     <p className="mt-3 text-sm leading-6 text-[#5F564C]">
-  Registre observações, hipóteses e pontos para devolutiva. Essas anotações
-  ficam disponíveis apenas para o terapeuta.
+  Registre observações, hipóteses clínicas e pontos para devolutiva. Essas
+  anotações ficam disponíveis apenas para o terapeuta.
 </p>
   </div>
 
@@ -1073,7 +1071,7 @@ carregarPaciente();
           type="text"
           value={tituloNota}
           onChange={(event) => setTituloNota(event.target.value)}
-          placeholder="Ex: hipótese sobre resposta predominante"
+          placeholder="Ex: hipótese clínica sobre resposta predominante"
           className="mt-2 min-h-11 w-full rounded-2xl border border-[#D8C7B1] bg-white px-4 text-sm text-[#2F2A24] outline-none transition placeholder:text-[#8A7A68] focus:border-[#8A2E2B]"
           disabled={salvandoNota}
         />
@@ -1108,7 +1106,7 @@ carregarPaciente();
       <textarea
         value={textoNota}
         onChange={(event) => setTextoNota(event.target.value)}
-        placeholder="Escreva uma observação clínica, hipótese ou ponto para devolutiva."
+        placeholder="Escreva uma observação clínica, hipótese de trabalho ou ponto para devolutiva."
         className="mt-2 min-h-32 w-full resize-none rounded-2xl border border-[#D8C7B1] bg-white px-4 py-3 text-sm leading-6 text-[#2F2A24] outline-none transition placeholder:text-[#8A7A68] focus:border-[#8A2E2B]"
         disabled={salvandoNota}
       />
@@ -1149,8 +1147,8 @@ carregarPaciente();
         </p>
 
         <p className="mt-2 text-sm leading-6 text-[#5F564C]">
-          As anotações criadas aqui ficarão disponíveis apenas para o terapeuta.
-        </p>
+  As anotações criadas aqui ficarão disponíveis apenas na área clínica do terapeuta.
+</p>
       </div>
     ) : (
       <div className="space-y-3">
@@ -1223,8 +1221,8 @@ carregarPaciente();
 
           {situacoes.length === 0 ? (
             <p className="text-sm leading-6 text-[#5F564C]">
-              Nenhuma situação registrada até agora.
-            </p>
+            Nenhuma situação registrada até o momento.
+          </p>
           ) : (
             <div className="space-y-3">
               {situacoes.map((situacao) => (

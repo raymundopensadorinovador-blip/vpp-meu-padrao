@@ -1005,10 +1005,10 @@ const [sucesso, setSucesso] = useState("");
           </SectionCard>
 
           <SectionCard
-            numero="06"
-            titulo="Rotina, corpo e sinais físicos"
-            subtitulo="O corpo costuma registrar o que a pessoa ainda não conseguiu organizar em palavras."
-          >
+  numero="06"
+  titulo="Rotina, corpo e sinais físicos"
+  subtitulo="O corpo também pode sinalizar tensões, emoções e mudanças que merecem atenção no cuidado clínico."
+>
             <div className="grid gap-5 md:grid-cols-2">
               <TextareaField
                 label="Como está seu sono?"

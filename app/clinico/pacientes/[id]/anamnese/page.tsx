@@ -483,9 +483,9 @@ setCarregando(false);
             </h1>
 
             <p className="mt-4 text-sm leading-6 text-[#5F564C]">
-              {erro ||
-                "O paciente pode não estar vinculado a você ou o vínculo pode ter sido removido."}
-            </p>
+  {erro ||
+    "O paciente pode não estar vinculado a este terapeuta ou o vínculo pode ter sido encerrado."}
+</p>
 
             <Link
               href="/clinico/painel"

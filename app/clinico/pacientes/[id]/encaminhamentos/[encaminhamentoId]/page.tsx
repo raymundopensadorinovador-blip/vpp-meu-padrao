@@ -346,8 +346,90 @@ export default function DetalheEncaminhamentoPage() {
   );
 }
 
-  return (
-    <main className="min-h-screen bg-[#F7F3EC] px-4 py-6 text-[#2F2A24] print:bg-white print:px-0 print:py-0">
+return (
+  <>
+    <style jsx global>{`
+      @media print {
+        @page {
+          size: A4;
+          margin: 8mm;
+        }
+
+        html,
+        body {
+          background: white !important;
+        }
+
+        body {
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
+        }
+
+        .documento-encaminhamento {
+          width: 100% !important;
+          max-width: 190mm !important;
+          margin: 0 auto !important;
+          padding: 0 !important;
+          border: 0 !important;
+          box-shadow: none !important;
+          color: #111 !important;
+          font-family: Arial, Helvetica, sans-serif !important;
+          font-size: 10.5px !important;
+          line-height: 1.32 !important;
+        }
+
+        .documento-encaminhamento h2 {
+          font-size: 17px !important;
+          line-height: 1.15 !important;
+          margin: 0 !important;
+        }
+
+        .documento-encaminhamento h3 {
+          font-size: 11px !important;
+          margin: 0 0 3px 0 !important;
+        }
+
+        .documento-encaminhamento p {
+          margin: 0 !important;
+          line-height: 1.32 !important;
+        }
+
+        .print-document-section {
+          margin-top: 8px !important;
+        }
+
+        .print-document-box {
+          padding: 6px 8px !important;
+          border: 1px solid #ddd !important;
+          background: white !important;
+        }
+
+        .print-document-text {
+          font-size: 10.5px !important;
+          line-height: 1.32 !important;
+        }
+
+        .print-document-small {
+          font-size: 9px !important;
+          line-height: 1.25 !important;
+        }
+
+        .print-signature {
+          margin-top: 18px !important;
+        }
+
+        .print-footer {
+          margin-top: 10px !important;
+          padding-top: 6px !important;
+        }
+
+        .print-hidden {
+          display: none !important;
+        }
+      }
+    `}</style>
+
+    <main className="min-h-screen bg-[#F6F0E8] px-4 py-6 text-[#2F2A24] print:bg-white print:px-0 print:py-0">
       <section className="mx-auto w-full max-w-5xl print:max-w-none">
       {erro && (
   <div className="mb-6 rounded-2xl border border-[#E8C7C0] bg-red-50 px-4 py-3 text-sm leading-6 text-[#8A2E2B] print:hidden">
@@ -359,7 +441,7 @@ export default function DetalheEncaminhamentoPage() {
     {mensagemCopiada}
   </div>
 )}
-        <div className="mb-6 rounded-3xl border border-[#E5DDD2] bg-white p-5 shadow-sm print:hidden sm:p-7">
+        <div className="print-hidden mb-6 rounded-3xl border border-[#E5DDD2] bg-white p-5 shadow-sm print:hidden sm:p-7">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
             <div>
               <p className="mb-2 text-sm font-medium text-[#8A2E2B]">
@@ -432,152 +514,169 @@ Copiar para WhatsApp
         </div>
 
         <article className="documento-encaminhamento rounded-3xl border border-[#E5DDD2] bg-white p-6 shadow-sm print:rounded-none print:border-0 print:p-0 print:shadow-none sm:p-10">
-          <header className="border-b border-[#E5DDD2] pb-6">
-            <p className="text-sm font-semibold uppercase tracking-wide text-[#8A2E2B]">
-              Encaminhamento clínico
-            </p>
+  <header className="border-b border-[#2F2A24] pb-4 print:pb-2">
+    <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between print:flex-row">
+      <div>
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#8A2E2B] print-document-small">
+          VPP — Meu Padrão
+        </p>
 
-            <h2 className="mt-3 text-3xl font-bold text-[#2F2A24]">
-  Encaminhamento clínico
-</h2>
+        <h2 className="mt-2 text-2xl font-bold text-[#2F2A24]">
+          Encaminhamento clínico
+        </h2>
 
-            <p className="mt-3 text-sm leading-6 text-[#5F564C]">
-              Data: {formatarData(encaminhamento.referral_date)}
-            </p>
-          </header>
+        <p className="mt-2 text-sm leading-6 text-[#5F564C] print-document-small">
+          Documento para continuidade de cuidado e avaliação complementar.
+        </p>
+      </div>
 
-          <section className="mt-8 grid gap-5 md:grid-cols-2">
-            <div className="print-compact rounded-2xl border border-[#E5DDD2] bg-[#F7F3EC] p-5 print:bg-white">
-              <p className="text-sm font-semibold text-[#8A2E2B]">
-                Paciente
-              </p>
+      <div className="rounded-2xl border border-[#E5DDD2] bg-[#F7F3EC] p-4 text-sm print-document-box print:w-[52mm]">
+        <p className="font-semibold text-[#2F2A24]">Data</p>
+        <p className="mt-1 text-[#5F564C]">
+          {formatarData(encaminhamento.referral_date)}
+        </p>
 
-              <p className="mt-2 text-lg font-semibold text-[#2F2A24]">
-                {encaminhamento.patient_name_snapshot}
-              </p>
+        <p className="mt-3 font-semibold text-[#2F2A24] print:mt-2">
+          Status
+        </p>
+        <p className="mt-1 capitalize text-[#5F564C]">
+          {encaminhamento.status}
+        </p>
+      </div>
+    </div>
+  </header>
 
-              {encaminhamento.patient_email_snapshot && (
-                <p className="mt-1 break-words text-sm text-[#5F564C]">
-                  {encaminhamento.patient_email_snapshot}
-                </p>
-              )}
-            </div>
+  <section className="print-document-section mt-6 grid gap-4 md:grid-cols-2 print:grid-cols-2 print:gap-2">
+    <div className="print-document-box rounded-2xl border border-[#E5DDD2] bg-[#F7F3EC] p-4">
+      <h3 className="text-sm font-semibold uppercase tracking-wide text-[#8A2E2B]">
+        Paciente
+      </h3>
 
-            <div className="print-compact rounded-2xl border border-[#E5DDD2] bg-[#F7F3EC] p-5 print:bg-white">
-              <p className="text-sm font-semibold text-[#8A2E2B]">
-                Destino
-              </p>
+      <p className="mt-2 text-base font-semibold text-[#2F2A24] print-document-text">
+        {encaminhamento.patient_name_snapshot}
+      </p>
 
-              <p className="mt-2 text-lg font-semibold text-[#2F2A24]">
-                {destinos[encaminhamento.destination_type] || "Outro"}
-              </p>
+      {encaminhamento.patient_email_snapshot && (
+        <p className="mt-1 break-words text-sm text-[#5F564C] print-document-small">
+          {encaminhamento.patient_email_snapshot}
+        </p>
+      )}
+    </div>
 
-              {encaminhamento.destination_name && (
-                <p className="mt-1 text-sm text-[#5F564C]">
-                  {encaminhamento.destination_name}
-                </p>
-              )}
+    <div className="print-document-box rounded-2xl border border-[#E5DDD2] bg-[#F7F3EC] p-4">
+      <h3 className="text-sm font-semibold uppercase tracking-wide text-[#8A2E2B]">
+        Destino
+      </h3>
 
-              {encaminhamento.destination_contact && (
-                <p className="mt-1 text-sm text-[#5F564C]">
-                  {encaminhamento.destination_contact}
-                </p>
-              )}
-            </div>
-          </section>
+      <p className="mt-2 text-base font-semibold text-[#2F2A24] print-document-text">
+        {destinos[encaminhamento.destination_type] || "Outro"}
+      </p>
 
-          <section className="mt-8 space-y-6">
-            <div>
-              <p className="mb-2 text-sm font-semibold text-[#8A2E2B]">
-                Motivo do encaminhamento
-              </p>
+      {encaminhamento.destination_name && (
+        <p className="mt-1 text-sm text-[#5F564C] print-document-small">
+          {encaminhamento.destination_name}
+        </p>
+      )}
 
-              <p className="whitespace-pre-wrap text-sm leading-7 text-[#2F2A24]">
-                {encaminhamento.reason}
-              </p>
-            </div>
+      {encaminhamento.destination_contact && (
+        <p className="mt-1 text-sm text-[#5F564C] print-document-small">
+          {encaminhamento.destination_contact}
+        </p>
+      )}
+    </div>
+  </section>
 
-            <div>
-              <p className="mb-2 text-sm font-semibold text-[#8A2E2B]">
-                Resumo clínico
-              </p>
+  <section className="print-document-section mt-6 rounded-2xl border border-[#E5DDD2] bg-white p-5 print-document-box">
+    <h3 className="text-sm font-semibold uppercase tracking-wide text-[#8A2E2B]">
+      Motivo do encaminhamento
+    </h3>
 
-              <p className="whitespace-pre-wrap text-sm leading-7 text-[#2F2A24]">
-                {encaminhamento.clinical_summary}
-              </p>
-            </div>
+    <p className="mt-3 whitespace-pre-wrap text-sm leading-6 text-[#2F2A24] print-document-text">
+      {encaminhamento.reason}
+    </p>
+  </section>
 
-            {encaminhamento.observations && (
-              <div>
-                <p className="mb-2 text-sm font-semibold text-[#8A2E2B]">
-                  Observações adicionais
-                </p>
+  <section className="print-document-section mt-5 rounded-2xl border border-[#E5DDD2] bg-white p-5 print-document-box">
+    <h3 className="text-sm font-semibold uppercase tracking-wide text-[#8A2E2B]">
+      Resumo clínico
+    </h3>
 
-                <p className="whitespace-pre-wrap text-sm leading-7 text-[#2F2A24]">
-                  {encaminhamento.observations}
-                </p>
-              </div>
-            )}
-          </section>
+    <p className="mt-3 whitespace-pre-wrap text-sm leading-6 text-[#2F2A24] print-document-text">
+      {encaminhamento.clinical_summary}
+    </p>
+  </section>
 
-          <section className="mt-10 border-t border-[#E5DDD2] pt-8">
-            <p className="text-sm font-semibold text-[#8A2E2B]">
-              Dados do profissional
-            </p>
+  {encaminhamento.observations && (
+    <section className="print-document-section mt-5 rounded-2xl border border-[#E5DDD2] bg-white p-5 print-document-box">
+      <h3 className="text-sm font-semibold uppercase tracking-wide text-[#8A2E2B]">
+        Observações adicionais
+      </h3>
 
-            <div className="mt-4 grid gap-5 md:grid-cols-2">
-              <div>
-                <p className="text-sm font-semibold text-[#2F2A24]">
-                  {encaminhamento.therapist_name_snapshot}
-                </p>
+      <p className="mt-3 whitespace-pre-wrap text-sm leading-6 text-[#2F2A24] print-document-text">
+        {encaminhamento.observations}
+      </p>
+    </section>
+  )}
 
-                {encaminhamento.therapist_registry && (
-                  <p className="mt-1 text-sm text-[#5F564C]">
-                    {encaminhamento.therapist_registry}
-                  </p>
-                )}
+  <section className="print-document-section mt-6 border-t border-[#2F2A24] pt-5 print:pt-3">
+    <h3 className="text-sm font-semibold uppercase tracking-wide text-[#8A2E2B]">
+      Profissional responsável
+    </h3>
 
-                {encaminhamento.therapist_location && (
-                  <p className="mt-1 text-sm text-[#5F564C]">
-                    {encaminhamento.therapist_location}
-                  </p>
-                )}
-              </div>
+    <div className="mt-4 grid gap-5 md:grid-cols-[1fr_180px] print:mt-2 print:grid-cols-[1fr_48mm] print:gap-3">
+      <div>
+        <p className="text-sm font-semibold text-[#2F2A24] print-document-text">
+          {encaminhamento.therapist_name_snapshot}
+        </p>
 
-              <div className="rounded-2xl border border-dashed border-[#D8C7B1] p-5 text-center">
-                <p className="text-xs font-medium uppercase tracking-wide text-[#8A7A68]">
-                  Espaço para carimbo
-                </p>
+        {encaminhamento.therapist_registry && (
+          <p className="mt-1 text-sm text-[#5F564C] print-document-small">
+            {encaminhamento.therapist_registry}
+          </p>
+        )}
 
-                <p className="mt-4 min-h-12 text-sm font-semibold text-[#2F2A24]">
-                  {encaminhamento.stamp_text || ""}
-                </p>
-              </div>
-            </div>
+        {encaminhamento.therapist_location && (
+          <p className="mt-1 text-sm text-[#5F564C] print-document-small">
+            {encaminhamento.therapist_location}
+          </p>
+        )}
+      </div>
 
-            <div className="print-signature mt-12 max-w-sm">
-              <div className="border-t border-[#2F2A24] pt-3 text-center">
-                <p className="text-sm font-semibold text-[#2F2A24]">
-                  {encaminhamento.signature_text ||
-                    encaminhamento.therapist_name_snapshot}
-                </p>
+      <div className="rounded-2xl border border-dashed border-[#D8C7B1] p-4 text-center print-document-box">
+        <p className="text-xs font-medium uppercase tracking-wide text-[#8A7A68] print-document-small">
+          Carimbo
+        </p>
 
-                <p className="mt-1 text-xs text-[#8A7A68]">
-                  Assinatura do profissional
-                </p>
-              </div>
-            </div>
-          </section>
+        <p className="mt-3 min-h-10 text-sm font-semibold text-[#2F2A24] print:mt-2 print:min-h-8 print-document-small">
+          {encaminhamento.stamp_text || ""}
+        </p>
+      </div>
+    </div>
 
-          <footer className="mt-10 border-t border-[#E5DDD2] pt-5">
-          <p className="text-xs leading-5 text-[#8A7A68]">
-  Documento emitido a partir do VPP — Meu Padrão. Este encaminhamento
-  tem finalidade informativa e de continuidade do cuidado, não substituindo
-  avaliação médica, psicológica ou psiquiátrica quando indicada.
-</p>
-          </footer>
-        </article>
+    <div className="print-signature mt-10 max-w-sm print:max-w-[70mm]">
+      <div className="border-t border-[#2F2A24] pt-3 text-center print:pt-2">
+        <p className="text-sm font-semibold text-[#2F2A24] print-document-text">
+          {encaminhamento.signature_text ||
+            encaminhamento.therapist_name_snapshot}
+        </p>
+
+        <p className="mt-1 text-xs text-[#8A7A68] print-document-small">
+          Assinatura do profissional
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <footer className="print-footer mt-8 border-t border-[#E5DDD2] pt-4">
+    <p className="text-xs leading-5 text-[#8A7A68] print-document-small">
+      Documento emitido a partir do VPP — Meu Padrão. Este encaminhamento tem
+      finalidade informativa e de continuidade do cuidado, não substituindo
+      avaliação médica, psicológica ou psiquiátrica quando indicada.
+    </p>
+  </footer>
+</article> 
       </section>
-    </main>
-  );
+      </main>
+  </>
+);
 }

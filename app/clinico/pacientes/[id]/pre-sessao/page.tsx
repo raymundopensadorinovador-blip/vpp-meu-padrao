@@ -545,10 +545,11 @@ const [preparacoes, setPreparacoes] = useState<PreparacaoSessao[]>([]);
               </p>
 
               <p className="mt-3 text-sm leading-6 text-[#5F564C]">
-                Esta página reúne dados clínicos importantes para o terapeuta se
-                preparar antes da sessão. Não é diagnóstico automático. É um
-                mapa de leitura para orientar a conversa.
-              </p>
+  Esta página reúne informações clínicas relevantes para apoiar a preparação
+  do terapeuta antes da sessão. O conteúdo não produz diagnóstico automático;
+  funciona como material de organização para orientar a escuta e a condução
+  clínica.
+</p>
             </div>
 
             <div className="no-print flex w-full flex-col gap-3 sm:flex-row lg:w-auto">
@@ -584,11 +585,11 @@ const [preparacoes, setPreparacoes] = useState<PreparacaoSessao[]>([]);
 
         <section className="print-card mb-6 rounded-3xl border border-[#D8C7B1] bg-[#FFF8EE] p-5 shadow-sm sm:p-7">
           <p className="mb-2 text-sm font-medium text-[#8A2E2B]">
-            Resumo automático para a sessão
+          Resumo clínico para a sessão
           </p>
 
           <h2 className="text-xl font-semibold text-[#2F2A24]">
-            Pontos de preparação
+          Dados principais para preparação
           </h2>
 
           <div className="mt-5 grid gap-4 lg:grid-cols-2">
@@ -706,10 +707,10 @@ const [preparacoes, setPreparacoes] = useState<PreparacaoSessao[]>([]);
               </h2>
 
               <p className="mt-3 text-sm leading-6 text-[#5F564C]">
-                Estes registros não são interpretados automaticamente. Eles
-                servem como apoio para observar relatos, emoções, figuras,
-                lugares, imagens e contextos que possam ser retomados na sessão.
-              </p>
+  Estes registros não são interpretados automaticamente. Eles servem como
+  apoio para observar relatos, emoções, figuras, lugares, imagens e contextos
+  que possam ser retomados durante a sessão.
+</p>
             </div>
 
             <Link
@@ -722,14 +723,14 @@ const [preparacoes, setPreparacoes] = useState<PreparacaoSessao[]>([]);
 
           {!ultimoSonho ? (
             <div className="rounded-2xl border border-dashed border-[#D8C7B1] bg-[#F7F3EC] p-5">
-              <p className="text-sm font-medium text-[#2F2A24]">
-                Nenhum sonho registrado até o momento.
-              </p>
+            <p className="text-sm font-medium text-[#2F2A24]">
+  Nenhum sonho registrado até o momento.
+</p>
 
-              <p className="mt-2 text-sm leading-6 text-[#5F564C]">
-                Quando o paciente registrar sonhos, os dados recentes aparecerão
-                aqui como material complementar para a preparação da sessão.
-              </p>
+<p className="mt-2 text-sm leading-6 text-[#5F564C]">
+  Quando o paciente registrar sonhos, os dados recentes aparecerão aqui como
+  material complementar para a preparação clínica.
+</p>  
             </div>
           ) : (
             <div className="grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
@@ -865,16 +866,16 @@ const [preparacoes, setPreparacoes] = useState<PreparacaoSessao[]>([]);
 
           <article className="rounded-3xl border border-[#E5DDD2] bg-white p-5 shadow-sm sm:p-7">
             <p className="mb-2 text-sm font-medium text-[#8A2E2B]">
-              Observações do terapeuta na anamnese
+            Observações clínicas sobre a anamnese
             </p>
 
             <h2 className="text-xl font-semibold text-[#2F2A24]">
-              Pontos já registrados
+            Registros do terapeuta
             </h2>
 
             {notasAnamnese.length === 0 ? (
               <p className="mt-4 text-sm leading-6 text-[#5F564C]">
-                Nenhuma observação registrada na última versão da anamnese.
+                Nenhuma observação clínica registrada na última versão da anamnese.
               </p>
             ) : (
               <div className="mt-4 max-h-80 overflow-y-auto pr-1">
@@ -917,9 +918,9 @@ const [preparacoes, setPreparacoes] = useState<PreparacaoSessao[]>([]);
             </h2>
 
             <p className="mt-3 text-sm leading-6 text-[#5F564C]">
-              Registre o foco da próxima conversa, hipóteses a investigar,
-              pontos de risco e perguntas que podem orientar a sessão.
-            </p>
+  Registre o foco da próxima sessão, pontos a investigar, cuidados clínicos e
+  perguntas que podem orientar a condução do atendimento.
+</p>
           </div>
 
           <div className="grid gap-4 md:grid-cols-[1fr_240px]">
@@ -962,7 +963,7 @@ const [preparacoes, setPreparacoes] = useState<PreparacaoSessao[]>([]);
                 value={pontosFoco}
                 onChange={(event) => setPontosFoco(event.target.value)}
                 disabled={salvando}
-                placeholder="Ex: investigar reação de evitação diante de cobrança."
+                placeholder="Ex: observar reações de evitação diante de cobranças ou conflitos."
                 className="mt-2 min-h-32 w-full resize-none rounded-2xl border border-[#D8C7B1] bg-[#F7F3EC] px-4 py-3 text-sm leading-6 text-[#2F2A24] outline-none transition placeholder:text-[#8A7A68] focus:border-[#8A2E2B] focus:bg-white disabled:cursor-not-allowed disabled:opacity-60"
               />
             </label>
@@ -976,7 +977,7 @@ const [preparacoes, setPreparacoes] = useState<PreparacaoSessao[]>([]);
                 value={perguntasExplorar}
                 onChange={(event) => setPerguntasExplorar(event.target.value)}
                 disabled={salvando}
-                placeholder="Ex: o que você espera que aconteça quando alguém discorda de você?"
+                placeholder="Ex: o que você costuma esperar que aconteça quando alguém discorda de você?"
                 className="mt-2 min-h-32 w-full resize-none rounded-2xl border border-[#D8C7B1] bg-[#F7F3EC] px-4 py-3 text-sm leading-6 text-[#2F2A24] outline-none transition placeholder:text-[#8A7A68] focus:border-[#8A2E2B] focus:bg-white disabled:cursor-not-allowed disabled:opacity-60"
               />
             </label>
@@ -990,7 +991,7 @@ const [preparacoes, setPreparacoes] = useState<PreparacaoSessao[]>([]);
                 value={pontosRisco}
                 onChange={(event) => setPontosRisco(event.target.value)}
                 disabled={salvando}
-                placeholder="Ex: observar fala sobre desistência, isolamento ou impulsividade."
+                placeholder="Ex: observar sinais de desistência, isolamento, impulsividade ou sofrimento intenso."
                 className="mt-2 min-h-32 w-full resize-none rounded-2xl border border-[#D8C7B1] bg-[#F7F3EC] px-4 py-3 text-sm leading-6 text-[#2F2A24] outline-none transition placeholder:text-[#8A7A68] focus:border-[#8A2E2B] focus:bg-white disabled:cursor-not-allowed disabled:opacity-60"
               />
             </label>
@@ -1006,7 +1007,7 @@ const [preparacoes, setPreparacoes] = useState<PreparacaoSessao[]>([]);
                   setObservacaoPreparacao(event.target.value)
                 }
                 disabled={salvando}
-                placeholder="Escreva uma síntese livre para entrar melhor preparado na sessão."
+                placeholder="Escreva uma síntese livre para organizar a preparação da sessão."
                 className="mt-2 min-h-32 w-full resize-none rounded-2xl border border-[#D8C7B1] bg-[#F7F3EC] px-4 py-3 text-sm leading-6 text-[#2F2A24] outline-none transition placeholder:text-[#8A7A68] focus:border-[#8A2E2B] focus:bg-white disabled:cursor-not-allowed disabled:opacity-60"
               />
             </label>
@@ -1021,7 +1022,7 @@ const [preparacoes, setPreparacoes] = useState<PreparacaoSessao[]>([]);
               value={notasPrivadas}
               onChange={(event) => setNotasPrivadas(event.target.value)}
               disabled={salvando}
-              placeholder="Anotações internas. Não visíveis ao paciente."
+              placeholder="Anotações internas do terapeuta. Não visíveis ao paciente."
               className="mt-2 min-h-28 w-full resize-none rounded-2xl border border-[#D8C7B1] bg-[#F7F3EC] px-4 py-3 text-sm leading-6 text-[#2F2A24] outline-none transition placeholder:text-[#8A7A68] focus:border-[#8A2E2B] focus:bg-white disabled:cursor-not-allowed disabled:opacity-60"
             />
           </label>
@@ -1101,9 +1102,8 @@ const [preparacoes, setPreparacoes] = useState<PreparacaoSessao[]>([]);
               </p>
 
               <p className="mt-2 text-sm leading-6 text-[#5F564C]">
-                Quando você salvar uma preparação, ela aparecerá aqui para
-                consulta e edição.
-              </p>
+  Quando uma preparação for salva, ela aparecerá aqui para consulta e edição.
+</p>
             </div>
           ) : (
             <div className="max-h-[520px] overflow-y-auto pr-1">

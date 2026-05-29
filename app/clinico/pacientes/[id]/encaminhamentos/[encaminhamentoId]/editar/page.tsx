@@ -262,7 +262,7 @@ export default function EditarEncaminhamentoPage() {
 
   if (!encaminhamento) {
     return (
-      <main className="min-h-screen bg-[#F7F3EC] px-4 py-6 text-[#2F2A24] sm:px-6 lg:px-8">
+      <main className="min-h-screen bg-[#F6F0E8] px-4 py-6 text-[#2F2A24] sm:px-6 lg:px-8">
         <section className="mx-auto flex min-h-[calc(100vh-48px)] w-full max-w-md flex-col justify-center">
           <div className="rounded-3xl border border-[#E5DDD2] bg-white p-6 text-center shadow-sm sm:p-8">
             <p className="text-sm font-medium text-[#8A2E2B]">
@@ -293,31 +293,31 @@ export default function EditarEncaminhamentoPage() {
   return (
     <main className="min-h-screen bg-[#F7F3EC] px-4 py-6 text-[#2F2A24] sm:px-6 lg:px-8">
       <section className="mx-auto w-full max-w-5xl">
-        <header className="mb-6 rounded-3xl border border-[#E5DDD2] bg-white p-5 shadow-sm sm:p-7">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-            <div className="min-w-0">
-              <p className="mb-2 text-sm font-medium text-[#8A2E2B]">
-                Editar encaminhamento clínico
-              </p>
+      <header className="mb-6 flex flex-col gap-4 rounded-3xl bg-white p-5 shadow-sm sm:flex-row sm:items-start sm:justify-between">
+  <div className="min-w-0 space-y-2">
+    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#8A7A68]">
+      Editar encaminhamento clínico
+    </p>
 
-              <h1 className="text-2xl font-semibold tracking-tight text-[#2F2A24] sm:text-3xl">
-                Ajustar documento
-              </h1>
+    <div className="space-y-1">
+      <h1 className="break-words text-2xl font-semibold text-[#2F2A24] sm:text-3xl">
+        Ajustar documento
+      </h1>
 
-              <p className="mt-3 max-w-3xl text-sm leading-6 text-[#5F564C]">
-  Revise e ajuste os dados do encaminhamento antes de imprimir, salvar em
-  PDF ou compartilhar o conteúdo com o paciente ou outro profissional.
-</p>
-            </div>
+      <p className="max-w-3xl text-sm leading-relaxed text-[#6F6257]">
+        Revise e ajuste os dados do encaminhamento antes de imprimir, salvar em
+        PDF ou compartilhar o conteúdo com o paciente ou outro profissional.
+      </p>
+    </div>
+  </div>
 
-            <Link
-              href={`/clinico/pacientes/${pacienteId}/encaminhamentos/${encaminhamento.id}`}
-              className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-[#D8C7B1] bg-white px-5 text-sm font-medium text-[#5F564C] shadow-sm transition hover:bg-[#FFF8EE] lg:w-auto"
-            >
-              Cancelar edição
-            </Link>
-          </div>
-        </header>
+  <Link
+    href={`/clinico/pacientes/${pacienteId}/encaminhamentos/${encaminhamento.id}`}
+    className="inline-flex w-full items-center justify-center rounded-2xl border border-[#D8C7B1] bg-white px-4 py-2 text-sm font-medium text-[#5F564C] transition hover:bg-[#F7F3EC] sm:w-auto"
+  >
+    Cancelar edição
+  </Link>
+</header>
 
         {erro && (
           <div className="mb-6 rounded-2xl border border-[#E8C7C0] bg-red-50 px-4 py-3 text-sm leading-6 text-[#8A2E2B]">
@@ -331,14 +331,17 @@ export default function EditarEncaminhamentoPage() {
           </div>
         )}
 
-        <form
-          onSubmit={handleSalvarEdicao}
-          className="space-y-6 rounded-3xl border border-[#E5DDD2] bg-white p-5 shadow-sm sm:p-7"
-        >
-          <section className="rounded-2xl border border-[#E5DDD2] bg-[#F7F3EC] p-4">
-            <p className="mb-3 text-sm font-semibold text-[#8A2E2B]">
-              Dados do paciente
-            </p>
+<form onSubmit={handleSalvarEdicao} className="space-y-6">
+<section className="rounded-3xl bg-white p-5 shadow-sm">
+  <div className="mb-5 space-y-1">
+    <h2 className="text-lg font-semibold text-[#2F2A24]">
+      Dados do paciente
+    </h2>
+
+    <p className="text-sm leading-relaxed text-[#6F6257]">
+      Confirme os dados principais do paciente vinculados a este encaminhamento.
+    </p>
+  </div>         
 
             <div className="grid gap-3 sm:grid-cols-2">
               <div className="rounded-2xl bg-white p-4">
@@ -357,10 +360,16 @@ export default function EditarEncaminhamentoPage() {
             </div>
           </section>
 
-          <section>
-            <p className="mb-3 text-sm font-semibold text-[#8A2E2B]">
-              Destino do encaminhamento
-            </p>
+          <section className="rounded-3xl bg-white p-5 shadow-sm">
+  <div className="mb-5 space-y-1">
+    <h2 className="text-lg font-semibold text-[#2F2A24]">
+      Destino do encaminhamento
+    </h2>
+
+    <p className="text-sm leading-relaxed text-[#6F6257]">
+      Ajuste para qual profissional, serviço ou instituição o paciente será encaminhado.
+    </p>
+  </div>
 
             <div className="grid gap-5 md:grid-cols-2">
               <label className="block">
@@ -417,10 +426,16 @@ export default function EditarEncaminhamentoPage() {
             </div>
           </section>
 
-          <section>
-            <p className="mb-3 text-sm font-semibold text-[#8A2E2B]">
-              Conteúdo clínico do encaminhamento
-            </p>
+          <section className="rounded-3xl bg-white p-5 shadow-sm">
+  <div className="mb-5 space-y-1">
+    <h2 className="text-lg font-semibold text-[#2F2A24]">
+      Conteúdo clínico do encaminhamento
+    </h2>
+
+    <p className="text-sm leading-relaxed text-[#6F6257]">
+      Revise o motivo, o resumo clínico e observações complementares do documento.
+    </p>
+  </div>
 
             <div className="space-y-5">
               <label className="block">
@@ -469,10 +484,16 @@ export default function EditarEncaminhamentoPage() {
             </div>
           </section>
 
-          <section>
-            <p className="mb-3 text-sm font-semibold text-[#8A2E2B]">
-              Dados do terapeuta no documento
-            </p>
+          <section className="rounded-3xl bg-white p-5 shadow-sm">
+  <div className="mb-5 space-y-1">
+    <h2 className="text-lg font-semibold text-[#2F2A24]">
+      Dados do terapeuta no documento
+    </h2>
+
+    <p className="text-sm leading-relaxed text-[#6F6257]">
+      Essas informações aparecerão no encaminhamento emitido para o paciente.
+    </p>
+  </div>
 
             <div className="grid gap-5 md:grid-cols-2">
               <label className="block">
@@ -584,14 +605,15 @@ export default function EditarEncaminhamentoPage() {
             </div>
           </section>
 
-          <div className="rounded-2xl border border-[#E5DDD2] bg-[#F7F3EC] p-4">
-          <p className="text-sm leading-6 text-[#5F564C]">
-  As alterações serão aplicadas ao documento salvo. Depois de salvar, você
-  retornará para a página do encaminhamento.
-</p>
-          </div>
+          <section className="rounded-3xl bg-white p-5 shadow-sm">
+  <div className="rounded-2xl border border-[#E5DDD2] bg-[#F7F3EC] p-4">
+    <p className="text-sm leading-6 text-[#5F564C]">
+      As alterações serão aplicadas ao documento salvo. Depois de salvar, você
+      retornará para a página do encaminhamento.
+    </p>
+  </div>
 
-          <div className="flex flex-col gap-3 sm:flex-row">
+  <div className="mt-5 flex flex-col gap-3 sm:flex-row">
             <button
               type="submit"
               disabled={salvando}
@@ -601,13 +623,14 @@ export default function EditarEncaminhamentoPage() {
             </button>
 
             <Link
-              href={`/clinico/pacientes/${pacienteId}/encaminhamentos/${encaminhamento.id}`}
-              className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-[#D8C7B1] bg-white px-5 text-sm font-medium text-[#5F564C] shadow-sm transition hover:bg-[#FFF8EE] sm:w-auto"
-            >
-              Cancelar
-            </Link>
-          </div>
-        </form>
+  href={`/clinico/pacientes/${pacienteId}/encaminhamentos/${encaminhamento.id}`}
+  className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-[#D8C7B1] bg-white px-5 text-sm font-medium text-[#5F564C] shadow-sm transition hover:bg-[#FFF8EE] sm:w-auto"
+>
+  Cancelar
+</Link>
+  </div>
+</section>
+</form>    
       </section>
     </main>
   );

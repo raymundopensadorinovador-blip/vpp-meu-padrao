@@ -21,10 +21,6 @@ type DreamEntry = {
   updated_at: string;
 };
 
-type PatientProfile = {
-  name: string | null;
-};
-
 export default function SonhosPacienteClinicoPage() {
     const router = useRouter();
     const params = useParams();
@@ -180,7 +176,9 @@ export default function SonhosPacienteClinicoPage() {
   href={linkVoltar}
   className="mt-5 inline-flex min-h-11 w-full items-center justify-center rounded-2xl bg-[#2F2A24] px-5 text-sm font-semibold text-white shadow-sm transition hover:opacity-95 sm:w-auto"
 >
-  {voltarParaPreSessao ? "Voltar para pré-sessão" : "Voltar para ficha do paciente"}
+  {voltarParaPreSessao
+    ? "Voltar para pré-sessão"
+    : "Voltar para ficha do paciente"}
 </Link>
         </section>
       </main>
@@ -202,11 +200,11 @@ export default function SonhosPacienteClinicoPage() {
               </h1>
 
               <p className="mt-3 max-w-3xl text-sm leading-6 text-[#5F564C]">
-                Esta área organiza os sonhos registrados pelo paciente. O app não
-                interpreta os sonhos automaticamente, não atribui significados
-                simbólicos fechados e não produz diagnóstico. O conteúdo serve
-                como material clínico para escuta, preparação e acompanhamento.
-              </p>
+  Esta área reúne os sonhos registrados pelo paciente. O app não interpreta
+  sonhos automaticamente, não atribui significados simbólicos fechados e não
+  produz diagnóstico. Os registros servem como material clínico para escuta,
+  preparação e acompanhamento terapêutico.
+</p> 
             </div>
 
             <Link
@@ -229,8 +227,8 @@ export default function SonhosPacienteClinicoPage() {
             </p>
 
             <p className="mt-2 text-sm leading-6 text-[#5F564C]">
-              sonho(s) salvo(s) pelo paciente.
-            </p>
+  registro(s) salvo(s) pelo paciente.
+</p>
           </article>
 
           <article className="rounded-3xl border border-[#E5DDD2] bg-white p-5 shadow-sm">
@@ -243,8 +241,8 @@ export default function SonhosPacienteClinicoPage() {
             </p>
 
             <p className="mt-2 text-sm leading-6 text-[#5F564C]">
-              registros com emoções anotadas.
-            </p>
+  registro(s) com emoções descritas.
+</p> 
           </article>
 
           <article className="rounded-3xl border border-[#E5DDD2] bg-white p-5 shadow-sm">
@@ -257,8 +255,8 @@ export default function SonhosPacienteClinicoPage() {
             </p>
 
             <p className="mt-2 text-sm leading-6 text-[#5F564C]">
-              registros com sensação inicial.
-            </p>
+  registro(s) com sensação ao acordar.
+</p>
           </article>
 
           <article className="rounded-3xl border border-[#E5DDD2] bg-white p-5 shadow-sm">
@@ -271,8 +269,8 @@ export default function SonhosPacienteClinicoPage() {
             </p>
 
             <p className="mt-2 text-sm leading-6 text-[#5F564C]">
-              registros com contexto recente.
-            </p>
+  registro(s) com contexto possível informado.
+</p>
           </article>
         </section>
 
@@ -287,8 +285,8 @@ export default function SonhosPacienteClinicoPage() {
             </h2>
 
             <p className="mt-2 text-sm text-[#8A7A68]">
-              Registrado para {formatarData(ultimoSonho.dream_date)}
-            </p>
+  Data do sonho: {formatarData(ultimoSonho.dream_date)}
+</p>
 
             <div className="mt-4 rounded-2xl border border-[#E5DDD2] bg-white p-4">
               <p className="whitespace-pre-wrap break-words text-sm leading-6 text-[#5F564C] [overflow-wrap:anywhere]">
@@ -309,17 +307,17 @@ export default function SonhosPacienteClinicoPage() {
             </h2>
 
             <p className="mt-3 text-sm leading-6 text-[#5F564C]">
-  Use este material como apoio para observar repetições, emoções,
-  figuras, lugares e contextos que possam aparecer na escuta clínica.
-  O app apenas organiza os registros. A leitura clínica deve ser feita
-  pelo terapeuta durante o acompanhamento.
+  Use este material como apoio para observar relatos, emoções, figuras,
+  lugares, imagens e contextos que possam aparecer na escuta clínica. O app
+  apenas organiza os registros. A leitura clínica deve ser feita pelo terapeuta
+  durante o acompanhamento.
 </p> 
           </div>
 
           {sonhosOrdenados.length === 0 ? (
             <div className="rounded-2xl border border-dashed border-[#D8C7B1] bg-[#F7F3EC] p-5 text-sm leading-6 text-[#5F564C]">
-              Este paciente ainda não registrou sonhos.
-            </div>
+            Este paciente ainda não possui sonhos registrados.
+          </div>
           ) : (
             <div className="max-h-[760px] space-y-4 overflow-y-auto pr-1">
               {sonhosOrdenados.map((sonho) => (
