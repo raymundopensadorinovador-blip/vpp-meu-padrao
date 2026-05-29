@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
@@ -33,6 +33,47 @@ const emptyForm = {
   possible_context: "",
 };
 
+type SpeechRecognitionResultItem = {
+  transcript: string;
+};
+
+type SpeechRecognitionResult = {
+  isFinal: boolean;
+  [index: number]: SpeechRecognitionResultItem;
+};
+
+type SpeechRecognitionResultList = {
+  length: number;
+  [index: number]: SpeechRecognitionResult;
+};
+
+type SpeechRecognitionEvent = {
+  results: SpeechRecognitionResultList;
+};
+
+type SpeechRecognitionErrorEvent = {
+  error: string;
+};
+
+type SpeechRecognitionInstance = {
+  lang: string;
+  continuous: boolean;
+  interimResults: boolean;
+  start: () => void;
+  stop: () => void;
+  abort: () => void;
+  onresult: ((event: SpeechRecognitionEvent) => void) | null;
+  onerror: ((event: SpeechRecognitionErrorEvent) => void) | null;
+  onend: (() => void) | null;
+};
+
+type SpeechRecognitionConstructor = new () => SpeechRecognitionInstance;
+
+type WindowWithSpeechRecognition = Window & {
+  SpeechRecognition?: SpeechRecognitionConstructor;
+  webkitSpeechRecognition?: SpeechRecognitionConstructor;
+};
+
 export default function SonhosPage() {
   const router = useRouter();
 
@@ -45,6 +86,10 @@ export default function SonhosPage() {
   const [salvando, setSalvando] = useState(false);
   const [erro, setErro] = useState("");
   const [sucesso, setSucesso] = useState("");
+  const reconhecimentoRef = useRef<SpeechRecognitionInstance | null>(null);
+  const [transcricaoSuportada, setTranscricaoSuportada] = useState(false);
+  const [transcrevendoAudio, setTranscrevendoAudio] = useState(false);
+  const [textoParcialTranscricao, setTextoParcialTranscricao] = useState("");
 
   const sonhosOrdenados = useMemo(() => {
     return [...sonhos].sort((a, b) => {
@@ -91,6 +136,23 @@ export default function SonhosPage() {
     carregar();
   }, [router]);
 
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const janela = window as WindowWithSpeechRecognition;
+    const SpeechRecognition =
+      janela.SpeechRecognition || janela.webkitSpeechRecognition;
+
+    setTranscricaoSuportada(Boolean(SpeechRecognition));
+
+    return () => {
+      if (reconhecimentoRef.current) {
+        reconhecimentoRef.current.abort();
+        reconhecimentoRef.current = null;
+      }
+    };
+  }, []);
+
   function limparAvisos() {
     setErro("");
     setSucesso("");
@@ -104,13 +166,103 @@ export default function SonhosPage() {
     }));
   }
 
+  function iniciarTranscricaoPorVoz() {
+    limparAvisos();
+    setTextoParcialTranscricao("");
+
+    if (typeof window === "undefined") return;
+
+    const janela = window as WindowWithSpeechRecognition;
+    const SpeechRecognition =
+      janela.SpeechRecognition || janela.webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+      setErro(
+        "Seu navegador não oferece suporte para transcrição por voz. Você ainda pode escrever o sonho manualmente."
+      );
+      return;
+    }
+
+    if (reconhecimentoRef.current) {
+      reconhecimentoRef.current.abort();
+      reconhecimentoRef.current = null;
+    }
+
+    const reconhecimento = new SpeechRecognition();
+
+    reconhecimento.lang = "pt-BR";
+    reconhecimento.continuous = true;
+    reconhecimento.interimResults = true;
+
+    reconhecimento.onresult = (event) => {
+      let textoFinal = "";
+      let textoParcial = "";
+
+      for (let index = 0; index < event.results.length; index += 1) {
+        const resultado = event.results[index];
+        const transcricao = resultado[0]?.transcript || "";
+
+        if (resultado.isFinal) {
+          textoFinal += transcricao;
+        } else {
+          textoParcial += transcricao;
+        }
+      }
+
+      if (textoFinal.trim()) {
+        setForm((atual) => ({
+          ...atual,
+          dream_report: `${atual.dream_report.trim() ? `${atual.dream_report.trim()}\n\n` : ""}${textoFinal.trim()}`,
+        }));
+      }
+
+      setTextoParcialTranscricao(textoParcial.trim());
+    };
+
+    reconhecimento.onerror = (event) => {
+      console.error("ERRO NA TRANSCRIÇÃO POR VOZ:", event.error);
+
+      if (event.error === "not-allowed") {
+        setErro(
+          "Permissão do microfone negada. Libere o microfone no navegador para usar a transcrição por voz."
+        );
+      } else {
+        setErro(
+          "Não foi possível continuar a transcrição por voz. Você pode tentar novamente ou escrever o sonho manualmente."
+        );
+      }
+
+      setTranscrevendoAudio(false);
+      setTextoParcialTranscricao("");
+    };
+
+    reconhecimento.onend = () => {
+      setTranscrevendoAudio(false);
+      setTextoParcialTranscricao("");
+      reconhecimentoRef.current = null;
+    };
+
+    reconhecimentoRef.current = reconhecimento;
+    reconhecimento.start();
+    setTranscrevendoAudio(true);
+  }
+
+  function pararTranscricaoPorVoz() {
+    if (reconhecimentoRef.current) {
+      reconhecimentoRef.current.stop();
+    }
+
+    setTranscrevendoAudio(false);
+    setTextoParcialTranscricao("");
+  }
+
   function validarFormulario() {
     if (!form.dream_date) {
       return "Informe a data do sonho.";
     }
 
     if (!form.title.trim()) {
-      return "Dê um título simples para o sonho.";
+        return "Informe um título simples para o sonho.";
     }
 
     if (!form.dream_report.trim()) {
@@ -122,7 +274,7 @@ export default function SonhosPage() {
     }
 
     if (form.dream_report.trim().length < 10) {
-      return "A descrição do sonho está curta demais. Escreva um pouco mais.";
+        return "A descrição do sonho precisa ter um pouco mais de informação.";
     }
 
     return "";
@@ -145,6 +297,14 @@ export default function SonhosPage() {
     }
 
     setSalvando(true);
+
+    if (reconhecimentoRef.current) {
+      reconhecimentoRef.current.abort();
+      reconhecimentoRef.current = null;
+    }
+
+    setTranscrevendoAudio(false);
+    setTextoParcialTranscricao("");
 
     const payload = {
       patient_id: userId,
@@ -224,6 +384,14 @@ export default function SonhosPage() {
 
   function cancelarEdicao() {
     limparAvisos();
+
+    if (reconhecimentoRef.current) {
+      reconhecimentoRef.current.abort();
+      reconhecimentoRef.current = null;
+    }
+
+    setTranscrevendoAudio(false);
+    setTextoParcialTranscricao("");
     setEditandoId(null);
     setForm(emptyForm);
   }
@@ -290,10 +458,10 @@ export default function SonhosPage() {
               </h1>
 
               <p className="max-w-3xl text-sm leading-relaxed text-[#6F6257]">
-                Registre sonhos, emoções, pessoas, lugares e imagens que apareceram.
-                Este espaço não interpreta o sonho automaticamente. Ele apenas organiza
-                o material para sua própria percepção e para leitura clínica do terapeuta.
-              </p>
+  Registre sonhos, emoções, pessoas, lugares e imagens lembradas. Este espaço
+  não interpreta sonhos automaticamente e não produz diagnóstico. Ele organiza
+  o material para sua percepção pessoal e para leitura clínica do terapeuta.
+</p>
             </div>
           </div>
 
@@ -328,19 +496,81 @@ export default function SonhosPage() {
             </h2>
 
             <p className="text-sm leading-relaxed text-[#6F6257]">
-              Escreva de forma livre, sem tentar encaixar o sonho em uma explicação
-              pronta. O mais útil clinicamente é preservar o relato, as emoções e os
-              elementos que se repetem.
-            </p>
+  Escreva de forma livre, priorizando o que você lembra do sonho. Preserve o
+  relato, as emoções e os elementos que chamaram sua atenção, mesmo que pareçam
+  incompletos ou sem ordem clara.
+</p>
           </div>
 
           <form onSubmit={salvarSonho} className="space-y-4">
-             <label className="space-y-1">
+            <div className="rounded-2xl border border-[#E5DDD2] bg-[#F7F3EC] p-4">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold text-[#2F2A24]">
+                    Registrar por voz
+                  </p>
+
+                  <p className="mt-2 text-sm leading-6 text-[#6F6257]">
+                    Use o microfone para narrar o sonho. A transcrição será
+                    adicionada ao relato e poderá ser revisada antes de salvar.
+                  </p>
+                </div>
+
+                <div className="flex w-full flex-col gap-2 sm:w-auto">
+                  {!transcrevendoAudio ? (
+                    <button
+                      type="button"
+                      onClick={iniciarTranscricaoPorVoz}
+                      disabled={!transcricaoSuportada || salvando}
+                      className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl bg-[#2F2A24] px-5 text-sm font-semibold text-white shadow-sm transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+                    >
+                      🎙️ Gravar e transcrever
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={pararTranscricaoPorVoz}
+                      className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-red-200 bg-red-50 px-5 text-sm font-semibold text-red-700 shadow-sm transition hover:bg-red-100 sm:w-auto"
+                    >
+                      Parar gravação
+                    </button>
+                  )}
+
+                  {!transcricaoSuportada && (
+                    <p className="text-xs leading-5 text-[#8A7A68] sm:max-w-[220px]">
+                      Este navegador não oferece suporte para transcrição por
+                      voz. Use o Chrome ou digite o relato manualmente.
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              {transcrevendoAudio && (
+                <div className="mt-4 rounded-2xl border border-[#D8C7B1] bg-white p-3">
+                  <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#8A7A68]">
+                    Microfone ativo
+                  </p>
+
+                  <p className="mt-2 text-sm leading-6 text-[#5F564C]">
+                    Continue narrando o sonho. Quando terminar, toque em parar
+                    gravação e revise o texto antes de salvar.
+                  </p>
+
+                  {textoParcialTranscricao && (
+                    <p className="mt-3 rounded-xl bg-[#FFF8EE] px-3 py-2 text-sm leading-6 text-[#5F564C]">
+                      {textoParcialTranscricao}
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
+
+            <label className="space-y-1">
               <span className="text-sm font-medium text-[#5F564C]">Relato do sonho</span>
               <textarea
                 value={form.dream_report}
                 onChange={(event) => atualizarCampo("dream_report", event.target.value)}
-                placeholder="Descreva o sonho como você lembra, mesmo que pareça confuso ou incompleto."
+                placeholder="Descreva o sonho como você lembra, mesmo que as cenas pareçam soltas, confusas ou incompletas."
                 rows={7}
                 className="w-full resize-y rounded-2xl border border-[#D8C7B1] bg-white px-4 py-3 text-sm leading-relaxed outline-none transition focus:border-[#2F2A24]"
                 required
@@ -434,10 +664,10 @@ export default function SonhosPage() {
   </p>
 
   <p className="mb-4 text-sm leading-6 text-[#6F6257]">
-    Depois de escrever o relato e os elementos principais do sonho, informe a data
-    e dê um título simples. Assim você registra primeiro o que ainda está vivo na
-    memória.
-  </p>
+  Depois de escrever o relato e os elementos principais do sonho, informe a data
+  e dê um título simples. Essa ordem ajuda a preservar primeiro o conteúdo que
+  ainda está mais presente na memória.
+</p>
 
   <div className="grid gap-4 md:grid-cols-[180px_1fr]">
     <label className="space-y-1">
@@ -507,11 +737,11 @@ export default function SonhosPage() {
           </div>
 
           {sonhosOrdenados.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-[#D8C7B1] bg-[#F7F3EC] p-5 text-sm leading-relaxed text-[#6F6257]">
-              Quando registrar seus sonhos, eles aparecerão aqui. A ideia não é
-              interpretar tudo na hora, mas guardar material que possa revelar
-              repetições, emoções e cenas importantes ao longo do tempo.
-            </div>
+           <div className="rounded-2xl border border-dashed border-[#D8C7B1] bg-[#F7F3EC] p-5 text-sm leading-relaxed text-[#6F6257]">
+           Quando você registrar sonhos, eles aparecerão aqui. O objetivo é guardar
+           relatos, emoções e elementos recorrentes para acompanhamento pessoal e
+           leitura clínica, sem interpretação automática.
+         </div> 
           ) : (
             <div className="max-h-[520px] space-y-4 overflow-y-auto pr-1 sm:max-h-[620px] lg:max-h-[720px]">
               {sonhosOrdenados.map((sonho) => (

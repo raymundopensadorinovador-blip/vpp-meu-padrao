@@ -1021,7 +1021,23 @@ setNomeUsuario(perfil.name || "");
             </p>
           </article>
         </section>
-      </section>
-    </main>
-  );
+        </section>
+
+<div className="fixed bottom-4 right-4 z-50 flex flex-col items-end gap-3 sm:bottom-6 sm:right-6">
+  <Link
+    href="/sonhos"
+    className="inline-flex min-h-12 items-center justify-center rounded-full border border-[#D8C7B1] bg-white px-4 text-sm font-semibold text-[#2F2A24] shadow-lg transition hover:bg-[#FFF8EE]"
+  >
+    🌙 Sonho
+  </Link>
+
+  <Link
+    href="/situacoes/nova"
+    className="inline-flex min-h-12 items-center justify-center rounded-full bg-[#2F2A24] px-4 text-sm font-semibold text-white shadow-lg transition hover:opacity-95"
+  >
+    + Situação
+  </Link>
+</div>
+</main>
+);
 }
