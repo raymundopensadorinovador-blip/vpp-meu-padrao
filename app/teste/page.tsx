@@ -482,8 +482,10 @@ export default function TestePage() {
   }, [respostas]);
 
   const progresso = Math.round((totalRespondidas / perguntas.length) * 100);
-
+  const perguntasFaltantes = perguntas.length - totalRespondidas;
+  const testeCompleto = totalRespondidas === perguntas.length;
   function alterarResposta(perguntaId: number, valor: number) {
+   
     setRespostas((estadoAtual) => ({
       ...estadoAtual,
       [perguntaId]: valor,
@@ -596,64 +598,131 @@ export default function TestePage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#F7F3EC] px-4 py-6 text-[#2F2A24] sm:px-6 lg:px-8">
+    <main className="min-h-screen bg-[#F6F0E8] px-4 py-6 text-[#2F2A24] sm:px-6 lg:px-8">
       <section className="mx-auto w-full max-w-5xl">
-        <header className="mb-6 rounded-3xl border border-[#E5DDD2] bg-white p-5 shadow-sm sm:p-7">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-            <div className="min-w-0">
-              <p className="mb-2 text-sm font-medium text-[#8A2E2B]">
-                Teste VPP
-              </p>
+      <header className="mb-6 overflow-hidden rounded-3xl bg-white shadow-sm">
+  <div className="border-b border-[#E5DDD2] p-5 sm:p-7">
+    <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+      <div className="min-w-0 space-y-2">
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#8A7A68]">
+          Teste VPP — Vetor Psíquico Primário
+        </p>
 
-              <h1 className="text-2xl font-semibold tracking-tight text-[#2F2A24] sm:text-3xl">
-                36 perguntas para observar seu padrão
-              </h1>
+        <h1 className="break-words text-2xl font-semibold tracking-tight text-[#2F2A24] sm:text-3xl [overflow-wrap:anywhere]">
+          36 perguntas para observar seu padrão de funcionamento
+        </h1>
 
-              <p className="mt-3 max-w-3xl text-sm leading-6 text-[#5F564C]">
-              {nomeUsuario
-  ? `${nomeUsuario}, responda considerando seu funcionamento mais frequente, não a resposta que pareceria ideal.`
-  : "Responda considerando seu funcionamento mais frequente, não a resposta que pareceria ideal."}  
-              </p>
-            </div>
+        <p className="max-w-3xl text-sm leading-relaxed text-[#6F6257]">
+          {nomeUsuario
+            ? `${nomeUsuario}, responda pensando na forma como você costuma funcionar na prática, principalmente em situações de pressão, vínculo, escolha, frustração e expectativa.`
+            : "Responda pensando na forma como você costuma funcionar na prática, principalmente em situações de pressão, vínculo, escolha, frustração e expectativa."}
+        </p>
+      </div>
 
-            <Link
-              href="/painel"
-              className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-[#D8C7B1] bg-white px-5 text-sm font-medium text-[#5F564C] shadow-sm transition hover:bg-[#FFF8EE] lg:w-auto"
-            >
-              Voltar ao painel
-            </Link>
-          </div>
-        </header>
+      <Link
+        href="/painel"
+        className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-[#D8C7B1] bg-white px-5 text-sm font-medium text-[#5F564C] shadow-sm transition hover:bg-[#F7F3EC] lg:w-auto"
+      >
+        Voltar ao painel
+      </Link>
+    </div>
+  </div>
 
-        <section className="mb-6 rounded-3xl border border-[#E5DDD2] bg-white p-5 shadow-sm sm:p-7">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <p className="text-sm font-medium text-[#8A7A68]">
-                Progresso do teste
-              </p>
+  <div className="grid gap-4 bg-[#FFF8EE] p-5 sm:p-7 md:grid-cols-3">
+    <article className="rounded-2xl bg-white p-4 shadow-sm">
+      <p className="text-sm font-semibold text-[#2F2A24]">
+        Não responda o ideal
+      </p>
 
-              <p className="mt-1 text-lg font-semibold text-[#2F2A24]">
-                {totalRespondidas} de {perguntas.length} perguntas respondidas
-              </p>
-            </div>
+      <p className="mt-2 text-sm leading-6 text-[#5F564C]">
+        Marque o que mais se aproxima do seu funcionamento real, não da resposta
+        que pareceria mais correta.
+      </p>
+    </article>
 
-            <div className="rounded-2xl border border-[#E5DDD2] bg-[#F7F3EC] px-4 py-3 text-sm font-semibold text-[#8A2E2B]">
-              {progresso}%
-            </div>
-          </div>
+    <article className="rounded-2xl bg-white p-4 shadow-sm">
+      <p className="text-sm font-semibold text-[#2F2A24]">
+        Observe repetições
+      </p>
 
-          <div className="mt-4 h-3 overflow-hidden rounded-full bg-[#F7F3EC]">
-            <div
-              className="h-full rounded-full bg-[#2F2A24] transition-all"
-              style={{ width: `${progresso}%` }}
-            />
-          </div>
+      <p className="mt-2 text-sm leading-6 text-[#5F564C]">
+        Pense em situações que se repetem na sua vida: relações, escolhas,
+        reações, conflitos e formas de se proteger.
+      </p>
+    </article>
 
-          <p className="mt-4 text-sm leading-6 text-[#5F564C]">
-  Marque de 1 a 5 o quanto cada frase se aproxima da forma como você costuma
-  funcionar na prática.
-</p>
-        </section>
+    <article className="rounded-2xl bg-white p-4 shadow-sm">
+      <p className="text-sm font-semibold text-[#2F2A24]">
+        Não é diagnóstico
+      </p>
+
+      <p className="mt-2 text-sm leading-6 text-[#5F564C]">
+        O resultado organiza uma leitura inicial de padrão. A compreensão mais
+        profunda deve ser construída no acompanhamento clínico.
+      </p>
+    </article>
+  </div>
+</header>
+
+<section className="mb-6 rounded-3xl bg-white p-5 shadow-sm sm:p-7">
+  <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div className="min-w-0">
+      <p className="text-sm font-medium text-[#8A7A68]">
+        Progresso do teste
+      </p>
+
+      <p className="mt-1 text-lg font-semibold text-[#2F2A24]">
+        {totalRespondidas} de {perguntas.length} perguntas respondidas
+      </p>
+
+      <p className="mt-2 text-sm leading-6 text-[#5F564C]">
+        {testeCompleto
+          ? "Todas as perguntas foram respondidas. Você já pode finalizar o teste."
+          : `Ainda faltam ${perguntasFaltantes} pergunta(s). Responda com calma, sem tentar forçar um perfil.`}
+      </p>
+    </div>
+
+    <div className="flex items-center gap-3">
+      <div className="rounded-2xl border border-[#E5DDD2] bg-[#F7F3EC] px-4 py-3 text-sm font-semibold text-[#8A2E2B]">
+        {progresso}%
+      </div>
+    </div>
+  </div>
+
+  <div className="mt-5 h-3 overflow-hidden rounded-full bg-[#F7F3EC]">
+    <div
+      className="h-full rounded-full bg-[#2F2A24] transition-all"
+      style={{ width: `${progresso}%` }}
+    />
+  </div>
+
+  <div className="mt-5 grid gap-3 sm:grid-cols-5">
+    <div className="rounded-2xl border border-[#E5DDD2] bg-[#F7F3EC] p-3 text-center">
+      <p className="text-sm font-semibold text-[#2F2A24]">1</p>
+      <p className="mt-1 text-xs text-[#8A7A68]">Quase nunca</p>
+    </div>
+
+    <div className="rounded-2xl border border-[#E5DDD2] bg-[#F7F3EC] p-3 text-center">
+      <p className="text-sm font-semibold text-[#2F2A24]">2</p>
+      <p className="mt-1 text-xs text-[#8A7A68]">Pouco</p>
+    </div>
+
+    <div className="rounded-2xl border border-[#E5DDD2] bg-[#F7F3EC] p-3 text-center">
+      <p className="text-sm font-semibold text-[#2F2A24]">3</p>
+      <p className="mt-1 text-xs text-[#8A7A68]">Às vezes</p>
+    </div>
+
+    <div className="rounded-2xl border border-[#E5DDD2] bg-[#F7F3EC] p-3 text-center">
+      <p className="text-sm font-semibold text-[#2F2A24]">4</p>
+      <p className="mt-1 text-xs text-[#8A7A68]">Frequentemente</p>
+    </div>
+
+    <div className="rounded-2xl border border-[#E5DDD2] bg-[#F7F3EC] p-3 text-center">
+      <p className="text-sm font-semibold text-[#2F2A24]">5</p>
+      <p className="mt-1 text-xs text-[#8A7A68]">Muito parecido</p>
+    </div>
+  </div>
+</section>  
 
         {erro && (
           <div className="mb-6 rounded-2xl border border-[#E8C7C0] bg-red-50 px-4 py-3 text-sm leading-6 text-[#8A2E2B]">
@@ -667,62 +736,105 @@ export default function TestePage() {
           </div>
         )}
 
-        <form onSubmit={handleEnviarTeste} className="space-y-4">
-          {perguntas.map((pergunta) => (
-            <article
-              key={pergunta.id}
-              className="rounded-3xl border border-[#E5DDD2] bg-white p-5 shadow-sm sm:p-6"
-            >
-              <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-                <div className="min-w-0">
-                  <p className="text-sm font-semibold text-[#8A2E2B]">
-                    Pergunta {pergunta.id}
-                  </p>
+<form onSubmit={handleEnviarTeste} className="space-y-4">
+  {perguntas.map((pergunta) => {
+    const respondida = typeof respostas[pergunta.id] === "number";
 
-                  <p className="mt-2 text-sm leading-6 text-[#2F2A24]">
-                    {pergunta.texto}
-                  </p>
-                </div>
-              </div>
+    return (
+      <article
+        key={pergunta.id}
+        className={`rounded-3xl border p-5 shadow-sm transition sm:p-6 ${
+          respondida
+            ? "border-[#D8C7B1] bg-white"
+            : "border-[#E5DDD2] bg-white"
+        }`}
+      >
+        <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-2">
+              <p className="rounded-2xl bg-[#F7F3EC] px-3 py-1 text-xs font-semibold text-[#8A2E2B]">
+                Pergunta {pergunta.id}
+              </p>
 
-              <div className="grid grid-cols-5 gap-2">
-                {[1, 2, 3, 4, 5].map((valor) => {
-                  const selecionado = respostas[pergunta.id] === valor;
+              <span
+                className={`rounded-2xl border px-3 py-1 text-xs font-semibold ${
+                  respondida
+                    ? "border-green-200 bg-green-50 text-green-700"
+                    : "border-[#D8C7B1] bg-white text-[#8A7A68]"
+                }`}
+              >
+                {respondida ? "Respondida" : "Pendente"}
+              </span>
+            </div>
 
-                  return (
-                    <button
-                      key={valor}
-                      type="button"
-                      onClick={() => alterarResposta(pergunta.id, valor)}
-                      className={`min-h-11 rounded-2xl border px-2 text-sm font-semibold transition ${
-                        selecionado
-                          ? "border-[#2F2A24] bg-[#2F2A24] text-white"
-                          : "border-[#D8C7B1] bg-[#F7F3EC] text-[#5F564C] hover:bg-[#FFF8EE]"
-                      }`}
-                    >
-                      {valor}
-                    </button>
-                  );
-                })}
-              </div>
+            <p className="mt-4 break-words text-base leading-7 text-[#2F2A24] [overflow-wrap:anywhere]">
+              {pergunta.texto}
+            </p>
+          </div>
+        </div>
 
-              <div className="mt-3 grid grid-cols-2 gap-2 text-xs text-[#8A7A68]">
-                <p>1 = quase nunca</p>
-                <p className="text-right">5 = muito parecido comigo</p>
-              </div>
-            </article>
-          ))}
+        <div className="grid grid-cols-5 gap-2">
+          {[1, 2, 3, 4, 5].map((valor) => {
+            const selecionado = respostas[pergunta.id] === valor;
 
-          <section className="sticky bottom-0 -mx-4 border-t border-[#E5DDD2] bg-[#F7F3EC]/95 px-4 py-4 backdrop-blur sm:static sm:mx-0 sm:border-0 sm:bg-transparent sm:px-0 sm:py-0">
-            <button
-              type="submit"
-              disabled={salvando}
-              className="min-h-11 w-full rounded-2xl bg-[#2F2A24] px-5 text-sm font-semibold text-white shadow-sm transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              {salvando ? "Salvando resultado..." : "Finalizar teste VPP"}
-            </button>
-          </section>
-        </form>
+            return (
+              <button
+                key={valor}
+                type="button"
+                onClick={() => alterarResposta(pergunta.id, valor)}
+                aria-label={`Responder ${valor} na pergunta ${pergunta.id}`}
+                className={`min-h-12 rounded-2xl border px-2 text-sm font-semibold transition ${
+                  selecionado
+                    ? "border-[#2F2A24] bg-[#2F2A24] text-white shadow-sm"
+                    : "border-[#D8C7B1] bg-[#F7F3EC] text-[#5F564C] hover:bg-[#FFF8EE]"
+                }`}
+              >
+                {valor}
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="mt-3 flex items-center justify-between gap-3 text-xs text-[#8A7A68]">
+          <p>Quase nunca</p>
+          <p className="text-right">Muito parecido comigo</p>
+        </div>
+      </article>
+    );
+  })}
+
+  <section className="sticky bottom-0 -mx-4 border-t border-[#E5DDD2] bg-[#F6F0E8]/95 px-4 py-4 backdrop-blur sm:static sm:mx-0 sm:border-0 sm:bg-transparent sm:px-0 sm:py-0">
+    <div className="rounded-3xl bg-white p-4 shadow-sm sm:p-5">
+      <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p className="text-sm font-semibold text-[#2F2A24]">
+            {testeCompleto
+              ? "Teste pronto para finalizar"
+              : "Ainda há perguntas pendentes"}
+          </p>
+
+          <p className="mt-1 text-sm leading-6 text-[#5F564C]">
+            {testeCompleto
+              ? "Ao finalizar, sua leitura inicial será organizada a partir do perfil predominante."
+              : `Responda as ${perguntasFaltantes} pergunta(s) restante(s) antes de finalizar.`}
+          </p>
+        </div>
+
+        <div className="rounded-2xl border border-[#E5DDD2] bg-[#F7F3EC] px-4 py-2 text-sm font-semibold text-[#8A2E2B]">
+          {progresso}%
+        </div>
+      </div>
+
+      <button
+        type="submit"
+        disabled={salvando}
+        className="min-h-11 w-full rounded-2xl bg-[#2F2A24] px-5 text-sm font-semibold text-white shadow-sm transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-60"
+      >
+        {salvando ? "Salvando resultado..." : "Finalizar teste VPP"}
+      </button>
+    </div>
+  </section>
+</form>  
       </section>
     </main>
   );

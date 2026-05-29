@@ -17,7 +17,10 @@ type ResumoSituacoes = {
 type ResultadoResumo = {
   predominant_profile: string;
   secondary_profiles: string[];
+  description: string | null;
   observation_focus: string | null;
+  self_observation_question: string | null;
+  created_at: string;
 };
 
 type PlanoFinanceiroPaciente = {
@@ -108,6 +111,25 @@ function formatarMesReferencia(data: string | null | undefined) {
   }).format(new Date(data));
 }
 
+function separarNomePerfil(perfil: string) {
+  const partes = perfil.split(" — ");
+
+  return {
+    nome: partes[0] || perfil,
+    vetor: partes[1] || "",
+  };
+}
+
+function formatarDataResultado(data: string | null | undefined) {
+  if (!data) return "Não informado";
+
+  return new Intl.DateTimeFormat("pt-BR", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+  }).format(new Date(data));
+}
+
 export default function PainelPage() {
   const router = useRouter();
 
@@ -133,7 +155,9 @@ export default function PainelPage() {
 
   const [resultadoResumo, setResultadoResumo] =
     useState<ResultadoResumo | null>(null);
-
+    const perfilPainel = resultadoResumo
+    ? separarNomePerfil(resultadoResumo.predominant_profile)
+    : null;
   function encontrarMaisRecorrente(lista: string[]) {
     if (lista.length === 0) {
       return "Ainda sem registros";
@@ -221,12 +245,14 @@ setNomeUsuario(perfil.name || "");
       });
 
       const { data: resultadoEncontrado } = await supabase
-        .from("vpp_test_results")
-        .select("predominant_profile, secondary_profiles, observation_focus")
-        .eq("user_id", usuarioAtual.user.id)
-        .order("created_at", { ascending: false })
-        .limit(1)
-        .maybeSingle();
+  .from("vpp_test_results")
+  .select(
+    "predominant_profile, secondary_profiles, description, observation_focus, self_observation_question, created_at"
+  )
+  .eq("user_id", usuarioAtual.user.id)
+  .order("created_at", { ascending: false })
+  .limit(1)
+  .maybeSingle();
 
         setResultadoResumo((resultadoEncontrado as ResultadoResumo) || null);
 
@@ -601,82 +627,153 @@ setNomeUsuario(perfil.name || "");
     </p>
   </div>
 </section>
-<section className="mb-6 rounded-3xl border border-[#E5DDD2] bg-white p-5 shadow-sm sm:p-7">
-          <div className="flex flex-col gap-4">
-            <div>
-              <p className="mb-2 text-sm font-medium text-[#8A7A68]">
-                Status atual
+<section className="mb-6 overflow-hidden rounded-3xl bg-white shadow-sm">
+  <div className="border-b border-[#E5DDD2] p-5 sm:p-7">
+    <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+      <div className="min-w-0">
+        <p className="mb-2 text-sm font-medium text-[#8A7A68]">
+          Status atual
+        </p>
+
+        {resultadoResumo ? (
+          <>
+            <h2 className="break-words text-2xl font-semibold text-[#2F2A24] [overflow-wrap:anywhere]">
+              Sua leitura inicial do VPP está disponível
+            </h2>
+
+            <p className="mt-3 max-w-3xl text-sm leading-6 text-[#5F564C]">
+              O teste organizou uma primeira leitura do seu padrão predominante.
+              Esse resultado não define quem você é; ele serve como ponto de
+              partida para observar repetições no cotidiano.
+            </p>
+          </>
+        ) : (
+          <>
+            <h2 className="text-2xl font-semibold text-[#2F2A24]">
+              Seu teste VPP ainda não foi realizado
+            </h2>
+
+            <p className="mt-3 max-w-3xl text-sm leading-6 text-[#5F564C]">
+              Responda ao teste inicial para receber uma primeira leitura do seu
+              padrão predominante, perfis secundários e pontos de observação.
+            </p>
+          </>
+        )}
+      </div>
+
+      <div className="flex flex-col gap-3 sm:flex-row lg:flex-col">
+        <Link
+          href="/teste"
+          className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl bg-[#2F2A24] px-5 text-sm font-semibold text-white shadow-sm transition hover:opacity-95 sm:w-auto"
+        >
+          {resultadoResumo ? "Refazer teste VPP" : "Fazer teste VPP"}
+        </Link>
+
+        {resultadoResumo && (
+          <Link
+            href="/resultado"
+            className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-[#D8C7B1] bg-white px-5 text-sm font-semibold text-[#5F564C] shadow-sm transition hover:bg-[#FFF8EE] sm:w-auto"
+          >
+            Ver resultado completo
+          </Link>
+        )}
+      </div>
+    </div>
+  </div>
+
+  {resultadoResumo ? (
+    <div className="bg-[#FFF8EE] p-5 sm:p-7">
+      <div className="grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
+        <article className="rounded-3xl bg-[#2F2A24] p-5 text-white shadow-sm">
+          <p className="text-sm font-medium text-white/70">
+            Perfil predominante
+          </p>
+
+          <h3 className="mt-3 break-words text-2xl font-semibold text-white [overflow-wrap:anywhere]">
+            {perfilPainel?.nome || resultadoResumo.predominant_profile}
+          </h3>
+
+          {perfilPainel?.vetor && (
+            <p className="mt-2 break-words text-sm font-medium text-white/75 [overflow-wrap:anywhere]">
+              {perfilPainel.vetor}
+            </p>
+          )}
+
+          {resultadoResumo.description && (
+            <p className="mt-4 text-sm leading-6 text-white/75">
+              {resultadoResumo.description}
+            </p>
+          )}
+
+          <p className="mt-4 text-xs text-white/55">
+            Resultado gerado em{" "}
+            {formatarDataResultado(resultadoResumo.created_at)}
+          </p>
+        </article>
+
+        <article className="rounded-3xl bg-white p-5 shadow-sm">
+          <p className="mb-2 text-sm font-medium text-[#8A2E2B]">
+            Onde observar agora
+          </p>
+
+          <h3 className="text-lg font-semibold text-[#2F2A24]">
+            Comece percebendo como esse padrão aparece na prática
+          </h3>
+
+          <p className="mt-3 text-sm leading-6 text-[#5F564C]">
+            {resultadoResumo.observation_focus ||
+              "O resultado funciona como uma lente inicial de observação para apoiar sua consciência sobre padrões."}
+          </p>
+
+          {resultadoResumo.self_observation_question && (
+            <div className="mt-4 rounded-2xl border border-[#D8C7B1] bg-[#FFF8EE] p-4">
+              <p className="text-xs font-semibold uppercase tracking-wide text-[#8A7A68]">
+                Pergunta de auto-observação
               </p>
-             
-              {resultadoResumo ? (
-                <>
-                  <h2 className="text-xl font-semibold text-[#2F2A24]">
-                    Seu teste VPP já foi realizado
-                  </h2>
 
-                  <p className="mt-3 text-sm leading-6 text-[#5F564C]">
-                    Seu perfil predominante atual é{" "}
-                    <span className="font-semibold text-[#8A2E2B]">
-                      {resultadoResumo.predominant_profile}
-                    </span>
-                    .
-                  </p>
-
-                  {resultadoResumo.secondary_profiles?.length > 0 && (
-                    <div className="mt-4 flex flex-wrap gap-2">
-                      {resultadoResumo.secondary_profiles.map((perfil) => (
-                        <span
-                          key={perfil}
-                          className="rounded-2xl border border-[#D8C7B1] bg-[#F7F3EC] px-3 py-2 text-xs font-semibold text-[#5F564C]"
-                        >
-                          {perfil}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                </>
-              ) : (
-                <>
-                  <h2 className="text-xl font-semibold text-[#2F2A24]">
-                    Seu teste VPP ainda não foi realizado
-                  </h2>
-
-                  <p className="mt-3 text-sm leading-6 text-[#5F564C]">
-                    Responda ao teste inicial para receber uma primeira leitura
-                    do seu padrão predominante, perfis secundários e pontos de
-                    observação.
-                  </p>
-                </>
-              )}
-            </div>
-
-            <div className="rounded-2xl border border-[#E5DDD2] bg-[#F7F3EC] p-4">
-              <p className="text-sm leading-6 text-[#5F564C]">
-                {resultadoResumo?.observation_focus
-                  ? resultadoResumo.observation_focus
-                  : "O resultado não é diagnóstico. Ele funciona como uma lente inicial de observação para apoiar sua consciência sobre padrões."}
+              <p className="mt-2 text-sm font-semibold leading-6 text-[#2F2A24]">
+                {resultadoResumo.self_observation_question}
               </p>
             </div>
+          )}
+        </article>
+      </div>
 
-            <div className="flex flex-col gap-3 sm:flex-row">
-              <Link
-                href="/teste"
-                className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl bg-[#2F2A24] px-5 text-sm font-semibold text-white shadow-sm transition hover:opacity-95 sm:w-auto"
+      {resultadoResumo.secondary_profiles?.length > 0 && (
+        <div className="mt-4 rounded-3xl bg-white p-5 shadow-sm">
+          <p className="mb-3 text-sm font-medium text-[#8A2E2B]">
+            Perfis secundários que também apareceram
+          </p>
+
+          <div className="flex flex-wrap gap-2">
+            {resultadoResumo.secondary_profiles.map((perfil) => (
+              <span
+                key={perfil}
+                className="rounded-2xl border border-[#D8C7B1] bg-[#F7F3EC] px-3 py-2 text-xs font-semibold text-[#5F564C]"
               >
-                {resultadoResumo ? "Refazer teste VPP" : "Fazer teste VPP"}
-              </Link>
-
-              {resultadoResumo && (
-                <Link
-                  href="/resultado"
-                  className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-[#D8C7B1] bg-white px-5 text-sm font-semibold text-[#5F564C] shadow-sm transition hover:bg-[#FFF8EE] sm:w-auto"
-                >
-                  Ver resultado completo
-                </Link>
-              )}
-            </div>
+                {perfil}
+              </span>
+            ))}
           </div>
-        </section>
+        </div>
+      )}
+    </div>
+  ) : (
+    <div className="bg-[#FFF8EE] p-5 sm:p-7">
+      <div className="rounded-3xl bg-white p-5 shadow-sm">
+        <p className="text-sm font-semibold text-[#2F2A24]">
+          O teste é o ponto de entrada da sua leitura VPP.
+        </p>
+
+        <p className="mt-2 text-sm leading-6 text-[#5F564C]">
+          Ao responder, você receberá uma devolutiva inicial com perfil
+          predominante, perfis secundários, foco de observação e uma pergunta
+          para levar para situações reais.
+        </p>
+      </div>
+    </div>
+  )}
+</section>
 
         <section className="mb-6 rounded-3xl border border-[#E5DDD2] bg-white p-5 shadow-sm sm:p-7">
           <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">

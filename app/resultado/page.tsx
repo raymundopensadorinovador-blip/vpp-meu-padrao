@@ -20,13 +20,32 @@ type ResultadoVpp = {
   created_at: string;
 };
 
+function separarNomePerfil(perfil: string) {
+  const partes = perfil.split(" — ");
+
+  return {
+    nome: partes[0] || perfil,
+    vetor: partes[1] || "",
+  };
+}
+
+function formatarDataResultado(data: string) {
+  return new Intl.DateTimeFormat("pt-BR", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+  }).format(new Date(data));
+}
+
 export default function ResultadoPage() {
   const router = useRouter();
 
   const [carregando, setCarregando] = useState(true);
   const [resultado, setResultado] = useState<ResultadoVpp | null>(null);
   const [nomeUsuario, setNomeUsuario] = useState("");
-
+  const perfilSeparado = resultado
+  ? separarNomePerfil(resultado.predominant_profile)
+  : null;
   useEffect(() => {
     async function carregarResultado() {
       const { data: usuarioAtual, error: erroUsuario } =
@@ -104,7 +123,7 @@ export default function ResultadoPage() {
 
   if (!resultado) {
     return (
-      <main className="min-h-screen bg-[#F7F3EC] px-4 py-6 text-[#2F2A24] sm:px-6 lg:px-8">
+      <main className="min-h-screen bg-[#F6F0E8] px-4 py-6 text-[#2F2A24] sm:px-6 lg:px-8">
         <section className="mx-auto flex min-h-[calc(100vh-48px)] w-full max-w-md flex-col justify-center">
           <div className="rounded-3xl border border-[#E5DDD2] bg-white p-6 text-center shadow-sm sm:p-8">
             <p className="text-sm font-medium text-[#8A2E2B]">
@@ -144,181 +163,298 @@ export default function ResultadoPage() {
   return (
     <main className="min-h-screen bg-[#F7F3EC] px-4 py-6 text-[#2F2A24] sm:px-6 lg:px-8">
       <section className="mx-auto w-full max-w-5xl">
-        <header className="mb-6 rounded-3xl border border-[#E5DDD2] bg-white p-5 shadow-sm sm:p-7">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-            <div className="min-w-0">
-              <p className="mb-2 text-sm font-medium text-[#8A2E2B]">
-                Resultado do teste VPP
-              </p>
+      <header className="mb-6 overflow-hidden rounded-3xl bg-white shadow-sm">
+  <div className="border-b border-[#E5DDD2] p-5 sm:p-7">
+    <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+      <div className="min-w-0 space-y-2">
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#8A7A68]">
+          Resultado do teste VPP
+        </p>
 
-              <h1 className="text-2xl font-semibold tracking-tight text-[#2F2A24] sm:text-3xl">
-                {nomeUsuario
-                  ? `${nomeUsuario}, sua leitura inicial está pronta`
-                  : "Sua leitura inicial está pronta"}
-              </h1>
+        <h1 className="break-words text-2xl font-semibold tracking-tight text-[#2F2A24] sm:text-3xl [overflow-wrap:anywhere]">
+          {nomeUsuario
+            ? `${nomeUsuario}, sua leitura inicial está pronta`
+            : "Sua leitura inicial está pronta"}
+        </h1>
 
-              <p className="mt-3 max-w-3xl text-sm leading-6 text-[#5F564C]">
-  Este resultado não é diagnóstico. Ele organiza uma leitura inicial de
-  padrão para apoiar sua auto-observação e, quando houver acompanhamento,
-  aprofundar o processo terapêutico.
-</p>
-            </div>
+        <p className="max-w-3xl text-sm leading-relaxed text-[#6F6257]">
+          Este resultado não define quem você é. Ele organiza sinais do seu
+          funcionamento para ajudar você a observar repetições, reações,
+          expectativas e possibilidades de mudança.
+        </p>
+      </div>
 
-            <Link
-              href="/painel"
-              className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-[#D8C7B1] bg-white px-5 text-sm font-medium text-[#5F564C] shadow-sm transition hover:bg-[#FFF8EE] lg:w-auto"
-            >
-              Voltar ao painel
-            </Link>
-          </div>
-        </header>
+      <Link
+        href="/painel"
+        className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-[#D8C7B1] bg-white px-5 text-sm font-medium text-[#5F564C] shadow-sm transition hover:bg-[#F7F3EC] lg:w-auto"
+      >
+        Voltar ao painel
+      </Link>
+    </div>
+  </div>
 
-        <section className="mb-6 rounded-3xl border border-[#E5DDD2] bg-white p-5 shadow-sm sm:p-7">
-          <p className="mb-2 text-sm font-medium text-[#8A7A68]">
-            Perfil predominante
-          </p>
+  <div className="grid gap-4 bg-[#FFF8EE] p-5 sm:p-7 md:grid-cols-3">
+    <article className="rounded-2xl bg-white p-4 shadow-sm">
+      <p className="text-sm font-semibold text-[#2F2A24]">
+        Leitura inicial
+      </p>
 
-          <h2 className="text-3xl font-semibold tracking-tight text-[#2F2A24]">
-            {resultado.predominant_profile}
-          </h2>
+      <p className="mt-2 text-sm leading-6 text-[#5F564C]">
+        O teste aponta uma direção predominante de funcionamento, não um rótulo
+        definitivo.
+      </p>
+    </article>
 
-          {resultado.description && (
-            <p className="mt-4 text-sm leading-6 text-[#5F564C]">
-              {resultado.description}
-            </p>
-          )}
+    <article className="rounded-2xl bg-white p-4 shadow-sm">
+      <p className="text-sm font-semibold text-[#2F2A24]">
+        Observe no cotidiano
+      </p>
 
-          {resultado.secondary_profiles?.length > 0 && (
-            <div className="mt-5">
-              <p className="mb-3 text-sm font-medium text-[#8A2E2B]">
-                Perfis secundários
-              </p>
+      <p className="mt-2 text-sm leading-6 text-[#5F564C]">
+        O valor do resultado aparece quando você começa a reconhecer esse padrão
+        em situações reais.
+      </p>
+    </article>
 
-              <div className="flex flex-wrap gap-2">
-                {resultado.secondary_profiles.map((perfil) => (
-                  <span
-                    key={perfil}
-                    className="rounded-2xl border border-[#D8C7B1] bg-[#F7F3EC] px-4 py-2 text-sm font-medium text-[#5F564C]"
-                  >
-                    {perfil}
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
-        </section>
+    <article className="rounded-2xl bg-white p-4 shadow-sm">
+      <p className="text-sm font-semibold text-[#2F2A24]">
+        Leve para a escuta
+      </p>
 
-        <section className="grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
-        <article className="rounded-3xl border border-blue-200 bg-blue-50/70 p-5 shadow-sm sm:p-7">
-  <p className="mb-2 text-sm font-medium text-blue-700">
-    Leitura do funcionamento
+      <p className="mt-2 text-sm leading-6 text-[#5F564C]">
+        Com acompanhamento, essa leitura pode ser aprofundada com mais cuidado,
+        contexto e precisão clínica.
+      </p>
+    </article>
+  </div>
+</header>
+
+<section className="mb-6 rounded-3xl bg-[#2F2A24] p-5 text-white shadow-sm sm:p-7">
+  <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+    <div className="min-w-0">
+      <p className="text-sm font-medium text-white/70">
+        Perfil predominante
+      </p>
+
+      <h2 className="mt-3 break-words text-3xl font-semibold tracking-tight text-white sm:text-4xl [overflow-wrap:anywhere]">
+        {perfilSeparado?.nome || resultado.predominant_profile}
+      </h2>
+
+      {perfilSeparado?.vetor && (
+        <p className="mt-2 break-words text-lg font-medium text-white/80 [overflow-wrap:anywhere]">
+          {perfilSeparado.vetor}
+        </p>
+      )}
+
+      {resultado.description && (
+        <p className="mt-5 max-w-3xl text-sm leading-6 text-white/75">
+          {resultado.description}
+        </p>
+      )}
+    </div>
+
+    <div className="rounded-2xl border border-white/15 bg-white/10 p-4">
+      <p className="text-xs font-semibold uppercase tracking-wide text-white/60">
+        Resultado gerado em
+      </p>
+
+      <p className="mt-2 text-sm font-semibold text-white">
+        {formatarDataResultado(resultado.created_at)}
+      </p>
+    </div>
+  </div>
+
+  {resultado.secondary_profiles?.length > 0 && (
+    <div className="mt-6 border-t border-white/10 pt-5">
+      <p className="mb-3 text-sm font-medium text-white/70">
+        Perfis secundários que também apareceram
+      </p>
+
+      <div className="flex flex-wrap gap-2">
+        {resultado.secondary_profiles.map((perfil) => (
+          <span
+            key={perfil}
+            className="rounded-2xl border border-white/15 bg-white/10 px-4 py-2 text-sm font-medium text-white/85"
+          >
+            {perfil}
+          </span>
+        ))}
+      </div>
+    </div>
+  )}
+</section>       
+
+<section className="grid gap-4 lg:grid-cols-[1.15fr_0.85fr]">
+  <article className="rounded-3xl bg-white p-5 shadow-sm sm:p-7">
+    <p className="mb-2 text-sm font-medium text-[#8A2E2B]">
+      Leitura do funcionamento
+    </p>
+
+    <h2 className="text-xl font-semibold text-[#2F2A24]">
+      Como esse padrão pode aparecer na prática
+    </h2>
+
+    <p className="mt-4 text-sm leading-6 text-[#5F564C]">
+      {resultado.functioning_reading ||
+        "Ainda não há leitura registrada para este perfil."}
+    </p>
+
+    <div className="mt-5 rounded-2xl border border-[#E5DDD2] bg-[#F7F3EC] p-4">
+      <p className="text-sm leading-6 text-[#5F564C]">
+        Use esta leitura como ponto de partida. Ela ganha mais precisão quando
+        você observa situações reais e percebe como reage diante de frustrações,
+        vínculos, escolhas e expectativas.
+      </p>
+    </div>
+  </article>
+
+  <article className="rounded-3xl border border-[#E8C7C0] bg-red-50/80 p-5 shadow-sm sm:p-7">
+    <p className="mb-2 text-sm font-medium text-red-700">
+      Ponto de atenção
+    </p>
+
+    <h2 className="text-xl font-semibold text-[#2F2A24]">
+      Onde esse padrão pode gerar sofrimento
+    </h2>
+
+    <p className="mt-4 text-sm leading-6 text-[#5F564C]">
+      {resultado.attention_point ||
+        "Ainda não há ponto de atenção registrado para este perfil."}
+    </p>
+
+    <p className="mt-5 text-sm leading-6 text-[#5F564C]">
+      Esse ponto não deve ser lido como falha pessoal. Ele indica uma região do
+      funcionamento que merece observação, cuidado e elaboração.
+    </p>
+  </article>
+</section>
+
+<section className="mt-4 grid gap-4 lg:grid-cols-2">
+  <article className="rounded-3xl border border-green-200 bg-green-50/80 p-5 shadow-sm sm:p-7">
+    <p className="mb-2 text-sm font-medium text-green-700">
+      Potencial
+    </p>
+
+    <h2 className="text-xl font-semibold text-[#2F2A24]">
+      O que pode se tornar força
+    </h2>
+
+    <p className="mt-4 text-sm leading-6 text-[#5F564C]">
+      {resultado.potential ||
+        "Ainda não há potencial registrado para este perfil."}
+    </p>
+  </article>
+
+  <article className="rounded-3xl border border-amber-200 bg-amber-50/80 p-5 shadow-sm sm:p-7">
+    <p className="mb-2 text-sm font-medium text-amber-700">
+      Foco de observação
+    </p>
+
+    <h2 className="text-xl font-semibold text-[#2F2A24]">
+      Comece observando isto
+    </h2>
+
+    <p className="mt-4 text-sm leading-6 text-[#5F564C]">
+      {resultado.observation_focus ||
+        "Ainda não há foco de observação registrado para este perfil."}
+    </p>
+  </article>
+</section> 
+
+<section className="mt-4 rounded-3xl bg-white p-5 shadow-sm sm:p-7">
+  <p className="mb-2 text-sm font-medium text-[#8A2E2B]">
+    Pergunta de auto-observação
   </p>
 
   <h2 className="text-xl font-semibold text-[#2F2A24]">
-    Como esse padrão tende a operar
+    Uma pergunta para levar para a vida real
   </h2>
 
-  <p className="mt-4 text-sm leading-6 text-[#5F564C]">
-    {resultado.functioning_reading ||
-      "Ainda não há leitura registrada para este perfil."}
-  </p>
-</article>
+  <div className="mt-5 rounded-3xl border border-[#D8C7B1] bg-[#FFF8EE] p-5">
+    <p className="text-lg font-semibold leading-8 text-[#2F2A24]">
+      {resultado.self_observation_question ||
+        "Ainda não há pergunta registrada para este perfil."}
+    </p>
+  </div>
 
-<article className="rounded-3xl border border-red-200 bg-red-50/70 p-5 shadow-sm sm:p-7">
-  <p className="mb-2 text-sm font-medium text-red-700">
-    Ponto de atenção
+  <p className="mt-4 text-sm leading-6 text-[#5F564C]">
+    Anote situações em que essa pergunta fizer sentido. A repetição observada no
+    cotidiano é mais importante do que tentar entender tudo de uma vez.
+  </p>
+</section>     
+
+<section className="mt-6 rounded-3xl bg-white p-5 shadow-sm sm:p-7">
+  <p className="mb-2 text-sm font-medium text-[#8A7A68]">
+    Próximo passo
   </p>
 
   <h2 className="text-xl font-semibold text-[#2F2A24]">
-  Onde esse padrão pode limitar sua resposta
+    Transformar resultado em observação real
   </h2>
 
-  <p className="mt-4 text-sm leading-6 text-[#5F564C]">
-    {resultado.attention_point ||
-      "Ainda não há ponto de atenção registrado para este perfil."}
-  </p>
-</article> 
-        </section>
-
-        <section className="mt-4 grid gap-4 lg:grid-cols-2">
-        <article className="rounded-3xl border border-green-200 bg-green-50/70 p-5 shadow-sm sm:p-7">
-  <p className="mb-2 text-sm font-medium text-green-700">
-    Potencial
+  <p className="mt-3 text-sm leading-6 text-[#5F564C]">
+    O teste mostra uma leitura inicial. O próximo passo é registrar situações
+    reais para observar como esse padrão aparece no cotidiano: o que você espera,
+    como interpreta, que emoção surge e como reage.
   </p>
 
-  <h2 className="text-xl font-semibold text-[#2F2A24]">
-  O que pode se tornar força
-  </h2>
+  <div className="mt-5 grid gap-4 md:grid-cols-3">
+    <article className="rounded-2xl border border-[#E5DDD2] bg-[#F7F3EC] p-4">
+      <p className="text-sm font-semibold text-[#2F2A24]">
+        1. Observe situações reais
+      </p>
 
-  <p className="mt-4 text-sm leading-6 text-[#5F564C]">
-    {resultado.potential ||
-      "Ainda não há potencial registrado para este perfil."}
-  </p>
-</article> 
+      <p className="mt-2 text-sm leading-6 text-[#5F564C]">
+        Perceba momentos em que a reação parece maior, repetida ou difícil de
+        controlar.
+      </p>
+    </article>
 
-<article className="rounded-3xl border border-amber-200 bg-amber-50/80 p-5 shadow-sm sm:p-7">
-  <p className="mb-2 text-sm font-medium text-amber-700">
-    Onde você precisa observar agora
-  </p>
+    <article className="rounded-2xl border border-[#E5DDD2] bg-[#F7F3EC] p-4">
+      <p className="text-sm font-semibold text-[#2F2A24]">
+        2. Registre o que aconteceu
+      </p>
 
-  <h2 className="text-xl font-semibold text-[#2F2A24]">
-    Comece por aqui
-  </h2>
+      <p className="mt-2 text-sm leading-6 text-[#5F564C]">
+        Anote pensamento, emoção, expectativa, realidade e comportamento.
+      </p>
+    </article>
 
-  <p className="mt-4 text-sm leading-6 text-[#5F564C]">
-    {resultado.observation_focus ||
-      "Ainda não há foco de observação registrado para este perfil."}
-  </p>
-</article>
-        </section>
+    <article className="rounded-2xl border border-[#E5DDD2] bg-[#F7F3EC] p-4">
+      <p className="text-sm font-semibold text-[#2F2A24]">
+        3. Leve para o acompanhamento
+      </p>
 
-        <section className="mt-4 rounded-3xl border border-[#E5DDD2] bg-white p-5 shadow-sm sm:p-7">
-          <p className="mb-2 text-sm font-medium text-[#8A2E2B]">
-            Pergunta de auto-observação
-          </p>
+      <p className="mt-2 text-sm leading-6 text-[#5F564C]">
+        Com o terapeuta, esses registros podem ajudar a construir uma devolutiva
+        mais precisa.
+      </p>
+    </article>
+  </div>
 
-          <h2 className="text-xl font-semibold text-[#2F2A24]">
-          Uma pergunta para observar na prática
-          </h2>
+  <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+    <Link
+      href="/painel"
+      className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl bg-[#2F2A24] px-5 text-sm font-semibold text-white shadow-sm transition hover:opacity-95 sm:w-auto"
+    >
+      Voltar ao painel
+    </Link>
 
-          <div className="mt-5 rounded-2xl border border-[#E5DDD2] bg-[#F7F3EC] p-4">
-            <p className="text-sm leading-6 text-[#5F564C]">
-              {resultado.self_observation_question ||
-                "Ainda não há pergunta registrada para este perfil."}
-            </p>
-          </div>
-        </section>
+    <Link
+      href="/situacoes/nova"
+      className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-[#D8C7B1] bg-[#FFF8EE] px-5 text-sm font-semibold text-[#8A2E2B] shadow-sm transition hover:bg-white sm:w-auto"
+    >
+      Registrar situação
+    </Link>
 
-        <section className="mt-6 rounded-3xl border border-[#E5DDD2] bg-white p-5 shadow-sm sm:p-7">
-          <p className="mb-2 text-sm font-medium text-[#8A7A68]">
-            Próximo passo
-          </p>
-
-          <h2 className="text-xl font-semibold text-[#2F2A24]">
-            Transformar resultado em observação real
-          </h2>
-
-          <p className="mt-3 text-sm leading-6 text-[#5F564C]">
-  O teste mostra uma leitura inicial. O próximo passo é registrar situações
-  reais para observar como esse padrão aparece no cotidiano.
-</p>
-
-          <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-            <Link
-              href="/painel"
-              className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl bg-[#2F2A24] px-5 text-sm font-semibold text-white shadow-sm transition hover:opacity-95 sm:w-auto"
-            >
-              Voltar ao painel
-            </Link>
-
-            <Link
-              href="/teste"
-              className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-[#D8C7B1] bg-white px-5 text-sm font-medium text-[#5F564C] shadow-sm transition hover:bg-[#FFF8EE] sm:w-auto"
-            >
-              Refazer teste
-            </Link>
-          </div>
-        </section>
+    <Link
+      href="/teste"
+      className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-[#D8C7B1] bg-white px-5 text-sm font-medium text-[#5F564C] shadow-sm transition hover:bg-[#FFF8EE] sm:w-auto"
+    >
+      Refazer teste
+    </Link>
+  </div>
+</section>  
       </section>
     </main>
   );
