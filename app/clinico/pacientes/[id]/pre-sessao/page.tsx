@@ -500,36 +500,62 @@ const [preparacoes, setPreparacoes] = useState<PreparacaoSessao[]>([]);
       id="topo-pre-sessao"
       className="min-h-screen bg-[#F7F3EC] px-4 py-6 text-[#2F2A24] sm:px-6 lg:px-8"
     >
-      <style>{`
-        @media print {
-          .no-print {
-            display: none !important;
-          }
+    <style>{`
+  @media print {
+    .no-print {
+      display: none !important;
+    }
 
-          body {
-            background: white !important;
-          }
+    body {
+      background: white !important;
+    }
 
-          main {
-            background: white !important;
-          }
+    main {
+      background: white !important;
+      padding: 12px !important;
+    }
 
-          .print-card {
-            box-shadow: none !important;
-            border-color: #ddd !important;
-            break-inside: avoid;
-          }
+    .print-card {
+      box-shadow: none !important;
+      border-color: #ddd !important;
+      break-inside: avoid;
+    }
 
-          textarea,
-          input,
-          select {
-            border: 1px solid #ddd !important;
-          }
-        }
-      `}</style>
+    .print-header {
+      margin-bottom: 12px !important;
+      padding: 14px !important;
+      border-radius: 18px !important;
+    }
+
+    .print-header h1 {
+      font-size: 20px !important;
+      line-height: 1.25 !important;
+    }
+
+    .print-header p {
+      font-size: 12px !important;
+      line-height: 1.45 !important;
+      margin-top: 4px !important;
+    }
+
+    .print-compact-text {
+      display: none !important;
+    }
+
+    section {
+      margin-bottom: 12px !important;
+    }
+
+    textarea,
+    input,
+    select {
+      border: 1px solid #ddd !important;
+    }
+  }
+`}</style>  
 
       <section className="mx-auto w-full max-w-6xl">
-        <header className="print-card mb-6 rounded-3xl border border-[#E5DDD2] bg-white p-5 shadow-sm sm:p-7">
+      <header className="print-card print-header mb-6 rounded-3xl border border-[#E5DDD2] bg-white p-5 shadow-sm sm:p-7">
           <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
             <div className="min-w-0">
               <p className="mb-2 text-sm font-medium text-[#8A2E2B]">
@@ -544,12 +570,12 @@ const [preparacoes, setPreparacoes] = useState<PreparacaoSessao[]>([]);
                 {paciente.patient_email}
               </p>
 
-              <p className="mt-3 text-sm leading-6 text-[#5F564C]">
+              <p className="print-compact-text mt-3 text-sm leading-6 text-[#5F564C]">
   Esta página reúne informações clínicas relevantes para apoiar a preparação
   do terapeuta antes da sessão. O conteúdo não produz diagnóstico automático;
   funciona como material de organização para orientar a escuta e a condução
   clínica.
-</p>
+</p>  
             </div>
 
             <div className="no-print flex w-full flex-col gap-3 sm:flex-row lg:w-auto">
@@ -905,7 +931,7 @@ const [preparacoes, setPreparacoes] = useState<PreparacaoSessao[]>([]);
           </article>
         </section>
 
-        <section className="no-print mb-6 rounded-3xl border border-[#E5DDD2] bg-white p-5 shadow-sm sm:p-7">
+        <section className="print-card mb-6 rounded-3xl border border-[#E5DDD2] bg-white p-5 shadow-sm sm:p-7">
   <div className="mb-5">
     <p className="mb-2 text-sm font-medium text-[#8A2E2B]">
       Preparação do terapeuta
@@ -1084,7 +1110,7 @@ const [preparacoes, setPreparacoes] = useState<PreparacaoSessao[]>([]);
           </div>
         </section>
 
-        <section className="print-card rounded-3xl border border-[#E5DDD2] bg-white p-5 shadow-sm sm:p-7">
+        <section className="no-print rounded-3xl border border-[#E5DDD2] bg-white p-5 shadow-sm sm:p-7">
           <div className="mb-5">
             <p className="mb-2 text-sm font-medium text-[#8A2E2B]">
               Preparações anteriores
@@ -1129,18 +1155,25 @@ const [preparacoes, setPreparacoes] = useState<PreparacaoSessao[]>([]);
                       </div>
 
                       <div className="no-print flex flex-wrap gap-2 sm:justify-end">
-                        <span className="rounded-2xl border border-[#D8C7B1] bg-white px-3 py-2 text-xs font-semibold capitalize text-[#5F564C]">
-                          {preparacao.status}
-                        </span>
+  <span className="rounded-2xl border border-[#D8C7B1] bg-white px-3 py-2 text-xs font-semibold capitalize text-[#5F564C]">
+    {preparacao.status}
+  </span>
 
-                        <button
-                          type="button"
-                          onClick={() => handleEditarPreparacao(preparacao)}
-                          className="rounded-2xl border border-[#D8C7B1] bg-white px-3 py-2 text-xs font-semibold text-[#5F564C] transition hover:bg-[#FFF8EE]"
-                        >
-                          Editar
-                        </button>
-                      </div>
+  <Link
+    href={`/clinico/pacientes/${paciente.patient_id}/pre-sessao/${preparacao.id}`}
+    className="rounded-2xl border border-[#D8C7B1] bg-white px-3 py-2 text-xs font-semibold text-[#5F564C] transition hover:bg-[#FFF8EE]"
+  >
+    Abrir
+  </Link>
+
+  <button
+    type="button"
+    onClick={() => handleEditarPreparacao(preparacao)}
+    className="rounded-2xl border border-[#D8C7B1] bg-white px-3 py-2 text-xs font-semibold text-[#5F564C] transition hover:bg-[#FFF8EE]"
+  >
+    Editar
+  </button>
+</div>
                     </div>
 
                     {preparacao.focus_points && (
