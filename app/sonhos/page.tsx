@@ -87,10 +87,10 @@ export default function SonhosPage() {
   const [erro, setErro] = useState("");
   const [sucesso, setSucesso] = useState("");
   const reconhecimentoRef = useRef<SpeechRecognitionInstance | null>(null);
-  const ultimoResultadoTranscritoRef = useRef(0);
-  const [transcricaoSuportada, setTranscricaoSuportada] = useState(false);
-  const [transcrevendoAudio, setTranscrevendoAudio] = useState(false);
-  const [textoParcialTranscricao, setTextoParcialTranscricao] = useState("");
+const textoTranscritoRef = useRef("");
+const [transcricaoSuportada, setTranscricaoSuportada] = useState(false);
+const [transcrevendoAudio, setTranscrevendoAudio] = useState(false);
+const [textoParcialTranscricao, setTextoParcialTranscricao] = useState("");
 
   const sonhosOrdenados = useMemo(() => {
     return [...sonhos].sort((a, b) => {
@@ -170,7 +170,7 @@ export default function SonhosPage() {
   function iniciarTranscricaoPorVoz() {
     limparAvisos();
     setTextoParcialTranscricao("");
-    ultimoResultadoTranscritoRef.current = 0;
+    textoTranscritoRef.current = ""; 
 
     if (typeof window === "undefined") return;
 
@@ -197,35 +197,19 @@ export default function SonhosPage() {
     reconhecimento.interimResults = true;
 
     reconhecimento.onresult = (event) => {
-      let textoFinalNovo = "";
-      let textoParcial = "";
-
-      for (
-        let index = ultimoResultadoTranscritoRef.current;
-        index < event.results.length;
-        index += 1
-      ) {
+      let textoCompleto = "";
+    
+      for (let index = 0; index < event.results.length; index += 1) {
         const resultado = event.results[index];
         const transcricao = resultado[0]?.transcript || "";
-
-        if (resultado.isFinal) {
-          textoFinalNovo += ` ${transcricao.trim()}`;
-          ultimoResultadoTranscritoRef.current = index + 1;
-        } else {
-          textoParcial += ` ${transcricao.trim()}`;
-        }
+    
+        textoCompleto += ` ${transcricao.trim()}`;
       }
-
-      if (textoFinalNovo.trim()) {
-        setForm((atual) => ({
-          ...atual,
-          dream_report: atual.dream_report.trim()
-            ? `${atual.dream_report.trim()}\n\n${textoFinalNovo.trim()}`
-            : textoFinalNovo.trim(),
-        }));
-      }
-
-      setTextoParcialTranscricao(textoParcial.trim());
+    
+      const textoLimpo = textoCompleto.replace(/\s+/g, " ").trim();
+    
+      textoTranscritoRef.current = textoLimpo;
+      setTextoParcialTranscricao(textoLimpo);
     };
 
     reconhecimento.onerror = (event) => {
@@ -257,14 +241,25 @@ export default function SonhosPage() {
   }
 
   function pararTranscricaoPorVoz() {
+    const textoFinal = textoTranscritoRef.current.trim();
+  
     if (reconhecimentoRef.current) {
       reconhecimentoRef.current.stop();
     }
-
-    ultimoResultadoTranscritoRef.current = 0;
+  
+    if (textoFinal) {
+      setForm((atual) => ({
+        ...atual,
+        dream_report: atual.dream_report.trim()
+          ? `${atual.dream_report.trim()}\n\n${textoFinal}`
+          : textoFinal,
+      }));
+    }
+  
+    textoTranscritoRef.current = "";
     setTranscrevendoAudio(false);
     setTextoParcialTranscricao("");
-  }
+  } 
 
   function validarFormulario() {
     if (!form.dream_date) {
@@ -313,9 +308,9 @@ export default function SonhosPage() {
       reconhecimentoRef.current = null;
     }
 
-    ultimoResultadoTranscritoRef.current = 0;
+    textoTranscritoRef.current = "";
     setTranscrevendoAudio(false);
-    setTextoParcialTranscricao("");
+    setTextoParcialTranscricao(""); 
     
 
     const payload = {
@@ -402,11 +397,10 @@ export default function SonhosPage() {
       reconhecimentoRef.current = null;
     }
 
-    ultimoResultadoTranscritoRef.current = 0;
+    textoTranscritoRef.current = "";
     setTranscrevendoAudio(false);
     setTextoParcialTranscricao("");
-    setEditandoId(null);
-    setForm(emptyForm);
+    setEditandoId(null);  
   }
 
   async function excluirSonho(id: string) {
@@ -570,10 +564,12 @@ export default function SonhosPage() {
                   </p>
 
                   {textoParcialTranscricao && (
-                    <p className="mt-3 rounded-xl bg-[#FFF8EE] px-3 py-2 text-sm leading-6 text-[#5F564C]">
-                      {textoParcialTranscricao}
-                    </p>
-                  )}
+  <div className="mt-3 max-h-40 overflow-y-auto rounded-xl bg-[#FFF8EE] px-3 py-2 text-sm leading-6 text-[#5F564C]">
+    <p className="whitespace-pre-wrap break-words [overflow-wrap:anywhere]">
+      {textoParcialTranscricao}
+    </p>
+  </div>
+)} 
                 </div>
               )}
             </div>
