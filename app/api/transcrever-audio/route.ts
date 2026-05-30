@@ -7,13 +7,25 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
+function getExtensaoPorTipo(mimeType: string) {
+  if (mimeType.includes("mp4")) return "mp4";
+  if (mimeType.includes("mpeg")) return "mp3";
+  if (mimeType.includes("mp3")) return "mp3";
+  if (mimeType.includes("wav")) return "wav";
+  if (mimeType.includes("ogg")) return "ogg";
+  if (mimeType.includes("webm")) return "webm";
+  if (mimeType.includes("m4a")) return "m4a";
+
+  return "webm";
+}
+
 export async function POST(request: NextRequest) {
   try {
     if (!process.env.OPENAI_API_KEY) {
       return NextResponse.json(
         {
           error:
-            "A chave de transcrição ainda não foi configurada no servidor.",
+            "A chave OPENAI_API_KEY não foi encontrada no servidor. Configure no .env.local e também na Vercel.",
         },
         { status: 500 }
       );
@@ -25,7 +37,7 @@ export async function POST(request: NextRequest) {
     if (!audio || !(audio instanceof File)) {
       return NextResponse.json(
         {
-          error: "Nenhum áudio foi enviado para transcrição.",
+          error: "Nenhum arquivo de áudio foi recebido pela rota.",
         },
         { status: 400 }
       );
@@ -34,7 +46,7 @@ export async function POST(request: NextRequest) {
     if (audio.size === 0) {
       return NextResponse.json(
         {
-          error: "O áudio enviado está vazio. Grave novamente e tente transcrever.",
+          error: "O arquivo de áudio chegou vazio. Grave novamente e tente outra vez.",
         },
         { status: 400 }
       );
@@ -46,14 +58,29 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           error:
-            "O áudio está muito grande. Grave um relato mais curto ou tente novamente.",
+            "O áudio está muito grande. Grave um relato mais curto e tente novamente.",
         },
         { status: 413 }
       );
     }
 
+    const mimeType = audio.type || "audio/webm";
+    const extensao = getExtensaoPorTipo(mimeType);
+
+    const audioBuffer = Buffer.from(await audio.arrayBuffer());
+
+    const arquivo = new File([audioBuffer], `sonho.${extensao}`, {
+      type: mimeType,
+    });
+
+    console.log("ÁUDIO RECEBIDO PARA TRANSCRIÇÃO:", {
+      name: arquivo.name,
+      type: arquivo.type,
+      size: arquivo.size,
+    });
+
     const transcription = await openai.audio.transcriptions.create({
-      file: audio,
+      file: arquivo,
       model: "gpt-4o-mini-transcribe",
       language: "pt",
       response_format: "json",
@@ -65,7 +92,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           error:
-            "A transcrição não retornou texto. Tente gravar novamente falando mais perto do microfone.",
+            "A transcrição foi concluída, mas não retornou texto. Tente gravar novamente falando mais perto do microfone.",
         },
         { status: 422 }
       );
@@ -75,12 +102,16 @@ export async function POST(request: NextRequest) {
       text: texto,
     });
   } catch (error) {
-    console.error("ERRO AO TRANSCREVER ÁUDIO:", error);
+    console.error("ERRO DETALHADO AO TRANSCREVER ÁUDIO:", error);
+
+    const mensagem =
+      error instanceof Error
+        ? error.message
+        : "Erro desconhecido ao transcrever áudio.";
 
     return NextResponse.json(
       {
-        error:
-          "Não foi possível transcrever o áudio agora. Tente novamente em instantes ou registre o sonho manualmente.",
+        error: `Não foi possível transcrever o áudio agora. Detalhe técnico: ${mensagem}`,
       },
       { status: 500 }
     );
