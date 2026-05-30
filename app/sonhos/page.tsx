@@ -87,6 +87,7 @@ export default function SonhosPage() {
   const [erro, setErro] = useState("");
   const [sucesso, setSucesso] = useState("");
   const reconhecimentoRef = useRef<SpeechRecognitionInstance | null>(null);
+  const ultimoResultadoTranscritoRef = useRef(0);
   const [transcricaoSuportada, setTranscricaoSuportada] = useState(false);
   const [transcrevendoAudio, setTranscrevendoAudio] = useState(false);
   const [textoParcialTranscricao, setTextoParcialTranscricao] = useState("");
@@ -169,6 +170,7 @@ export default function SonhosPage() {
   function iniciarTranscricaoPorVoz() {
     limparAvisos();
     setTextoParcialTranscricao("");
+    ultimoResultadoTranscritoRef.current = 0;
 
     if (typeof window === "undefined") return;
 
@@ -195,24 +197,31 @@ export default function SonhosPage() {
     reconhecimento.interimResults = true;
 
     reconhecimento.onresult = (event) => {
-      let textoFinal = "";
+      let textoFinalNovo = "";
       let textoParcial = "";
 
-      for (let index = 0; index < event.results.length; index += 1) {
+      for (
+        let index = ultimoResultadoTranscritoRef.current;
+        index < event.results.length;
+        index += 1
+      ) {
         const resultado = event.results[index];
         const transcricao = resultado[0]?.transcript || "";
 
         if (resultado.isFinal) {
-          textoFinal += transcricao;
+          textoFinalNovo += ` ${transcricao.trim()}`;
+          ultimoResultadoTranscritoRef.current = index + 1;
         } else {
-          textoParcial += transcricao;
+          textoParcial += ` ${transcricao.trim()}`;
         }
       }
 
-      if (textoFinal.trim()) {
+      if (textoFinalNovo.trim()) {
         setForm((atual) => ({
           ...atual,
-          dream_report: `${atual.dream_report.trim() ? `${atual.dream_report.trim()}\n\n` : ""}${textoFinal.trim()}`,
+          dream_report: atual.dream_report.trim()
+            ? `${atual.dream_report.trim()}\n\n${textoFinalNovo.trim()}`
+            : textoFinalNovo.trim(),
         }));
       }
 
@@ -252,6 +261,7 @@ export default function SonhosPage() {
       reconhecimentoRef.current.stop();
     }
 
+    ultimoResultadoTranscritoRef.current = 0;
     setTranscrevendoAudio(false);
     setTextoParcialTranscricao("");
   }
@@ -303,8 +313,10 @@ export default function SonhosPage() {
       reconhecimentoRef.current = null;
     }
 
+    ultimoResultadoTranscritoRef.current = 0;
     setTranscrevendoAudio(false);
     setTextoParcialTranscricao("");
+    
 
     const payload = {
       patient_id: userId,
@@ -390,6 +402,7 @@ export default function SonhosPage() {
       reconhecimentoRef.current = null;
     }
 
+    ultimoResultadoTranscritoRef.current = 0;
     setTranscrevendoAudio(false);
     setTextoParcialTranscricao("");
     setEditandoId(null);
