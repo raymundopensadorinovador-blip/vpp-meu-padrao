@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
@@ -45,16 +45,6 @@ export default function SonhosPage() {
   const [salvando, setSalvando] = useState(false);
   const [erro, setErro] = useState("");
   const [sucesso, setSucesso] = useState("");
-
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const audioChunksRef = useRef<BlobPart[]>([]);
-  const audioUrlRef = useRef<string | null>(null);
-
-  const [gravandoAudio, setGravandoAudio] = useState(false);
-  const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
-  const [audioUrl, setAudioUrl] = useState("");
-  const [transcrevendoAudio, setTranscrevendoAudio] = useState(false);
-  const [gravacaoSuportada, setGravacaoSuportada] = useState(false);
 
   const sonhosOrdenados = useMemo(() => {
     return [...sonhos].sort((a, b) => {
@@ -101,25 +91,6 @@ export default function SonhosPage() {
     carregar();
   }, [router]);
 
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-
-    setGravacaoSuportada(
-      typeof navigator.mediaDevices?.getUserMedia === "function" &&
-        typeof window.MediaRecorder !== "undefined"
-    ); 
-
-    return () => {
-      if (mediaRecorderRef.current?.state === "recording") {
-        mediaRecorderRef.current.stop();
-      }
-
-      if (audioUrlRef.current) {
-        URL.revokeObjectURL(audioUrlRef.current);
-      }
-    };
-  }, []);
-
   function limparAvisos() {
     setErro("");
     setSucesso("");
@@ -132,133 +103,6 @@ export default function SonhosPage() {
       ...atual,
       [campo]: valor,
     }));
-  }
-
-  function limparAudioAtual() {
-    if (audioUrlRef.current) {
-      URL.revokeObjectURL(audioUrlRef.current);
-      audioUrlRef.current = null;
-    }
-
-    setAudioBlob(null);
-    setAudioUrl("");
-    audioChunksRef.current = [];
-  }
-
-  async function iniciarGravacaoAudio() {
-    limparAvisos();
-
-    if (!gravacaoSuportada) {
-      setErro(
-        "Este navegador não oferece suporte para gravação de áudio. Você ainda pode escrever o sonho manualmente."
-      );
-      return;
-    }
-
-    try {
-      limparAudioAtual();
-
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-
-      const mediaRecorder = new MediaRecorder(stream);
-      mediaRecorderRef.current = mediaRecorder;
-      audioChunksRef.current = [];
-
-      mediaRecorder.ondataavailable = (event) => {
-        if (event.data.size > 0) {
-          audioChunksRef.current.push(event.data);
-        }
-      };
-
-      mediaRecorder.onstop = () => {
-        const novoAudioBlob = new Blob(audioChunksRef.current, {
-          type: mediaRecorder.mimeType || "audio/webm",
-        });
-
-        const novoAudioUrl = URL.createObjectURL(novoAudioBlob);
-
-        audioUrlRef.current = novoAudioUrl;
-        setAudioBlob(novoAudioBlob);
-        setAudioUrl(novoAudioUrl);
-        setGravandoAudio(false);
-
-        stream.getTracks().forEach((track) => track.stop());
-      };
-
-      mediaRecorder.start();
-      setGravandoAudio(true);
-    } catch (error) {
-      setGravandoAudio(false);
-
-      setErro(
-        "Não foi possível acessar o microfone. Verifique a permissão do navegador e tente novamente."
-      );
-    }
-  }
-
-  function pararGravacaoAudio() {
-    if (mediaRecorderRef.current?.state === "recording") {
-      mediaRecorderRef.current.stop();
-    }
-
-    setGravandoAudio(false);
-  }
-
-  async function transcreverAudio() {
-    limparAvisos();
-
-    if (!audioBlob) {
-      setErro("Grave um áudio antes de tentar transcrever.");
-      return;
-    }
-
-    setTranscrevendoAudio(true);
-
-    try {
-      const formData = new FormData();
-      formData.append("audio", audioBlob, "sonho.webm");
-
-      const resposta = await fetch("/api/transcrever-audio", {
-        method: "POST",
-        body: formData,
-      });
-
-      const resultado = await resposta.json();
-
-      if (!resposta.ok) {
-        setErro(
-          resultado?.error ||
-            "Não foi possível transcrever o áudio agora. Tente novamente ou escreva o sonho manualmente."
-        );
-        setTranscrevendoAudio(false);
-        return;
-      }
-
-      const textoTranscrito = String(resultado?.text || "").trim();
-
-      if (!textoTranscrito) {
-        setErro(
-          "A transcrição não retornou texto. Tente gravar novamente, falando mais perto do microfone."
-        );
-        setTranscrevendoAudio(false);
-        return;
-      }
-
-      setForm((atual) => ({
-        ...atual,
-        dream_report: atual.dream_report.trim()
-          ? `${atual.dream_report.trim()}\n\n${textoTranscrito}`
-          : textoTranscrito,
-      }));
-
-      setSucesso("Áudio transcrito e adicionado ao relato do sonho.");
-      setTranscrevendoAudio(false);
-    } catch (error) {
-      setErro(
-        "A rota de transcrição ainda não está disponível ou houve falha na conexão. O áudio foi gravado, mas a transcrição não foi concluída."
-      );
-      setTranscrevendoAudio(false);
-    }
   }
 
   function validarFormulario() {
@@ -304,10 +148,6 @@ export default function SonhosPage() {
 
     setSalvando(true);
 
-    if (mediaRecorderRef.current?.state === "recording") {
-      mediaRecorderRef.current.stop();
-    }
-
     const payload = {
       patient_id: userId,
       dream_date: form.dream_date,
@@ -345,7 +185,6 @@ export default function SonhosPage() {
       setSucesso("Sonho atualizado com sucesso.");
       setEditandoId(null);
       setForm(emptyForm);
-      limparAudioAtual();
       setSalvando(false);
       return;
     }
@@ -365,19 +204,11 @@ export default function SonhosPage() {
     setSonhos((atuais) => [data as DreamEntry, ...atuais]);
     setSucesso("Sonho registrado com sucesso.");
     setForm(emptyForm);
-    limparAudioAtual();
     setSalvando(false);
   }
 
   function iniciarEdicao(sonho: DreamEntry) {
     limparAvisos();
-    limparAudioAtual();
-
-    if (mediaRecorderRef.current?.state === "recording") {
-      mediaRecorderRef.current.stop();
-    }
-
-    setGravandoAudio(false);
     setEditandoId(sonho.id);
 
     setForm({
@@ -397,15 +228,8 @@ export default function SonhosPage() {
 
   function cancelarEdicao() {
     limparAvisos();
-
-    if (mediaRecorderRef.current?.state === "recording") {
-      mediaRecorderRef.current.stop();
-    }
-
-    setGravandoAudio(false);
     setEditandoId(null);
     setForm(emptyForm);
-    limparAudioAtual();
   }
 
   async function excluirSonho(id: string) {
@@ -518,112 +342,18 @@ export default function SonhosPage() {
           </div>
 
           <form onSubmit={salvarSonho} className="space-y-4">
-            <div className="rounded-2xl border border-[#E5DDD2] bg-[#F7F3EC] p-4">
-              <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-                <div className="min-w-0">
-                  <p className="text-sm font-semibold text-[#2F2A24]">
-                    Registrar por áudio
-                  </p>
+          <div className="rounded-2xl border border-[#E5DDD2] bg-[#F7F3EC] p-4">
+              <p className="text-sm font-semibold text-[#2F2A24]">
+                Registro manual do sonho
+              </p>
 
-                  <p className="mt-2 text-sm leading-6 text-[#6F6257]">
-                    Grave o relato do sonho com calma. Depois você poderá ouvir,
-                    descartar ou tentar transcrever o áudio para preencher o
-                    campo de relato.
-                  </p>
-
-                  <p className="mt-2 text-xs leading-5 text-[#8A7A68]">
-                    A gravação ajuda a preservar o sonho enquanto ele ainda está
-                    fresco. Revise o texto antes de salvar o registro.
-                  </p>
-                </div>
-
-                <div className="flex w-full flex-col gap-2 lg:w-auto">
-                  {!gravandoAudio ? (
-                    <button
-                      type="button"
-                      onClick={iniciarGravacaoAudio}
-                      disabled={!gravacaoSuportada || salvando || transcrevendoAudio}
-                      className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl bg-[#2F2A24] px-5 text-sm font-semibold text-white shadow-sm transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-60 lg:w-auto"
-                    >
-                      🎙️ Gravar áudio
-                    </button>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={pararGravacaoAudio}
-                      className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-red-200 bg-red-50 px-5 text-sm font-semibold text-red-700 shadow-sm transition hover:bg-red-100 lg:w-auto"
-                    >
-                      Parar gravação
-                    </button>
-                  )}
-
-                  {!gravacaoSuportada && (
-                    <p className="text-xs leading-5 text-[#8A7A68] lg:max-w-[260px]">
-                      Este navegador não oferece suporte para gravação de áudio.
-                      Use o Chrome ou registre o sonho por texto.
-                    </p>
-                  )}
-                </div>
-              </div>
-
-              {gravandoAudio && (
-                <div className="mt-4 rounded-2xl border border-red-100 bg-red-50 px-4 py-3">
-                  <p className="text-sm font-semibold text-red-700">
-                    Gravação em andamento
-                  </p>
-
-                  <p className="mt-1 text-sm leading-6 text-red-700">
-                    Fale o sonho com calma. Quando terminar, toque em parar
-                    gravação.
-                  </p>
-                </div>
-              )}
-
-              {audioUrl && (
-                <div className="mt-4 rounded-2xl border border-[#D8C7B1] bg-white p-4">
-                  <p className="text-sm font-semibold text-[#2F2A24]">
-                    Áudio gravado
-                  </p>
-
-                  <p className="mt-2 text-sm leading-6 text-[#6F6257]">
-                    Ouça o áudio antes de transcrever. Se não ficou claro,
-                    descarte e grave novamente.
-                  </p>
-
-                  <audio controls src={audioUrl} className="mt-3 w-full">
-                    Seu navegador não conseguiu reproduzir este áudio.
-                  </audio>
-
-                  <div className="mt-4 flex flex-col gap-3 sm:flex-row">
-                    <button
-                      type="button"
-                      onClick={transcreverAudio}
-                      disabled={transcrevendoAudio || salvando}
-                      className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl bg-[#2F2A24] px-5 text-sm font-semibold text-white shadow-sm transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
-                    >
-                      {transcrevendoAudio
-                        ? "Transcrevendo..."
-                        : "Transcrever áudio"}
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={limparAudioAtual}
-                      disabled={transcrevendoAudio || salvando}
-                      className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-[#D8C7B1] bg-white px-5 text-sm font-semibold text-[#5F564C] shadow-sm transition hover:bg-[#FFF8EE] disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
-                    >
-                      Descartar áudio
-                    </button>
-                  </div>
-
-                  <p className="mt-3 text-xs leading-5 text-[#8A7A68]">
-                    A transcrição depende da rota interna de áudio. Se ela ainda
-                    não estiver criada, o app manterá o áudio apenas como prévia
-                    nesta tela.
-                  </p>
-                </div>
-              )}
-            </div>
+              <p className="mt-2 text-sm leading-6 text-[#6F6257]">
+                Escreva o sonho da forma como ele vier à memória. Não precisa
+                organizar tudo de imediato. O mais importante é preservar o
+                relato, as emoções e as imagens principais antes que os detalhes
+                se percam.
+              </p>
+            </div> 
 
             <label className="space-y-1">
               <span className="text-sm font-medium text-[#5F564C]">
@@ -791,9 +521,9 @@ export default function SonhosPage() {
             </div>
 
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-              <button
+            <button
                 type="submit"
-                disabled={salvando || gravandoAudio || transcrevendoAudio}
+                disabled={salvando}
                 className="inline-flex w-full items-center justify-center rounded-2xl bg-[#2F2A24] px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
               >
                 {salvando
@@ -807,7 +537,7 @@ export default function SonhosPage() {
                 <button
                   type="button"
                   onClick={cancelarEdicao}
-                  disabled={salvando || transcrevendoAudio}
+                  disabled={salvando}
                   className="inline-flex w-full items-center justify-center rounded-2xl border border-[#D8C7B1] bg-white px-5 py-3 text-sm font-medium text-[#5F564C] transition hover:bg-[#F7F3EC] disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
                 >
                   Cancelar edição
