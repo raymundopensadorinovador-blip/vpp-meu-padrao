@@ -33,47 +33,6 @@ const emptyForm = {
   possible_context: "",
 };
 
-type SpeechRecognitionResultItem = {
-  transcript: string;
-};
-
-type SpeechRecognitionResult = {
-  isFinal: boolean;
-  [index: number]: SpeechRecognitionResultItem;
-};
-
-type SpeechRecognitionResultList = {
-  length: number;
-  [index: number]: SpeechRecognitionResult;
-};
-
-type SpeechRecognitionEvent = {
-  results: SpeechRecognitionResultList;
-};
-
-type SpeechRecognitionErrorEvent = {
-  error: string;
-};
-
-type SpeechRecognitionInstance = {
-  lang: string;
-  continuous: boolean;
-  interimResults: boolean;
-  start: () => void;
-  stop: () => void;
-  abort: () => void;
-  onresult: ((event: SpeechRecognitionEvent) => void) | null;
-  onerror: ((event: SpeechRecognitionErrorEvent) => void) | null;
-  onend: (() => void) | null;
-};
-
-type SpeechRecognitionConstructor = new () => SpeechRecognitionInstance;
-
-type WindowWithSpeechRecognition = Window & {
-  SpeechRecognition?: SpeechRecognitionConstructor;
-  webkitSpeechRecognition?: SpeechRecognitionConstructor;
-};
-
 export default function SonhosPage() {
   const router = useRouter();
 
@@ -86,11 +45,16 @@ export default function SonhosPage() {
   const [salvando, setSalvando] = useState(false);
   const [erro, setErro] = useState("");
   const [sucesso, setSucesso] = useState("");
-  const reconhecimentoRef = useRef<SpeechRecognitionInstance | null>(null);
-const textoTranscritoRef = useRef("");
-const [transcricaoSuportada, setTranscricaoSuportada] = useState(false);
-const [transcrevendoAudio, setTranscrevendoAudio] = useState(false);
-const [textoParcialTranscricao, setTextoParcialTranscricao] = useState("");
+
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<BlobPart[]>([]);
+  const audioUrlRef = useRef<string | null>(null);
+
+  const [gravandoAudio, setGravandoAudio] = useState(false);
+  const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
+  const [audioUrl, setAudioUrl] = useState("");
+  const [transcrevendoAudio, setTranscrevendoAudio] = useState(false);
+  const [gravacaoSuportada, setGravacaoSuportada] = useState(false);
 
   const sonhosOrdenados = useMemo(() => {
     return [...sonhos].sort((a, b) => {
@@ -140,16 +104,18 @@ const [textoParcialTranscricao, setTextoParcialTranscricao] = useState("");
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    const janela = window as WindowWithSpeechRecognition;
-    const SpeechRecognition =
-      janela.SpeechRecognition || janela.webkitSpeechRecognition;
-
-    setTranscricaoSuportada(Boolean(SpeechRecognition));
+    setGravacaoSuportada(
+      typeof navigator.mediaDevices?.getUserMedia === "function" &&
+        typeof window.MediaRecorder !== "undefined"
+    ); 
 
     return () => {
-      if (reconhecimentoRef.current) {
-        reconhecimentoRef.current.abort();
-        reconhecimentoRef.current = null;
+      if (mediaRecorderRef.current?.state === "recording") {
+        mediaRecorderRef.current.stop();
+      }
+
+      if (audioUrlRef.current) {
+        URL.revokeObjectURL(audioUrlRef.current);
       }
     };
   }, []);
@@ -161,105 +127,139 @@ const [textoParcialTranscricao, setTextoParcialTranscricao] = useState("");
 
   function atualizarCampo(campo: keyof typeof emptyForm, valor: string) {
     limparAvisos();
+
     setForm((atual) => ({
       ...atual,
       [campo]: valor,
     }));
   }
 
-  function iniciarTranscricaoPorVoz() {
+  function limparAudioAtual() {
+    if (audioUrlRef.current) {
+      URL.revokeObjectURL(audioUrlRef.current);
+      audioUrlRef.current = null;
+    }
+
+    setAudioBlob(null);
+    setAudioUrl("");
+    audioChunksRef.current = [];
+  }
+
+  async function iniciarGravacaoAudio() {
     limparAvisos();
-    setTextoParcialTranscricao("");
-    textoTranscritoRef.current = ""; 
 
-    if (typeof window === "undefined") return;
-
-    const janela = window as WindowWithSpeechRecognition;
-    const SpeechRecognition =
-      janela.SpeechRecognition || janela.webkitSpeechRecognition;
-
-    if (!SpeechRecognition) {
+    if (!gravacaoSuportada) {
       setErro(
-        "Seu navegador não oferece suporte para transcrição por voz. Você ainda pode escrever o sonho manualmente."
+        "Este navegador não oferece suporte para gravação de áudio. Você ainda pode escrever o sonho manualmente."
       );
       return;
     }
 
-    if (reconhecimentoRef.current) {
-      reconhecimentoRef.current.abort();
-      reconhecimentoRef.current = null;
+    try {
+      limparAudioAtual();
+
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
+      audioChunksRef.current = [];
+
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          audioChunksRef.current.push(event.data);
+        }
+      };
+
+      mediaRecorder.onstop = () => {
+        const novoAudioBlob = new Blob(audioChunksRef.current, {
+          type: mediaRecorder.mimeType || "audio/webm",
+        });
+
+        const novoAudioUrl = URL.createObjectURL(novoAudioBlob);
+
+        audioUrlRef.current = novoAudioUrl;
+        setAudioBlob(novoAudioBlob);
+        setAudioUrl(novoAudioUrl);
+        setGravandoAudio(false);
+
+        stream.getTracks().forEach((track) => track.stop());
+      };
+
+      mediaRecorder.start();
+      setGravandoAudio(true);
+    } catch (error) {
+      setGravandoAudio(false);
+
+      setErro(
+        "Não foi possível acessar o microfone. Verifique a permissão do navegador e tente novamente."
+      );
     }
-
-    const reconhecimento = new SpeechRecognition();
-
-    reconhecimento.lang = "pt-BR";
-    reconhecimento.continuous = true;
-    reconhecimento.interimResults = true;
-
-    reconhecimento.onresult = (event) => {
-      let textoCompleto = "";
-    
-      for (let index = 0; index < event.results.length; index += 1) {
-        const resultado = event.results[index];
-        const transcricao = resultado[0]?.transcript || "";
-    
-        textoCompleto += ` ${transcricao.trim()}`;
-      }
-    
-      const textoLimpo = textoCompleto.replace(/\s+/g, " ").trim();
-    
-      textoTranscritoRef.current = textoLimpo;
-      setTextoParcialTranscricao(textoLimpo);
-    };
-
-    reconhecimento.onerror = (event) => {
-      console.error("ERRO NA TRANSCRIÇÃO POR VOZ:", event.error);
-
-      if (event.error === "not-allowed") {
-        setErro(
-          "Permissão do microfone negada. Libere o microfone no navegador para usar a transcrição por voz."
-        );
-      } else {
-        setErro(
-          "Não foi possível continuar a transcrição por voz. Você pode tentar novamente ou escrever o sonho manualmente."
-        );
-      }
-
-      setTranscrevendoAudio(false);
-      setTextoParcialTranscricao("");
-    };
-
-    reconhecimento.onend = () => {
-      setTranscrevendoAudio(false);
-      setTextoParcialTranscricao("");
-      reconhecimentoRef.current = null;
-    };
-
-    reconhecimentoRef.current = reconhecimento;
-    reconhecimento.start();
-    setTranscrevendoAudio(true);
   }
 
-  function pararTranscricaoPorVoz() {
-    const textoFinal = textoTranscritoRef.current.trim();
-  
-    if (reconhecimentoRef.current) {
-      reconhecimentoRef.current.stop();
+  function pararGravacaoAudio() {
+    if (mediaRecorderRef.current?.state === "recording") {
+      mediaRecorderRef.current.stop();
     }
-  
-    if (textoFinal) {
+
+    setGravandoAudio(false);
+  }
+
+  async function transcreverAudio() {
+    limparAvisos();
+
+    if (!audioBlob) {
+      setErro("Grave um áudio antes de tentar transcrever.");
+      return;
+    }
+
+    setTranscrevendoAudio(true);
+
+    try {
+      const formData = new FormData();
+      formData.append("audio", audioBlob, "sonho.webm");
+
+      const resposta = await fetch("/api/transcrever-audio", {
+        method: "POST",
+        body: formData,
+      });
+
+      const resultado = await resposta.json();
+
+      if (!resposta.ok) {
+        setErro(
+          resultado?.error ||
+            "Não foi possível transcrever o áudio agora. Tente novamente ou escreva o sonho manualmente."
+        );
+        setTranscrevendoAudio(false);
+        return;
+      }
+
+      const textoTranscrito = String(resultado?.text || "").trim();
+
+      if (!textoTranscrito) {
+        setErro(
+          "A transcrição não retornou texto. Tente gravar novamente, falando mais perto do microfone."
+        );
+        setTranscrevendoAudio(false);
+        return;
+      }
+
       setForm((atual) => ({
         ...atual,
         dream_report: atual.dream_report.trim()
-          ? `${atual.dream_report.trim()}\n\n${textoFinal}`
-          : textoFinal,
+          ? `${atual.dream_report.trim()}\n\n${textoTranscrito}`
+          : textoTranscrito,
       }));
+
+      setSucesso("Áudio transcrito e adicionado ao relato do sonho.");
+      setTranscrevendoAudio(false);
+    } catch (error) {
+      setErro(
+        "A rota de transcrição ainda não está disponível ou houve falha na conexão. O áudio foi gravado, mas a transcrição não foi concluída."
+      );
+      setTranscrevendoAudio(false);
     }
-  
-    textoTranscritoRef.current = "";
-    setTranscrevendoAudio(false);
-    setTextoParcialTranscricao("");
-  } 
+  }
 
   function validarFormulario() {
     if (!form.dream_date) {
@@ -267,7 +267,7 @@ const [textoParcialTranscricao, setTextoParcialTranscricao] = useState("");
     }
 
     if (!form.title.trim()) {
-        return "Informe um título simples para o sonho.";
+      return "Informe um título simples para o sonho.";
     }
 
     if (!form.dream_report.trim()) {
@@ -279,7 +279,7 @@ const [textoParcialTranscricao, setTextoParcialTranscricao] = useState("");
     }
 
     if (form.dream_report.trim().length < 10) {
-        return "A descrição do sonho precisa ter um pouco mais de informação.";
+      return "A descrição do sonho precisa ter um pouco mais de informação.";
     }
 
     return "";
@@ -296,6 +296,7 @@ const [textoParcialTranscricao, setTextoParcialTranscricao] = useState("");
     limparAvisos();
 
     const erroValidacao = validarFormulario();
+
     if (erroValidacao) {
       setErro(erroValidacao);
       return;
@@ -303,15 +304,9 @@ const [textoParcialTranscricao, setTextoParcialTranscricao] = useState("");
 
     setSalvando(true);
 
-    if (reconhecimentoRef.current) {
-      reconhecimentoRef.current.abort();
-      reconhecimentoRef.current = null;
+    if (mediaRecorderRef.current?.state === "recording") {
+      mediaRecorderRef.current.stop();
     }
-
-    textoTranscritoRef.current = "";
-    setTranscrevendoAudio(false);
-    setTextoParcialTranscricao(""); 
-    
 
     const payload = {
       patient_id: userId,
@@ -342,12 +337,15 @@ const [textoParcialTranscricao, setTextoParcialTranscricao] = useState("");
       }
 
       setSonhos((atuais) =>
-        atuais.map((sonho) => (sonho.id === editandoId ? (data as DreamEntry) : sonho))
+        atuais.map((sonho) =>
+          sonho.id === editandoId ? (data as DreamEntry) : sonho
+        )
       );
 
       setSucesso("Sonho atualizado com sucesso.");
       setEditandoId(null);
       setForm(emptyForm);
+      limparAudioAtual();
       setSalvando(false);
       return;
     }
@@ -367,13 +365,21 @@ const [textoParcialTranscricao, setTextoParcialTranscricao] = useState("");
     setSonhos((atuais) => [data as DreamEntry, ...atuais]);
     setSucesso("Sonho registrado com sucesso.");
     setForm(emptyForm);
+    limparAudioAtual();
     setSalvando(false);
   }
 
   function iniciarEdicao(sonho: DreamEntry) {
     limparAvisos();
+    limparAudioAtual();
 
+    if (mediaRecorderRef.current?.state === "recording") {
+      mediaRecorderRef.current.stop();
+    }
+
+    setGravandoAudio(false);
     setEditandoId(sonho.id);
+
     setForm({
       dream_date: sonho.dream_date,
       title: sonho.title || "",
@@ -392,15 +398,14 @@ const [textoParcialTranscricao, setTextoParcialTranscricao] = useState("");
   function cancelarEdicao() {
     limparAvisos();
 
-    if (reconhecimentoRef.current) {
-      reconhecimentoRef.current.abort();
-      reconhecimentoRef.current = null;
+    if (mediaRecorderRef.current?.state === "recording") {
+      mediaRecorderRef.current.stop();
     }
 
-    textoTranscritoRef.current = "";
-    setTranscrevendoAudio(false);
-    setTextoParcialTranscricao("");
-    setEditandoId(null);  
+    setGravandoAudio(false);
+    setEditandoId(null);
+    setForm(emptyForm);
+    limparAudioAtual();
   }
 
   async function excluirSonho(id: string) {
@@ -444,7 +449,9 @@ const [textoParcialTranscricao, setTextoParcialTranscricao] = useState("");
     return (
       <main className="min-h-screen bg-[#F6F0E8] px-4 py-6 text-[#2F2A24]">
         <div className="mx-auto flex min-h-[60vh] w-full max-w-5xl items-center justify-center">
-          <p className="text-sm text-[#6F6257]">Carregando diário de sonhos...</p>
+          <p className="text-sm text-[#6F6257]">
+            Carregando diário de sonhos...
+          </p>
         </div>
       </main>
     );
@@ -465,10 +472,11 @@ const [textoParcialTranscricao, setTextoParcialTranscricao] = useState("");
               </h1>
 
               <p className="max-w-3xl text-sm leading-relaxed text-[#6F6257]">
-  Registre sonhos, emoções, pessoas, lugares e imagens lembradas. Este espaço
-  não interpreta sonhos automaticamente e não produz diagnóstico. Ele organiza
-  o material para sua percepção pessoal e para leitura clínica do terapeuta.
-</p>
+                Registre sonhos, emoções, pessoas, lugares e imagens lembradas.
+                Este espaço não interpreta sonhos automaticamente e não produz
+                diagnóstico. Ele organiza o material para sua percepção pessoal
+                e para leitura clínica do terapeuta.
+              </p>
             </div>
           </div>
 
@@ -503,82 +511,130 @@ const [textoParcialTranscricao, setTextoParcialTranscricao] = useState("");
             </h2>
 
             <p className="text-sm leading-relaxed text-[#6F6257]">
-  Escreva de forma livre, priorizando o que você lembra do sonho. Preserve o
-  relato, as emoções e os elementos que chamaram sua atenção, mesmo que pareçam
-  incompletos ou sem ordem clara.
-</p>
+              Escreva de forma livre, priorizando o que você lembra do sonho.
+              Preserve o relato, as emoções e os elementos que chamaram sua
+              atenção, mesmo que pareçam incompletos ou sem ordem clara.
+            </p>
           </div>
 
           <form onSubmit={salvarSonho} className="space-y-4">
             <div className="rounded-2xl border border-[#E5DDD2] bg-[#F7F3EC] p-4">
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+              <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                 <div className="min-w-0">
                   <p className="text-sm font-semibold text-[#2F2A24]">
-                    Registrar por voz
+                    Registrar por áudio
                   </p>
 
                   <p className="mt-2 text-sm leading-6 text-[#6F6257]">
-                    Use o microfone para narrar o sonho. A transcrição será
-                    adicionada ao relato e poderá ser revisada antes de salvar.
+                    Grave o relato do sonho com calma. Depois você poderá ouvir,
+                    descartar ou tentar transcrever o áudio para preencher o
+                    campo de relato.
+                  </p>
+
+                  <p className="mt-2 text-xs leading-5 text-[#8A7A68]">
+                    A gravação ajuda a preservar o sonho enquanto ele ainda está
+                    fresco. Revise o texto antes de salvar o registro.
                   </p>
                 </div>
 
-                <div className="flex w-full flex-col gap-2 sm:w-auto">
-                  {!transcrevendoAudio ? (
+                <div className="flex w-full flex-col gap-2 lg:w-auto">
+                  {!gravandoAudio ? (
                     <button
                       type="button"
-                      onClick={iniciarTranscricaoPorVoz}
-                      disabled={!transcricaoSuportada || salvando}
-                      className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl bg-[#2F2A24] px-5 text-sm font-semibold text-white shadow-sm transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+                      onClick={iniciarGravacaoAudio}
+                      disabled={!gravacaoSuportada || salvando || transcrevendoAudio}
+                      className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl bg-[#2F2A24] px-5 text-sm font-semibold text-white shadow-sm transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-60 lg:w-auto"
                     >
-                      🎙️ Gravar e transcrever
+                      🎙️ Gravar áudio
                     </button>
                   ) : (
                     <button
                       type="button"
-                      onClick={pararTranscricaoPorVoz}
-                      className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-red-200 bg-red-50 px-5 text-sm font-semibold text-red-700 shadow-sm transition hover:bg-red-100 sm:w-auto"
+                      onClick={pararGravacaoAudio}
+                      className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-red-200 bg-red-50 px-5 text-sm font-semibold text-red-700 shadow-sm transition hover:bg-red-100 lg:w-auto"
                     >
                       Parar gravação
                     </button>
                   )}
 
-                  {!transcricaoSuportada && (
-                    <p className="text-xs leading-5 text-[#8A7A68] sm:max-w-[220px]">
-                      Este navegador não oferece suporte para transcrição por
-                      voz. Use o Chrome ou digite o relato manualmente.
+                  {!gravacaoSuportada && (
+                    <p className="text-xs leading-5 text-[#8A7A68] lg:max-w-[260px]">
+                      Este navegador não oferece suporte para gravação de áudio.
+                      Use o Chrome ou registre o sonho por texto.
                     </p>
                   )}
                 </div>
               </div>
 
-              {transcrevendoAudio && (
-                <div className="mt-4 rounded-2xl border border-[#D8C7B1] bg-white p-3">
-                  <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#8A7A68]">
-                    Microfone ativo
+              {gravandoAudio && (
+                <div className="mt-4 rounded-2xl border border-red-100 bg-red-50 px-4 py-3">
+                  <p className="text-sm font-semibold text-red-700">
+                    Gravação em andamento
                   </p>
 
-                  <p className="mt-2 text-sm leading-6 text-[#5F564C]">
-                    Continue narrando o sonho. Quando terminar, toque em parar
-                    gravação e revise o texto antes de salvar.
+                  <p className="mt-1 text-sm leading-6 text-red-700">
+                    Fale o sonho com calma. Quando terminar, toque em parar
+                    gravação.
+                  </p>
+                </div>
+              )}
+
+              {audioUrl && (
+                <div className="mt-4 rounded-2xl border border-[#D8C7B1] bg-white p-4">
+                  <p className="text-sm font-semibold text-[#2F2A24]">
+                    Áudio gravado
                   </p>
 
-                  {textoParcialTranscricao && (
-  <div className="mt-3 max-h-40 overflow-y-auto rounded-xl bg-[#FFF8EE] px-3 py-2 text-sm leading-6 text-[#5F564C]">
-    <p className="whitespace-pre-wrap break-words [overflow-wrap:anywhere]">
-      {textoParcialTranscricao}
-    </p>
-  </div>
-)} 
+                  <p className="mt-2 text-sm leading-6 text-[#6F6257]">
+                    Ouça o áudio antes de transcrever. Se não ficou claro,
+                    descarte e grave novamente.
+                  </p>
+
+                  <audio controls src={audioUrl} className="mt-3 w-full">
+                    Seu navegador não conseguiu reproduzir este áudio.
+                  </audio>
+
+                  <div className="mt-4 flex flex-col gap-3 sm:flex-row">
+                    <button
+                      type="button"
+                      onClick={transcreverAudio}
+                      disabled={transcrevendoAudio || salvando}
+                      className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl bg-[#2F2A24] px-5 text-sm font-semibold text-white shadow-sm transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+                    >
+                      {transcrevendoAudio
+                        ? "Transcrevendo..."
+                        : "Transcrever áudio"}
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={limparAudioAtual}
+                      disabled={transcrevendoAudio || salvando}
+                      className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-[#D8C7B1] bg-white px-5 text-sm font-semibold text-[#5F564C] shadow-sm transition hover:bg-[#FFF8EE] disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+                    >
+                      Descartar áudio
+                    </button>
+                  </div>
+
+                  <p className="mt-3 text-xs leading-5 text-[#8A7A68]">
+                    A transcrição depende da rota interna de áudio. Se ela ainda
+                    não estiver criada, o app manterá o áudio apenas como prévia
+                    nesta tela.
+                  </p>
                 </div>
               )}
             </div>
 
             <label className="space-y-1">
-              <span className="text-sm font-medium text-[#5F564C]">Relato do sonho</span>
+              <span className="text-sm font-medium text-[#5F564C]">
+                Relato do sonho
+              </span>
+
               <textarea
                 value={form.dream_report}
-                onChange={(event) => atualizarCampo("dream_report", event.target.value)}
+                onChange={(event) =>
+                  atualizarCampo("dream_report", event.target.value)
+                }
                 placeholder="Descreva o sonho como você lembra, mesmo que as cenas pareçam soltas, confusas ou incompletas."
                 rows={7}
                 className="w-full resize-y rounded-2xl border border-[#D8C7B1] bg-white px-4 py-3 text-sm leading-relaxed outline-none transition focus:border-[#2F2A24]"
@@ -591,9 +647,12 @@ const [textoParcialTranscricao, setTextoParcialTranscricao] = useState("");
                 <span className="text-sm font-medium text-[#5F564C]">
                   Emoções principais
                 </span>
+
                 <textarea
                   value={form.main_emotions}
-                  onChange={(event) => atualizarCampo("main_emotions", event.target.value)}
+                  onChange={(event) =>
+                    atualizarCampo("main_emotions", event.target.value)
+                  }
                   placeholder="Medo, culpa, alívio, vergonha, saudade..."
                   rows={3}
                   className="w-full resize-y rounded-2xl border border-[#D8C7B1] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#2F2A24]"
@@ -604,9 +663,12 @@ const [textoParcialTranscricao, setTextoParcialTranscricao] = useState("");
                 <span className="text-sm font-medium text-[#5F564C]">
                   Sensação ao acordar
                 </span>
+
                 <textarea
                   value={form.waking_feeling}
-                  onChange={(event) => atualizarCampo("waking_feeling", event.target.value)}
+                  onChange={(event) =>
+                    atualizarCampo("waking_feeling", event.target.value)
+                  }
                   placeholder="Como você acordou depois desse sonho?"
                   rows={3}
                   className="w-full resize-y rounded-2xl border border-[#D8C7B1] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#2F2A24]"
@@ -619,9 +681,12 @@ const [textoParcialTranscricao, setTextoParcialTranscricao] = useState("");
                 <span className="text-sm font-medium text-[#5F564C]">
                   Pessoas que apareceram
                 </span>
+
                 <textarea
                   value={form.recurring_people}
-                  onChange={(event) => atualizarCampo("recurring_people", event.target.value)}
+                  onChange={(event) =>
+                    atualizarCampo("recurring_people", event.target.value)
+                  }
                   placeholder="Pessoas conhecidas, desconhecidas ou figuras recorrentes."
                   rows={3}
                   className="w-full resize-y rounded-2xl border border-[#D8C7B1] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#2F2A24]"
@@ -632,9 +697,12 @@ const [textoParcialTranscricao, setTextoParcialTranscricao] = useState("");
                 <span className="text-sm font-medium text-[#5F564C]">
                   Lugares que apareceram
                 </span>
+
                 <textarea
                   value={form.recurring_places}
-                  onChange={(event) => atualizarCampo("recurring_places", event.target.value)}
+                  onChange={(event) =>
+                    atualizarCampo("recurring_places", event.target.value)
+                  }
                   placeholder="Casa antiga, escola, rua, igreja, hospital..."
                   rows={3}
                   className="w-full resize-y rounded-2xl border border-[#D8C7B1] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#2F2A24]"
@@ -646,9 +714,12 @@ const [textoParcialTranscricao, setTextoParcialTranscricao] = useState("");
               <span className="text-sm font-medium text-[#5F564C]">
                 Imagens, símbolos ou cenas marcantes
               </span>
+
               <textarea
                 value={form.symbols_or_images}
-                onChange={(event) => atualizarCampo("symbols_or_images", event.target.value)}
+                onChange={(event) =>
+                  atualizarCampo("symbols_or_images", event.target.value)
+                }
                 placeholder="Objetos, frases, ambientes, animais, portas, água, escadas, roupas, imagens fortes..."
                 rows={3}
                 className="w-full resize-y rounded-2xl border border-[#D8C7B1] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#2F2A24]"
@@ -659,54 +730,70 @@ const [textoParcialTranscricao, setTextoParcialTranscricao] = useState("");
               <span className="text-sm font-medium text-[#5F564C]">
                 Contexto possível do momento
               </span>
+
               <textarea
                 value={form.possible_context}
-                onChange={(event) => atualizarCampo("possible_context", event.target.value)}
+                onChange={(event) =>
+                  atualizarCampo("possible_context", event.target.value)
+                }
                 placeholder="Algo que aconteceu nos últimos dias, preocupação atual, conversa marcante, lembrança recente..."
                 rows={3}
                 className="w-full resize-y rounded-2xl border border-[#D8C7B1] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#2F2A24]"
               />
             </label>
+
             <div className="rounded-2xl border border-[#E5DDD2] bg-[#F7F3EC] p-4">
-  <p className="mb-3 text-sm font-semibold text-[#2F2A24]">
-    Para finalizar o registro
-  </p>
+              <p className="mb-3 text-sm font-semibold text-[#2F2A24]">
+                Para finalizar o registro
+              </p>
 
-  <p className="mb-4 text-sm leading-6 text-[#6F6257]">
-  Depois de escrever o relato e os elementos principais do sonho, informe a data
-  e dê um título simples. Essa ordem ajuda a preservar primeiro o conteúdo que
-  ainda está mais presente na memória.
-</p>
+              <p className="mb-4 text-sm leading-6 text-[#6F6257]">
+                Depois de escrever o relato e os elementos principais do sonho,
+                informe a data e dê um título simples. Essa ordem ajuda a
+                preservar primeiro o conteúdo que ainda está mais presente na
+                memória.
+              </p>
 
-  <div className="grid gap-4 md:grid-cols-[180px_1fr]">
-    <label className="space-y-1">
-      <span className="text-sm font-medium text-[#5F564C]">Data do sonho</span>
-      <input
-        type="date"
-        value={form.dream_date}
-        onChange={(event) => atualizarCampo("dream_date", event.target.value)}
-        className="w-full rounded-2xl border border-[#D8C7B1] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#2F2A24]"
-        required
-      />
-    </label>
+              <div className="grid gap-4 md:grid-cols-[180px_1fr]">
+                <label className="space-y-1">
+                  <span className="text-sm font-medium text-[#5F564C]">
+                    Data do sonho
+                  </span>
 
-    <label className="space-y-1">
-      <span className="text-sm font-medium text-[#5F564C]">Título simples</span>
-      <input
-        type="text"
-        value={form.title}
-        onChange={(event) => atualizarCampo("title", event.target.value)}
-        placeholder="Ex: Sonho com uma casa antiga"
-        className="w-full rounded-2xl border border-[#D8C7B1] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#2F2A24]"
-        required
-      />
-    </label>
-  </div>
-</div>
+                  <input
+                    type="date"
+                    value={form.dream_date}
+                    onChange={(event) =>
+                      atualizarCampo("dream_date", event.target.value)
+                    }
+                    className="w-full rounded-2xl border border-[#D8C7B1] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#2F2A24]"
+                    required
+                  />
+                </label>
+
+                <label className="space-y-1">
+                  <span className="text-sm font-medium text-[#5F564C]">
+                    Título simples
+                  </span>
+
+                  <input
+                    type="text"
+                    value={form.title}
+                    onChange={(event) =>
+                      atualizarCampo("title", event.target.value)
+                    }
+                    placeholder="Ex: Sonho com uma casa antiga"
+                    className="w-full rounded-2xl border border-[#D8C7B1] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#2F2A24]"
+                    required
+                  />
+                </label>
+              </div>
+            </div>
+
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
               <button
                 type="submit"
-                disabled={salvando}
+                disabled={salvando || gravandoAudio || transcrevendoAudio}
                 className="inline-flex w-full items-center justify-center rounded-2xl bg-[#2F2A24] px-5 py-3 text-sm font-semibold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
               >
                 {salvando
@@ -720,7 +807,7 @@ const [textoParcialTranscricao, setTextoParcialTranscricao] = useState("");
                 <button
                   type="button"
                   onClick={cancelarEdicao}
-                  disabled={salvando}
+                  disabled={salvando || transcrevendoAudio}
                   className="inline-flex w-full items-center justify-center rounded-2xl border border-[#D8C7B1] bg-white px-5 py-3 text-sm font-medium text-[#5F564C] transition hover:bg-[#F7F3EC] disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
                 >
                   Cancelar edição
@@ -746,11 +833,12 @@ const [textoParcialTranscricao, setTextoParcialTranscricao] = useState("");
           </div>
 
           {sonhosOrdenados.length === 0 ? (
-           <div className="rounded-2xl border border-dashed border-[#D8C7B1] bg-[#F7F3EC] p-5 text-sm leading-relaxed text-[#6F6257]">
-           Quando você registrar sonhos, eles aparecerão aqui. O objetivo é guardar
-           relatos, emoções e elementos recorrentes para acompanhamento pessoal e
-           leitura clínica, sem interpretação automática.
-         </div> 
+            <div className="rounded-2xl border border-dashed border-[#D8C7B1] bg-[#F7F3EC] p-5 text-sm leading-relaxed text-[#6F6257]">
+              Quando você registrar sonhos, eles aparecerão aqui. O objetivo é
+              guardar relatos, emoções e elementos recorrentes para
+              acompanhamento pessoal e leitura clínica, sem interpretação
+              automática.
+            </div>
           ) : (
             <div className="max-h-[520px] space-y-4 overflow-y-auto pr-1 sm:max-h-[620px] lg:max-h-[720px]">
               {sonhosOrdenados.map((sonho) => (
@@ -793,6 +881,7 @@ const [textoParcialTranscricao, setTextoParcialTranscricao] = useState("");
                       <p className="mb-1 text-xs font-semibold uppercase tracking-[0.12em] text-[#8A7A68]">
                         Relato
                       </p>
+
                       <p className="whitespace-pre-wrap break-words [overflow-wrap:anywhere]">
                         {sonho.dream_report}
                       </p>
@@ -800,19 +889,31 @@ const [textoParcialTranscricao, setTextoParcialTranscricao] = useState("");
 
                     <div className="grid gap-3 md:grid-cols-2">
                       {sonho.main_emotions && (
-                        <InfoBlock titulo="Emoções principais" texto={sonho.main_emotions} />
+                        <InfoBlock
+                          titulo="Emoções principais"
+                          texto={sonho.main_emotions}
+                        />
                       )}
 
                       {sonho.waking_feeling && (
-                        <InfoBlock titulo="Sensação ao acordar" texto={sonho.waking_feeling} />
+                        <InfoBlock
+                          titulo="Sensação ao acordar"
+                          texto={sonho.waking_feeling}
+                        />
                       )}
 
                       {sonho.recurring_people && (
-                        <InfoBlock titulo="Pessoas" texto={sonho.recurring_people} />
+                        <InfoBlock
+                          titulo="Pessoas"
+                          texto={sonho.recurring_people}
+                        />
                       )}
 
                       {sonho.recurring_places && (
-                        <InfoBlock titulo="Lugares" texto={sonho.recurring_places} />
+                        <InfoBlock
+                          titulo="Lugares"
+                          texto={sonho.recurring_places}
+                        />
                       )}
                     </div>
 
@@ -824,7 +925,10 @@ const [textoParcialTranscricao, setTextoParcialTranscricao] = useState("");
                     )}
 
                     {sonho.possible_context && (
-                      <InfoBlock titulo="Contexto possível" texto={sonho.possible_context} />
+                      <InfoBlock
+                        titulo="Contexto possível"
+                        texto={sonho.possible_context}
+                      />
                     )}
                   </div>
                 </article>
@@ -843,6 +947,7 @@ function InfoBlock({ titulo, texto }: { titulo: string; texto: string }) {
       <p className="mb-1 text-xs font-semibold uppercase tracking-[0.12em] text-[#8A7A68]">
         {titulo}
       </p>
+
       <p className="whitespace-pre-wrap break-words text-sm leading-relaxed text-[#5F564C] [overflow-wrap:anywhere]">
         {texto}
       </p>
