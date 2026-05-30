@@ -552,59 +552,70 @@ carregarPaciente();
       </p>
     </div>
 
-    <div className="flex w-full flex-col gap-3 sm:flex-row lg:w-auto">
-      <button
-        type="button"
-        onClick={() => setMostrandoEncerrarVinculo((valor) => !valor)}
-        className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-[#E8C7C0] bg-white px-5 text-sm font-semibold text-[#9A4A3F] shadow-sm transition hover:bg-red-50 lg:w-auto"
-      >
-        Encerrar vínculo
-      </button>
+    <div className="flex w-full flex-col gap-3 lg:w-[460px]">
+  <div className="grid gap-3 sm:grid-cols-2">
+    <Link
+      href={`/clinico/pacientes/${paciente.patient_id}/pre-sessao`}
+      className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl bg-[#2F2A24] px-5 text-sm font-semibold text-white shadow-sm transition hover:opacity-95"
+    >
+      Preparar sessão
+    </Link>
 
-      <Link
-        href={`/clinico/pacientes/${paciente.patient_id}/encaminhamentos/novo`}
-        className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl bg-[#2F2A24] px-5 text-sm font-semibold text-white shadow-sm transition hover:opacity-95 lg:w-auto"
-      >
-        Novo encaminhamento
-      </Link>
-      <Link
-  href={`/clinico/pacientes/${paciente.patient_id}/anamnese`}
-  className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-[#D8C7B1] bg-[#FFF8EE] px-5 text-sm font-semibold text-[#5F564C] shadow-sm transition hover:bg-white lg:w-auto"
->
-  Ver anamnese
-</Link>
-<Link
-  href={`/clinico/pacientes/${paciente.patient_id}/pre-sessao`}
-  className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-[#D8C7B1] bg-white px-5 text-sm font-semibold text-[#5F564C] shadow-sm transition hover:bg-[#FFF8EE] lg:w-auto"
->
-  Preparar sessão
-</Link>
+    <Link
+      href={`/clinico/pacientes/${paciente.patient_id}/sessoes`}
+      className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-[#D8C7B1] bg-[#FFF8EE] px-5 text-sm font-semibold text-[#8A2E2B] shadow-sm transition hover:bg-white"
+    >
+      Sessões
+    </Link>
+  </div>
 
-<Link
-  href={`/clinico/pacientes/${paciente.patient_id}/sessoes`}
-  className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-[#D8C7B1] bg-white px-5 text-sm font-semibold text-[#5F564C] shadow-sm transition hover:bg-[#FFF8EE] lg:w-auto"
->
-  Sessões
-</Link>
-<Link
-  href={`/clinico/financeiro/${paciente.patient_id}`}
-  className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-[#D8C7B1] bg-[#FFF8EE] px-5 text-sm font-semibold text-[#8A2E2B] shadow-sm transition hover:bg-white lg:w-auto"
->
-  Financeiro
-</Link>
-<Link
-  href={`/clinico/pacientes/${paciente.patient_id}/sonhos`}
-  className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-[#D8C7B1] bg-white px-5 text-sm font-semibold text-[#5F564C] shadow-sm transition hover:bg-[#FFF8EE] lg:w-auto"
->
-  Sonhos
-</Link>
-      <Link
-        href="/clinico/painel"
-        className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-[#D8C7B1] bg-white px-5 text-sm font-medium text-[#5F564C] shadow-sm transition hover:bg-[#FFF8EE] lg:w-auto"
-      >
-        Voltar ao painel clínico
-      </Link>
-    </div>
+  <div className="grid gap-3 sm:grid-cols-2">
+    <Link
+      href={`/clinico/pacientes/${paciente.patient_id}/anamnese`}
+      className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-[#D8C7B1] bg-white px-5 text-sm font-semibold text-[#5F564C] shadow-sm transition hover:bg-[#FFF8EE]"
+    >
+      Anamnese
+    </Link>
+
+    <Link
+      href={`/clinico/pacientes/${paciente.patient_id}/sonhos`}
+      className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-[#D8C7B1] bg-white px-5 text-sm font-semibold text-[#5F564C] shadow-sm transition hover:bg-[#FFF8EE]"
+    >
+      Sonhos
+    </Link>
+
+    <Link
+      href={`/clinico/pacientes/${paciente.patient_id}/encaminhamentos/novo`}
+      className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-[#D8C7B1] bg-white px-5 text-sm font-semibold text-[#5F564C] shadow-sm transition hover:bg-[#FFF8EE]"
+    >
+      Novo encaminhamento
+    </Link>
+
+    <Link
+      href={`/clinico/financeiro/${paciente.patient_id}`}
+      className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-[#D8C7B1] bg-white px-5 text-sm font-semibold text-[#5F564C] shadow-sm transition hover:bg-[#FFF8EE]"
+    >
+      Financeiro
+    </Link>
+  </div>
+
+  <div className="grid gap-3 sm:grid-cols-2">
+    <Link
+      href="/clinico/painel"
+      className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-[#D8C7B1] bg-white px-5 text-sm font-medium text-[#5F564C] shadow-sm transition hover:bg-[#FFF8EE]"
+    >
+      Voltar ao painel
+    </Link>
+
+    <button
+      type="button"
+      onClick={() => setMostrandoEncerrarVinculo((valor) => !valor)}
+      className="inline-flex min-h-11 w-full items-center justify-center rounded-2xl border border-[#E8C7C0] bg-white px-5 text-sm font-semibold text-[#9A4A3F] shadow-sm transition hover:bg-red-50"
+    >
+      Encerrar vínculo
+    </button>
+  </div>
+</div>  
   </div>
 </header>
         {mostrandoEncerrarVinculo && (
@@ -760,128 +771,212 @@ carregarPaciente();
           </article>
         </section>
 
-        <section className="mb-6 rounded-3xl border border-[#E5DDD2] bg-white p-5 shadow-sm sm:p-7">
-          <p className="mb-2 text-sm font-medium text-[#8A2E2B]">
-            Resultado do teste VPP
+        <section className="mb-6 overflow-hidden rounded-3xl border border-[#E5DDD2] bg-white shadow-sm">
+  <div className="border-b border-[#E5DDD2] bg-[#FFF8EE] p-5 sm:p-7">
+    <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+      <div className="min-w-0">
+        <p className="mb-2 text-sm font-medium text-[#8A2E2B]">
+          Resultado do teste VPP
+        </p>
+
+        <h2 className="text-xl font-semibold text-[#2F2A24]">
+          Leitura inicial do padrão predominante
+        </h2>
+
+        <p className="mt-3 max-w-3xl text-sm leading-6 text-[#5F564C]">
+          Esta área reúne a leitura inicial do teste VPP para apoiar a escuta
+          clínica, a preparação das sessões e a observação das repetições
+          registradas pelo paciente.
+        </p>
+      </div>
+
+      {paciente.test_created_at && (
+        <div className="rounded-2xl border border-[#D8C7B1] bg-white px-4 py-3">
+          <p className="text-xs font-semibold uppercase tracking-wide text-[#8A7A68]">
+            Último teste
           </p>
 
-          {paciente.predominant_profile ? (
-            <>
-              <h2 className="text-2xl font-semibold text-[#2F2A24]">
-                {paciente.predominant_profile}
-              </h2>
+          <p className="mt-1 text-sm font-semibold text-[#2F2A24]">
+            {formatarData(paciente.test_created_at)}
+          </p>
+        </div>
+      )}
+    </div>
+  </div>
 
-              {paciente.secondary_profiles &&
-                paciente.secondary_profiles.length > 0 && (
-                  <div className="mt-4 flex flex-wrap gap-2">
-                    {paciente.secondary_profiles.map((perfil) => (
-                      <span
-                        key={perfil}
-                        className="rounded-2xl border border-[#D8C7B1] bg-[#F7F3EC] px-3 py-2 text-xs font-semibold text-[#5F564C]"
-                      >
-                        {perfil}
-                      </span>
-                    ))}
-                  </div>
-                )}
+  <div className="p-5 sm:p-7">
+    {paciente.predominant_profile ? (
+      <div className="grid gap-5 lg:grid-cols-[1.05fr_0.95fr]">
+        <article className="min-w-0 rounded-3xl bg-[#2F2A24] p-5 text-white shadow-sm">
+          <p className="text-sm font-medium text-white/70">
+            Perfil predominante
+          </p>
 
-              {paciente.description && (
-                <p className="mt-4 text-sm leading-6 text-[#5F564C]">
-                  {paciente.description}
-                </p>
-              )}
-            </>
-          ) : (
-            <div className="rounded-2xl border border-dashed border-[#D8C7B1] bg-[#F7F3EC] p-5">
-              <p className="text-sm font-medium text-[#2F2A24]">
-                O paciente ainda não realizou o teste VPP.
+          <h3 className="mt-3 break-words text-2xl font-semibold leading-tight text-white [overflow-wrap:anywhere]">
+            {paciente.predominant_profile}
+          </h3>
+
+          {paciente.description && (
+            <div className="mt-5 max-h-48 overflow-y-auto rounded-2xl border border-white/10 bg-white/5 p-4 pr-3">
+              <p className="break-words text-sm leading-6 text-white/75 [overflow-wrap:anywhere]">
+                {paciente.description}
               </p>
-
-              <p className="mt-2 text-sm leading-6 text-[#5F564C]">
-  Quando o paciente responder ao teste, a leitura inicial ficará disponível
-  para apoiar a observação clínica.
-</p>
             </div>
           )}
-        </section>
+        </article>
 
-        {paciente.predominant_profile && (
-          <section className="mb-6 grid gap-4 lg:grid-cols-2">
-            <article className="rounded-3xl border border-blue-200 bg-blue-50/70 p-5 shadow-sm sm:p-7">
-              <p className="mb-2 text-sm font-medium text-blue-700">
-                Como o padrão opera
-              </p>
+        <article className="min-w-0 rounded-3xl border border-[#E5DDD2] bg-[#F7F3EC] p-5">
+          <p className="text-sm font-semibold text-[#2F2A24]">
+            Perfis secundários
+          </p>
 
-              <h2 className="text-xl font-semibold text-[#2F2A24]">
-                Leitura do funcionamento
-              </h2>
-
-              <p className="mt-4 text-sm leading-6 text-[#5F564C]">
-                {paciente.functioning_reading ||
-                  "Ainda não há leitura registrada para este resultado."}
-              </p>
-            </article>
-
-            <article className="rounded-3xl border border-red-200 bg-red-50/70 p-5 shadow-sm sm:p-7">
-              <p className="mb-2 text-sm font-medium text-red-700">
-              Ponto de atenção clínica
-              </p>
-
-              <h2 className="text-xl font-semibold text-[#2F2A24]">
-                Ponto de atenção
-              </h2>
-
-              <p className="mt-4 text-sm leading-6 text-[#5F564C]">
-                {paciente.attention_point ||
-                  "Ainda não há ponto de atenção registrado para este resultado."}
-              </p>
-            </article>
-
-            <article className="rounded-3xl border border-green-200 bg-green-50/70 p-5 shadow-sm sm:p-7">
-              <p className="mb-2 text-sm font-medium text-green-700">
-                Potencial
-              </p>
-
-              <h2 className="text-xl font-semibold text-[#2F2A24]">
-              Potencial observado
-              </h2>
-
-              <p className="mt-4 text-sm leading-6 text-[#5F564C]">
-                {paciente.potential ||
-                  "Ainda não há potencial registrado para este resultado."}
-              </p>
-            </article>
-
-            <article className="rounded-3xl border border-amber-200 bg-amber-50/80 p-5 shadow-sm sm:p-7">
-              <p className="mb-2 text-sm font-medium text-amber-700">
-              Foco inicial
-              </p>
-
-              <h2 className="text-xl font-semibold text-[#2F2A24]">
-                Foco de observação
-              </h2>
-
-              <p className="mt-4 text-sm leading-6 text-[#5F564C]">
-                {paciente.observation_focus ||
-                  "Ainda não há foco de observação registrado para este resultado."}
-              </p>
-            </article>
-          </section>
-        )}
-
-        {paciente.self_observation_question && (
-          <section className="mb-6 rounded-3xl border border-[#E5DDD2] bg-white p-5 shadow-sm sm:p-7">
-            <p className="mb-2 text-sm font-medium text-[#8A2E2B]">
-              Pergunta de auto-observação
+          {paciente.secondary_profiles &&
+          paciente.secondary_profiles.length > 0 ? (
+            <div className="mt-4 flex flex-wrap gap-2">
+              {paciente.secondary_profiles.map((perfil) => (
+                <span
+                  key={perfil}
+                  className="break-words rounded-2xl border border-[#D8C7B1] bg-white px-3 py-2 text-xs font-semibold text-[#5F564C] [overflow-wrap:anywhere]"
+                >
+                  {perfil}
+                </span>
+              ))}
+            </div>
+          ) : (
+            <p className="mt-3 text-sm leading-6 text-[#5F564C]">
+              Nenhum perfil secundário registrado neste resultado.
             </p>
+          )}
 
-            <div className="rounded-2xl border border-[#D8C7B1] bg-[#FFF8EE] p-4">
-              <p className="text-sm leading-6 text-[#5F564C]">
+          {paciente.observation_focus && (
+            <div className="mt-5 rounded-2xl border border-[#D8C7B1] bg-white p-4">
+              <p className="text-xs font-semibold uppercase tracking-wide text-[#8A7A68]">
+                Foco de observação
+              </p>
+
+              <p className="mt-2 break-words text-sm leading-6 text-[#5F564C] [overflow-wrap:anywhere]">
+                {paciente.observation_focus}
+              </p>
+            </div>
+          )}
+
+          {paciente.self_observation_question && (
+            <div className="mt-3 rounded-2xl border border-[#D8C7B1] bg-[#FFF8EE] p-4">
+              <p className="text-xs font-semibold uppercase tracking-wide text-[#8A7A68]">
+                Pergunta para acompanhamento
+              </p>
+
+              <p className="mt-2 break-words text-sm font-semibold leading-6 text-[#2F2A24] [overflow-wrap:anywhere]">
                 {paciente.self_observation_question}
               </p>
             </div>
-          </section>
-        )}
+          )}
+        </article>
+      </div>
+    ) : (
+      <div className="rounded-2xl border border-dashed border-[#D8C7B1] bg-[#F7F3EC] p-5">
+        <p className="text-sm font-medium text-[#2F2A24]">
+          O paciente ainda não realizou o teste VPP.
+        </p>
+
+        <p className="mt-2 text-sm leading-6 text-[#5F564C]">
+          Quando o paciente responder ao teste, a leitura inicial ficará
+          disponível para apoiar a observação clínica.
+        </p>
+      </div>
+    )}
+  </div>
+</section>  
+
+{paciente.predominant_profile && (
+  <section className="mb-6 rounded-3xl border border-[#E5DDD2] bg-white p-5 shadow-sm sm:p-7">
+    <div className="mb-5">
+      <p className="mb-2 text-sm font-medium text-[#8A2E2B]">
+        Leitura clínica do padrão
+      </p>
+
+      <h2 className="text-xl font-semibold text-[#2F2A24]">
+        Pontos principais para condução terapêutica
+      </h2>
+
+      <p className="mt-3 text-sm leading-6 text-[#5F564C]">
+        Estes blocos organizam a leitura inicial do teste para apoiar a escuta,
+        a preparação de sessões e a observação das repetições trazidas pelo
+        paciente. Não substituem avaliação clínica nem definem diagnóstico.
+      </p>
+    </div>
+
+    <div className="grid gap-4 lg:grid-cols-2">
+      <article className="rounded-3xl border border-blue-200 bg-blue-50/70 p-5 shadow-sm">
+        <p className="mb-2 text-sm font-medium text-blue-700">
+          Como o padrão opera
+        </p>
+
+        <h3 className="text-lg font-semibold text-[#2F2A24]">
+          Leitura do funcionamento
+        </h3>
+
+        <div className="mt-4 max-h-64 overflow-y-auto rounded-2xl border border-blue-100 bg-white/80 p-4 pr-3">
+          <p className="break-words text-sm leading-6 text-[#5F564C] [overflow-wrap:anywhere]">
+            {paciente.functioning_reading ||
+              "Ainda não há leitura registrada para este resultado."}
+          </p>
+        </div>
+      </article>
+
+      <article className="rounded-3xl border border-red-200 bg-red-50/70 p-5 shadow-sm">
+        <p className="mb-2 text-sm font-medium text-red-700">
+          Ponto de atenção clínica
+        </p>
+
+        <h3 className="text-lg font-semibold text-[#2F2A24]">
+          Onde pode gerar sofrimento
+        </h3>
+
+        <div className="mt-4 max-h-64 overflow-y-auto rounded-2xl border border-red-100 bg-white/80 p-4 pr-3">
+          <p className="break-words text-sm leading-6 text-[#5F564C] [overflow-wrap:anywhere]">
+            {paciente.attention_point ||
+              "Ainda não há ponto de atenção registrado para este resultado."}
+          </p>
+        </div>
+      </article>
+
+      <article className="rounded-3xl border border-green-200 bg-green-50/70 p-5 shadow-sm">
+        <p className="mb-2 text-sm font-medium text-green-700">
+          Potencial
+        </p>
+
+        <h3 className="text-lg font-semibold text-[#2F2A24]">
+          O que pode se tornar força clínica
+        </h3>
+
+        <div className="mt-4 max-h-56 overflow-y-auto rounded-2xl border border-green-100 bg-white/80 p-4 pr-3">
+          <p className="break-words text-sm leading-6 text-[#5F564C] [overflow-wrap:anywhere]">
+            {paciente.potential ||
+              "Ainda não há potencial registrado para este resultado."}
+          </p>
+        </div>
+      </article>
+
+      <article className="rounded-3xl border border-amber-200 bg-amber-50/80 p-5 shadow-sm">
+        <p className="mb-2 text-sm font-medium text-amber-700">
+          Foco inicial
+        </p>
+
+        <h3 className="text-lg font-semibold text-[#2F2A24]">
+          Ponto para observar nas próximas sessões
+        </h3>
+
+        <div className="mt-4 max-h-56 overflow-y-auto rounded-2xl border border-amber-100 bg-white/80 p-4 pr-3">
+          <p className="break-words text-sm leading-6 text-[#5F564C] [overflow-wrap:anywhere]">
+            {paciente.observation_focus ||
+              "Ainda não há foco de observação registrado para este resultado."}
+          </p>
+        </div>
+      </article>
+    </div>
+  </section>
+)}     
 
         <section className="mb-6 rounded-3xl border border-[#E5DDD2] bg-white p-5 shadow-sm sm:p-7">
           <div className="mb-5">
